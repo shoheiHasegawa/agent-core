@@ -13,7 +13,7 @@ tags: [migration, you_inc]
 
 ## マスタープラン（参照先）
 移行の全体計画とフェーズ定義は、現在レガシー環境にある以下のファイルを参照すること。
-👉 `second-brain-legacy/10_Projects/Proj_Playground_Reconstruction/migration/00_master_plan.md`
+👉 `agent-core/workspaces/Proj_Playground_Reconstruction/migration/00_master_plan.md`
 
 ## 進行状況
 - [x] **Phase 00: 移行前準備** (完了済: ai-learning削除, レガシーリネーム)
