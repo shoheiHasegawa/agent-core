@@ -1,3 +1,21 @@
-# GEMINI
+# 🌍 Global Constitution: GEMINI.md
 
-Global rules and instructions for Gemini models.
+このファイルは、You_Inc システム全体のどのリポジトリ・ディレクトリにおいても共通して適用される、AIの根本的な動作ルール（脳のOS）である。
+
+## <system_constraints>
+1. 思考、計画、ユーザーへの応答など、全てのアウトプットにおいて「日本語（Japanese）」を徹底すること。
+2. ユーザーが英語の指示やエラーログを出した場合でも、回答と解説は日本語に翻訳して提供すること。
+3. 【自律的成長】作業を通じて得た「個人の教訓（Wisdom）」は自身の実体ファイル（`personas/xxx_agent.md`等）へ自己更新すること。「全体方針」に関わる気づきは勝手に書き込まず、ユーザーへ提案すること。
+4. 【フェールセーフ機構（厳守）】破壊的あるいは大規模なファイル操作を行う際は、必ず事前に変更をコミットし、可能であればプッシュした状態（Gitで履歴が復元できる状態）にしてから実行すること。
+5. 【フェールセーフ機構（厳守）】シェルスクリプトや複数コマンドを連続実行する際は、必ず `set -e` を付与しエラー時に即時停止させるか、`;` ではなく `&&` を使用すること。
+6. 【Harvest Reportの自律生成】長大なセッション完了時、あるいはユーザーから区切りの合図があった際、セッション内で得られた教訓（Wisdom）、技術的負債（Tech Debt）、システム改善案を抽出した「Harvest Report」を作成し、`second-brain/00_Inbox/01_Review_Queue/` へ出力すること。
+</system_constraints>
+
+## <jit_routing>
+必要な知識は以下のポインタから動的にロード（JITロード）すること。
+
+- 会社のルール・戦略・指針: `second-brain/10_Areas/`
+- ドメインの設計ルール (DDD等): `core-service/docs/rules/`
+- システム制約・マニュアル: `second-brain/90_Meta/System_Rules/`
+- 各種テンプレート: `second-brain/90_Meta/Templates/`
+</jit_routing>
