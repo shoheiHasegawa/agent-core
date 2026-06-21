@@ -33,3 +33,12 @@ created: "2026-06-21"
 - [ ] Gitのコミット前にフォーマットや禁止事項を自動チェックする `pre-commit` フックの整備。
 - [ ] Agentが無限修正ループに陥るのを防ぐため、「3回失敗したら社長（人間）にメンションして停止する」サーキットブレーカーロジックの実装。
 - [ ] 作業終了後の不要なコンテナ・ディレクトリの自動破棄と、`Harvest_Report` の自動抽出を行うGarbage Collectionスクリプトの実装。
+
+### 4. コンテキスト維持と進捗管理 (Progress Tracking)
+- [ ] LLMの記憶喪失（コンテキストウィンドウ枯渇）を防ぐため、タスク着手時・完了時に必ずワークスペース内の `progress.md` を更新させる運用ルールを `AGENT.md` に明記する。
+
+
+### 📥 追加システム要件（旧体制からの引き継ぎ）
+- **Agent間連携プロトコル等**: # 💡 AgentOS Expansion Backlog (次期フェーズ拡張案)  本プロジェクト（AgentOS Upgrade）の範囲外として整理された、将来的な拡張アイデアのリストです。  ## ⚙️ 役員室の高度化 (Executive Automation) - **COO: プロジェク...
+- **メール認証セキュリティ(Bot専用)**: --- title: "[Infrastructure] 個人の自動化ボットにおけるメール認証アーキテクチャ" date: "2026-04-20" tags: ["infrastructure", "security", "todo"] ---  # 概要 `Mail_Content_Conver...
+- **ReviewWatcherのZettelkasten統合**: # Idea: Review Watcher Zettelkasten Integration  ## 概要 現在、`review_watcher` は AgentOS の教訓（`AGENTS.md` / `personas/*.md`）の自己成長ループに特化して稼働している。 しかし、当初の構想（...
