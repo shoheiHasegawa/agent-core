@@ -16,4 +16,4 @@ CORE_SERVICE_DIR="$WORKSPACE_ROOT/core-service"
 echo "🔍 Validating Zettelkasten rules for: $TARGET_DIR"
 
 export PYTHONPATH="$CORE_SERVICE_DIR/src"
-python3 -m core_service.cli.zettelkasten --dir "$TARGET_DIR"
+python3 -m application.cli.zettelkasten --dir "$TARGET_DIR"

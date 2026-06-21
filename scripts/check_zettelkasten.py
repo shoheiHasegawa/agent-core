@@ -8,8 +8,8 @@ WORKSPACE_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 CORE_SERVICE_SRC = os.path.join(WORKSPACE_ROOT, "core-service", "src")
 sys.path.insert(0, CORE_SERVICE_SRC)
 
-from core_service.infrastructure.local_file_repository import LocalFileZettelkastenRepository
-from core_service.application.zettelkasten_service import ZettelkastenService
+from infrastructure.local_file_repository import LocalFileZettelkastenRepository
+from application.zettelkasten_service import ZettelkastenService
 
 def main():
     target_dir = os.path.join(WORKSPACE_ROOT, "second-brain", "40_Permanent_Notes")
