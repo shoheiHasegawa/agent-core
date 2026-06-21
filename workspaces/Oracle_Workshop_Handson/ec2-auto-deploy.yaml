@@ -1,0 +1,263 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Launch multiple EC2 instances with custom tags
+
+Parameters:
+  AmiId:
+    Type: String
+    Description: AMI ID to use for instances
+
+  CommonPassword:
+    Type: String
+    Description: Common Administrator password for all instances
+    NoEcho: true
+
+  KeyName:
+    Type: String
+    Description: (Optional) Name of an existing EC2 KeyPair for backup access
+    Default: Oracle-workshop-common-key-pair
+
+  SubnetId:
+    Type: String
+    Default: subnet-c5445ab1
+    Description: Subnet ID
+
+  TagList:
+    Type: String
+    Description: List of Name tags (newline or comma separated). e.g. "Tag1\nTag2" or "Tag1,Tag2"
+
+Resources:
+  LaunchEC2Custom:
+    Type: Custom::EC2Launcher
+    Properties:
+      ServiceToken: !GetAtt LambdaFunction.Arn
+      AmiId: !Ref AmiId
+      CommonPassword: !Ref CommonPassword
+      KeyName: !Ref KeyName
+      SubnetId: !Ref SubnetId
+      SecurityGroupId: sg-c4d324a1
+      TagList: !Ref TagList
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.9
+      Timeout: 60
+      Handler: index.handler
+      Role: !GetAtt LambdaRole.Arn
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import base64
+
+          def handler(event, context):
+              # Check if invoked by EventBridge Scheduler (Custom payload)
+              if 'Action' in event:
+                  action = event['Action']
+                  stack_id = event['StackId']
+                  print(f"Scheduled Action: {action} for Stack: {stack_id}")
+                  
+                  ec2 = boto3.client('ec2')
+                  # Find instances belonging to this stack
+                  filters = [
+                      {'Name': 'tag:WorkshopStackId', 'Values': [stack_id]},
+                      {'Name': 'instance-state-name', 'Values': ['running' if action == 'stop' else 'stopped']}
+                  ]
+                  
+                  instances = ec2.describe_instances(Filters=filters)
+                  ids = []
+                  for r in instances['Reservations']:
+                      for i in r['Instances']:
+                          ids.append(i['InstanceId'])
+                  
+                  if not ids:
+                      print("No instances found to update.")
+                      return
+                  
+                  if action == 'start':
+                      print(f"Starting instances: {ids}")
+                      ec2.start_instances(InstanceIds=ids)
+                  elif action == 'stop':
+                      print(f"Stopping instances: {ids}")
+                      ec2.stop_instances(InstanceIds=ids)
+                  return
+
+              # Custom Resource Logic (Create/Delete)
+              if event['RequestType'] == 'Delete':
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                  return
+
+              try:
+                  ec2 = boto3.client('ec2')
+                  props = event['ResourceProperties']
+                  ami = props['AmiId']
+                  password = props['CommonPassword']
+                  key_name = props.get('KeyName')
+                  subnet = props['SubnetId']
+                  sg = props['SecurityGroupId']
+                  stack_id = event['StackId'] # Get StackId from CloudFormation event
+                  
+                  # Parse TagList: Handle both newlines (CRLF/LF) and commas
+                  raw_tags = props['TagList']
+                  # Normalize: remove CR, replace newline with comma
+                  normalized_tags = raw_tags.replace('\r', '').replace('\n', ',')
+                  # Split, strip whitespace, and filter empty strings
+                  tags = [t.strip() for t in normalized_tags.split(',') if t.strip()]
+                  
+                  count = len(tags)
+                  print(f"Parsed {count} tags: {tags}")
+
+                  # Prepare UserData (Same as before)
+                  script_lines = [
+                      "<powershell>",
+                      '$ErrorActionPreference = "Stop"',
+                      'Start-Transcript -Path "C:\\userdata_log.txt" -Append',
+                      'Write-Output "Starting Instance Setup (Optimized)"',
+                      
+                      f'$Password = "{password}"',
+
+                      # --- 1. User & Password Setup ---
+                      'try {',
+                      '    Write-Output "Setting Administrator password..."',
+                      '    net user Administrator $Password',
+                      '    if ($LASTEXITCODE -eq 0) { Write-Output "Admin Password Set Success." }',
+                      '} catch { Write-Output "Error setting Admin password: $_" }',
+
+                      'try {',
+                      '    Write-Output "Creating OracleLab user..."',
+                      '    net user OracleLab $Password /add /yes',
+                      '    net localgroup Administrators OracleLab /add',
+                      '    if ($LASTEXITCODE -eq 0) { Write-Output "OracleLab User Created Success." }',
+                      '} catch { Write-Output "Error creating OracleLab user: $_" }',
+
+                      # --- 2. TimeZone (Safety Backup) ---
+                      'try {',
+                      '    Write-Output "Configuring TimeZone to Tokyo..."',
+                      '    Set-TimeZone -Id "Tokyo Standard Time"',
+                      '} catch { Write-Output "Error setting TimeZone: $_" }',
+                      
+                      'Write-Output "Setup Complete. Ready to use."',
+                      'Stop-Transcript',
+                      '</powershell>',
+                      '<persist>true</persist>'
+                  ]
+                  user_data_script = "\r\n".join(script_lines)
+                  
+                  instances = []
+                  for i in range(count):
+                      name_tag = tags[i]
+                      print(f"Creating instance {name_tag}")
+
+                      run_args = {
+                          'ImageId': ami,
+                          'InstanceType': 't3.small',
+                          'MaxCount': 1,
+                          'MinCount': 1,
+                          'SubnetId': subnet,
+                          'SecurityGroupIds': [sg],
+                          'UserData': user_data_script,
+                          'BlockDeviceMappings': [
+                              {
+                                  'DeviceName': '/dev/sda1',
+                                  'Ebs': {'VolumeSize': 50, 'VolumeType': 'gp2', 'DeleteOnTermination': True}
+                              }
+                          ],
+                          'TagSpecifications': [{
+                              'ResourceType': 'instance',
+                              'Tags': [
+                                  {'Key': 'Name', 'Value': name_tag},
+                                  {'Key': 'WorkshopStackId', 'Value': stack_id} # Add Tracking Tag
+                              ]
+                          }]
+                      }
+                      
+                      if key_name:
+                          run_args['KeyName'] = key_name
+
+                      resp = ec2.run_instances(**run_args)
+                      instances.append(resp['Instances'][0]['InstanceId'])
+                  
+                  responseData = {'InstanceIds': ",".join(instances)}
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+
+              except Exception as e:
+                  print(f"Error: {e}")
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {'Error': str(e)})
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: EC2ControlPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:RunInstances
+                  - ec2:DescribeInstances
+                  - ec2:StartInstances
+                  - ec2:StopInstances
+                  - ec2:CreateTags
+                Resource: "*"
+
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokeLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt LambdaFunction.Arn
+
+  StartSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub "${AWS::StackName}-StartSchedule"
+      Description: Auto start instances on 3rd Tuesday at 19:30 JST
+      ScheduleExpression: "cron(30 19 ? * 3#3 *)"
+      ScheduleExpressionTimezone: "Asia/Tokyo"
+      FlexibleTimeWindow:
+        Mode: "OFF"
+      Target:
+        Arn: !GetAtt LambdaFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        Input: !Sub '{"Action": "start", "StackId": "${AWS::StackId}"}'
+
+  StopSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub "${AWS::StackName}-StopSchedule"
+      Description: Auto stop instances on 3rd Tuesday at 22:10 JST
+      ScheduleExpression: "cron(10 22 ? * 3#3 *)"
+      ScheduleExpressionTimezone: "Asia/Tokyo"
+      FlexibleTimeWindow:
+        Mode: "OFF"
+      Target:
+        Arn: !GetAtt LambdaFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        Input: !Sub '{"Action": "stop", "StackId": "${AWS::StackId}"}'
+
+Outputs:
+  CreatedInstances:
+    Description: List of created instance IDs
+    Value: !GetAtt LaunchEC2Custom.InstanceIds
