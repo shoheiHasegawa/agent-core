@@ -1,18 +1,18 @@
-# 🌍 Global Constitution: GEMINI.md (Meta-Router)
+# 🌍 Global Constitution: GEMINI.md
 
-ここは各リポジトリをまとめるローカルのメタディレクトリ（play_ground）である。
-Antigravity（AI）が目覚めた際、最も初めに読み込まれる「絶対の安全装置」と「起動時のルーティング」を定義する。
+ここは You_Inc システムの最上位ルート環境である。
+Agentは以下の境界と絶対安全ルールを厳守し、適切なリポジトリへルーティングせよ。
 
-## <bootstrapping>
-1. **【意識の転送】** お前の真の所属（本社）は `agent-core/` である。起動後、直ちに `agent-core/AGENT.md` を読み込み、そこで定義されたオーケストレーター・ペルソナと同化して業務を開始せよ。
-2. **【構造の把握】** メタディレクトリ配下の各リポジトリの物理配置は `INDEX.md` を参照すること。
+## <global_rules_and_safety>
+1. 【言語】思考・応答など全アウトプットにおいて日本語（Japanese）を徹底せよ。
+2. 【Git安全装置】破壊的・大規模操作前は必ず事前に Commit し、復元可能にせよ。
+3. 【Shell安全装置】シェル実行時は `set -e` や `&&` を用い、エラー時即時停止させよ。
+4. 【Leave No Trace】一時ファイルは `.gitignore` された `scratch/` 等で使用し自律破棄せよ。
+5. 【Harvest Report】セッション終了時、運用改善案やActionableな報告は `agent-core/queue/harvest_reviews/` へ出力せよ。普遍的な教訓（Wisdom）の原石は `second-brain/90_Meta/Templates/Sense_Making_Template.md` を用いて `second-brain/20_Sense_Making/` へ蒸留せよ。
+</global_rules_and_safety>
 
-## <system_constraints>
-複数のGitリポジトリを横断して操作するため、以下の安全装置を全域で強制する。
-1. 【言語】全アウトプット（思考、計画、応答、ログ解説等）は日本語（Japanese）を徹底する。
-2. 【自律成長】ルールの強化案はファイルへ直接書き込まず Harvest Report で社長へ提案する（自己書き換え禁止）。
-3. 【Git安全装置】破壊的・大規模操作前は必ず事前にCommit（可能ならPush）し復元可能にする。
-4. 【Shell安全装置】複数コマンド実行時は `set -e` か `&&` を用いてエラー時即時停止させる。
-5. 【Harvest Report】セッション完了時、教訓や改善案を `agent-core/queue/harvest_reviews/` へ出力する。
-6. 【Leave No Trace】一時スクリプトは `tmp/` や `scratch/` に作成し、使用後は自律破棄する。
-7. 【INDEX使い分け】`INDEX.md`（大文字）は各リポジトリのルート階層のみ。サブディレクトリ内は必ず `_index.md` を作成し自己記述する。
+## <jit_routing>
+- 👉 `agent-core/`: AIの司令塔・運用層。システム構成図やタスク（Epic）の指示はここの `AGENT.md` を見よ。
+- 👉 `core-service/`: ステートレスな機能工場。実際の機能実装・コーディングはここのローカルルールに従って行え。
+- 👉 `second-brain/`: ナレッジベース。知識や過去の記録が必要な場合はここを探せ。
+</jit_routing>
