@@ -1,2 +1,0 @@
-# agents
-SSOT: Agent personas.

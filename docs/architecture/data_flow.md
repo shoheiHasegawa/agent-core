@@ -1,36 +1,46 @@
 # Data Flow Architecture
 
 You_Inc エコシステムにおける、主要な情報の流れ（データフロー）を定義します。
+「情報の入力 → 実行 → 知識の抽出」という完璧な循環ループが根底にあります。
 
-## メモの作成から知識化（蒸留）までのフロー
-
-人間がモバイルでメモを作成し、それがAIによって処理され永続的な知識になるまでの流れです。
+## 究極のデータフロー（知識と実行の循環）
 
 ```mermaid
 sequenceDiagram
     actor User as 社長 (人間)
     participant Mobile as Mobile Vault
-    participant SB_Inbox as second-brain/00_Inbox
-    participant Agent as agent-core (AI)
-    participant SB_Perm as second-brain/40_Permanent_Notes
+    participant Queue as agent-core/queue
+    participant Inbox as second-brain/00_Inbox
+    participant Epic as agent-core/epics
+    participant Workspace as agent-core/workspaces
+    participant SenseMaking as second-brain/20_Sense_Making
+    participant PermNotes as second-brain/40_Permanent_Notes
     
-    User->>Mobile: アイデア・メモを素早く書き込む
-    note over Mobile,SB_Inbox: Git等による自動同期
-    Mobile->>SB_Inbox: ファイルが同期される
+    %% フェーズ1: 投入と整形
+    User->>Mobile: アイデア・メモを書き込む
+    note over Mobile,Queue: Agentが未整形データを回収
+    Mobile->>Queue: 1つのパケットとして投函
+    Queue->>Inbox: フォーマットして格納（バックログ化）
     
-    loop 定期実行 / トリガー実行
-        Agent->>SB_Inbox: Inboxに未処理のメモがないかスキャン
-        opt 未処理メモあり
-            Agent->>Agent: 文脈の理解・要約・蒸留 (Sense-Making)
-            Agent->>SB_Perm: Zettelkastenフォーマットで知識として保存
-            Agent->>SB_Inbox: 処理済みの元メモを削除/アーカイブ
-            note over Agent: Harvest Reportで処理完了を記録
-        end
-    end
+    %% フェーズ2: プロジェクト実行
+    note over User,Inbox: 人間がトリガーとなりEpic化
+    User->>Epic: Inboxからアイデアを吸い上げPJ立ち上げ
+    Epic->>Workspace: フラットな作業場を展開しPJ実行
+    note over Workspace,Queue: 作業中、Agent間でQueueを通じた通信
     
-    note over SB_Perm,Mobile: Git等による自動同期
-    SB_Perm->>Mobile: 整理された知識がMobileへ同期
-    User->>Mobile: 完成した知識を閲覧
+    %% フェーズ3: 学びと改善の抽出 (Continuous Harvesting)
+    Workspace->>SenseMaking: 実行により得た普遍的な学びを直接投函
+    Workspace->>Queue: システム運用改善案を harvest_reviews へ出力
+    note over Workspace: PJ完了時、Workspaceは削除（使い捨て）
+    
+    %% フェーズ4: 知識の永続化
+    note over SenseMaking,PermNotes: 必ず人間とのSocraticな壁打ちを経由
+    SenseMaking->>PermNotes: 人間の言葉で洗練された知識として保存
 ```
 
-このフローにより、人間は「書く」ことに集中し、AIが「整理・構造化」を自律的に引き受けるオーケストレーションが成立します。
+### 各フェーズの詳細
+1. **投入と整形 (Input & Format)**: 人間からの入力は Mobile 等から `agent-core/queue/` に入り、Agentが検索可能な形に整形してから `second-brain/00_Inbox/` に格納します。
+2. **アイデアの保管 (`00_Inbox`)**: ここは「整形済みのバックログ」として、人間からの指示を待ちます。
+3. **プロジェクト実行 (`epics` & `workspaces`)**: 人間がトリガーとなってInboxのアイデアがEpic（プロジェクト）になり、フラットな作業場を展開して実行されます。
+4. **出力と抽出 (`Sense_Making` & `harvest_reviews`)**: タスク完了の都度、普遍的な学びは `20_Sense_Making/` へ直接送られ、運用改善案は `queue/harvest_reviews/` へ出力されます（自己改善ループ）。
+5. **知識の永続化 (`Permanent_Notes`)**: Agent単独での永続化は禁止されており、Sense_Makingの学びは必ず人間との壁打ちを経て `40_Permanent_Notes` に昇華されます。

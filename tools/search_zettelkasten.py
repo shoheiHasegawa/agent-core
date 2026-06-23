@@ -3,14 +3,15 @@ import sys
 import os
 import argparse
 
+# agent-coreディレクトリへのパスを通す
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-WORKSPACE_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
-CORE_SERVICE_SRC = os.path.join(WORKSPACE_ROOT, "core-service", "src")
-sys.path.insert(0, CORE_SERVICE_SRC)
+AGENT_CORE_DIR = os.path.dirname(SCRIPT_DIR)
+if AGENT_CORE_DIR not in sys.path:
+    sys.path.insert(0, AGENT_CORE_DIR)
 
-from core_service.infrastructure.local_file_repository import LocalFileZettelkastenRepository
-from core_service.application.zettelkasten_service import ZettelkastenService
-from core_service.domain.search_query import SearchQuery
+# ファクトリをインポート（これにより core-service へのパスも通る）
+from factories.zettelkasten import get_zettelkasten_service
+from domain.search_query import SearchQuery
 
 def main():
     parser = argparse.ArgumentParser(description="Zettelkasten Search")
@@ -19,11 +20,7 @@ def main():
     parser.add_argument('--alias', help="Alias to search")
     args = parser.parse_args()
 
-    target_dir = os.path.join(WORKSPACE_ROOT, "second-brain", "40_Permanent_Notes")
-
-    # Dependency Injection
-    repo = LocalFileZettelkastenRepository(target_dir=target_dir)
-    service = ZettelkastenService(repository=repo)
+    service = get_zettelkasten_service()
     query = SearchQuery(keyword=args.keyword, tag=args.tag, alias=args.alias)
 
     results = service.search_notes(query)

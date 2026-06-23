@@ -7,9 +7,9 @@ You_Incのアーキテクチャにおいて、Gitで管理される `second-brai
 - **閲覧性**: 蓄積された知識（Permanent Notes）をモバイルデバイスで快適に検索・閲覧するためのUIとして機能します。
 
 ## 同期と役割分担
-Mobile Vault は原則として `second-brain` のサブセット、あるいは完全なクローンとして振る舞います。
+Mobile Vault は人間がアイデアを素早くシステム（You_Inc）に投入するための外部バッファとして機能します。純粋な知識庫である `second-brain` とは直接同期せず、以下のフローを経由します。
 
-- **Write**: 人間はMobile Vaultの `00_Inbox` にメモを書き込みます。
-- **Sync**: （※同期ツールやGitの自動Push/Pullの仕組みを通じて）Mobile Vaultの内容は `second-brain` にマージされます。
-- **Process**: `agent-core`（AI）は、同期された `00_Inbox` の内容を検知し、自律的に蒸留（Sense-Making）やタスク化を行います。
-- **Read**: AIが生成・整理した成果物は再びMobile Vaultへ同期され、人間が閲覧します。
+- **Write**: 人間は Mobile Vault (出先機関) に未整形のメモやアイデアを書き込みます。
+- **Sync & Format**: `agent-core`（AI）が Mobile Vault の内容を検知して `agent-core/queue/` にパケットとして回収し、検索可能なMarkdownに整形（フォーマット）した上で `second-brain/00_Inbox` に投函します。
+- **Process**: `00_Inbox` に溜まったアイデア（バックログ）は、人間のトリガーによってプロジェクト（Epic）化され、フラットなWorkspaceで実行されます。
+- **Read**: 最終的に蒸留された知識（Permanent Notes）は Mobile Vault 側へ同期され、人間が快適に閲覧できるようになります。
