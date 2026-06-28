@@ -33,7 +33,7 @@ def get_zettelkasten_service() -> ZettelkastenService:
         raise ValueError("ZETTELKASTEN_PERMANENT_NOTES_DIR is not set in conf.env")
     
     # 1. Config Object を組み立てる (Service-Config Pattern)
-    config = ZettelkastenConfig()
+    config = ZettelkastenConfig(forbidden_patterns=[])
     
     # 2. Repository を組み立てる (Data Access Layer)
     repo = LocalFileZettelkastenRepository(target_dir=target_dir)
