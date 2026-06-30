@@ -1,30 +1,49 @@
 ---
 type: epic
 status: backlogged
-tags: [automation, productivity]
+tags: [automation, productivity, journaling]
 ---
 
-# Epic 03: Task and Calendar Automation
+# Epic 03: Action & Reflection Pipeline (行動と内省の自動化)
 
 ## 📖 Background (背景と課題)
-タスク管理およびカレンダー連携を手動で行っており、日々の実行コンテキストスイッチやスケジュールの見直しにコストがかかっている。
-旧体制からの引き継ぎアイデア（自律型スクレイパー、ローカル音声文字起こし、地政学・AIトレンド収集等）が散在しており、一元化・自動化が求められている。
+日々のタスク管理やカレンダー設定にかかる認知コスト（計画疲れ）をなくし、「実行（Action）」にのみ集中できる環境が必要である。
+また、行動をやりっ放しにせず、摩擦のないジャーナリングを通して自己との対話を行い、システムのインプット（Reflection）とするフィードバックループの構築が求められている。
 
 ## 🎯 Goal (目的)
-- タスク管理およびカレンダー連携の完全自動化。
-- 毎朝のエージェントによる日報サマリー生成・Mobile Vaultへの通知機能 (Dashboard_Briefing) の実現。
-- 各種インプット（Web、音声、ニュース等）の自動処理パイプラインの構築。
+- 「今日何をするか」を考える認知コストをゼロにする（カレンダーとタスクの自動連携）。
+- 摩擦のない「振り返り（ジャーナリング）」のループを構築する。
+- **【重要】** 単なるタスク処理に陥らないよう、北極星となる「今どこへ向かっているのか（Focus/Direction）」を `10_Areas` などの直下に定義し、毎日のジャーナリング・行動が常にその目標と紐づく状態を作る。
 
-## 🚧 Scope (やらないこと・境界)
-- 現時点では大規模なLLMのファインチューニングなどは行わず、既存のAPIやスクリプトを `core-service` 化して活用する。
+## 🚧 Scope (境界)
+**【In Scope（実現すること）】**
+- **「どこへ向かうか」のコンパス（目標・フォーカス）の定義と `10_Areas` への配置**
+- Timeblocking（タスクのカレンダー自動割り当て）の仕組み構築
+- Dashboard Briefing（朝のアクションプラン提示）機能
+- Journaling System（スマホや音声等から摩擦なく入力でき、Agentが整理する仕組み）
 
-## ✅ DoD (完了条件)
-- [ ] バックログの整理と設計完了。
-- [ ] Dashboard_Briefing 機能の稼働。
-- [ ] （オプション）旧体制のアイデア（WhisperやScraper等）の実装・統合。
+**【Out of Scope（やらないこと）】**
+- 情報収集（地政学・AIトレンド等のWebスクレイピング収集等）は対象外。
+- 重厚な四半期・年間目標管理システム（複雑なOKRツール等）のフルスクラッチ開発。
 
-## 🛡️ 【必須】開発・実装の制約と前提知識 (TO-BE Architecture)
-このEpicに紐づく機能開発を行うAgent（Implementer等）は、以下のルールを絶対に遵守せよ。
-1. **全体アーキテクチャの把握**: 実装前に必ず `agent-core/docs/architecture/` 配下のシステム構成図とデータフロー図を参照し、全体のデータの流れ（TO-BE）を理解すること。
-2. **責務の分離**: ドメインロジック（ビジネスルール）は必ず `core-service` リポジトリ内に実装せよ。APIの呼び出しやバッチの起動などの「運用スクリプト」のみを `agent-core` に配置せよ。
-3. **AI防衛網の突破**: `core-service` での実装時は、TDD（テスト駆動）と Feature-Driven Packaging を遵守し、`make check-all` (Linter通過およびカバレッジ90%以上) を必ず達成せよ。
+## ✅ DoD & Task Backlog (タスク一覧)
+システム全体のアーキテクチャが固まったため、ここからは以下のフェーズに沿って設計・実装を進めます。
+
+### Phase 1: 詳細設計（仕様の策定）👈 現在ここ
+- [ ] **`02_Formatter_Logic.md` の作成**: サテライト（`Drop_Zone`）に投げ込まれた「汚いメモ」を、Agentがどういうルールでパースし、`second-brain` 用の綺麗なタスクやナレッジに変換するか（プロンプトや正規表現のルール）を定義する。
+- [ ] **`03_Calendar_Sync_Logic.md` の作成**: `second-brain` にあるタスクやYAMLのルーティン予定を、Google Calendar APIにどう流し込むか（カレンダーへの登録条件、色分け、重複制御など）を定義する。
+- [ ] **`04_Journaling_Prompt.md` の作成**: 朝のブリーフィングの出力フォーマット（Briefing.md）と、夜の対話でAgentが投げる「問い」の具体的な内容を定義する。
+
+### Phase 2: 実装・環境構築
+- [ ] **サテライト環境の構築**: iCloud Drive上に `Satellite_Vault` フォルダ（01_Drop_Zone, 02_Briefing, 03_Reference等）を作成する。
+- [ ] **iOSショートカットの作成**: iPhoneから `Drop_Zone` にメモを書き込むためのショートカットを作成し、ホーム画面に配置する。
+- [ ] **`core-service` 実装**: Google Calendar APIクライアントの構築と、Markdownタスクパーサーの実装（TDDで実行）。
+- [ ] **`agent-core` 実装**: 朝晩に `core-service` を叩くバッチ処理（cron/launchd）と、夜の対話用スキル（`journaling-coach`等）を実装する。
+
+### Phase 3: 魂の注入と本稼働
+- [ ] **コンパスの設定**: `10_Areas`（例えば `01_Executive/` 等）に、今どこへ向かうのか（Focus）を定義したルール/目標ファイルを策定する。
+- [ ] 本番環境でのエンドツーエンドテストを実施し、日々の運用ループを回し始める。本Epicをクローズする。
+
+## 🛡️ 制約と前提知識 (TO-BE Architecture)
+1. ドメインロジックは `core-service` に、運用バッチは `agent-core` に配置すること。
+2. Whisper等の音声入力インターフェースを活用する場合は、入力の「摩擦を極限まで減らす」ことを最優先に設計すること。
