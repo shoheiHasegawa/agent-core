@@ -119,11 +119,11 @@ sequenceDiagram
 iPhone側のバッファとなる `Satellite_Vault` は、複雑な階層を持たず、情報の「入り口」と「出口」に特化したシンプルな構成とします。
 
 ```text
-Satellite_Vault/ (iCloud上の任意のディレクトリ)
-├── 01_Drop_Zone/     # 【入口】iPhoneからの殴り書きメモ、音声テキストが保存される場所（※Agentの回収対象）
-├── 02_Briefing/      # 【出口】Agentが毎朝生成する「今日のサマリー」が置かれる場所（※Agentの上書き対象）
-├── 03_Reference/     # 【静的】Agentに回収・変更されない安全なエリア。iPhoneからいつでもサクッと見たい備忘録やチートシート、目標（コンパス）のコピーなどを置く
-└── 04_Templates/     # iPhoneのObsidianから手動で呼び出すための「問い」のテンプレート群
+Satellite_Vault/ (iCloud上の既存ディレクトリを利用)
+├── 00_Inbox/         # 【入口】iPhoneからの殴り書きメモ、音声テキストが保存される場所（※Agentの回収対象）
+├── 10_Briefing/      # 【出口】Agentが毎朝生成する「今日のサマリー」が置かれる場所（※Agentの上書き対象）
+├── 30_Reference/     # 【静的】Agentに回収・変更されない安全なエリア。iPhoneからいつでもサクッと見たい備忘録などを置く
+└── 99_System/        # 【システム設定】テンプレートや画像ファイル(Attachments)など、Obsidianの既存システム設定エリア
 ```
 
-※ **Agentの動作ルール**: Agentの定期バッチがRead & Delete（回収）を行うのは `01_Drop_Zone` のみとし、`03_Reference` 等の静的エリアには一切干渉しないよう実装します。
+※ **Agentの動作ルール**: Agentの定期バッチがRead & Delete（回収）を行うのは `00_Inbox` のみとし、`30_Reference` や `99_System` 等の静的エリアには一切干渉しないよう実装します。

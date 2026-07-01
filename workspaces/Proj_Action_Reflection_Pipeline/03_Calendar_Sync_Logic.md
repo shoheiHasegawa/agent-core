@@ -31,6 +31,6 @@ Google Calendarの全予定の詳細（Description）には、以下のディー
 
 ```text
 詳細と実績の入力はこちら:
-obsidian://open?vault=Satellite_Vault&file=02_Briefing.md
+obsidian://open?vault=Satellite_Vault&file=10_Briefing.md
 ```
 これにより、ユーザーはカレンダーの通知（リマインダー）をタップするだけで、即座にObsidianのタスクリスト（実績入力枠）へジャンプでき、UXの摩擦を極小化します。
