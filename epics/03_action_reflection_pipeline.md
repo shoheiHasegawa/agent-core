@@ -29,10 +29,10 @@ tags: [automation, productivity, journaling]
 ## ✅ DoD & Task Backlog (タスク一覧)
 システム全体のアーキテクチャが固まったため、ここからは以下のフェーズに沿って設計・実装を進めます。
 
-### Phase 1: 詳細設計（仕様の策定）👈 現在ここ
-- [ ] **`02_Formatter_Logic.md` の作成**: サテライト（`Drop_Zone`）に投げ込まれた「汚いメモ」を、Agentがどういうルールでパースし、`second-brain` 用の綺麗なタスクやナレッジに変換するか（プロンプトや正規表現のルール）を定義する。
-- [ ] **`03_Calendar_Sync_Logic.md` の作成**: `second-brain` にあるタスクやYAMLのルーティン予定を、Google Calendar APIにどう流し込むか（カレンダーへの登録条件、色分け、重複制御など）を定義する。
-- [ ] **`04_Journaling_Prompt.md` の作成**: 朝のブリーフィングの出力フォーマット（Briefing.md）と、夜の対話でAgentが投げる「問い」の具体的な内容を定義する。
+### Phase 1: 詳細設計（仕様の策定）👈 完了 🎉
+- [x] **`02_Formatter_Logic.md` の作成**: サテライト（`Drop_Zone`）に投げ込まれた「汚いメモ」を、Agentがどういうルールでパースし、`second-brain` 用の綺麗なタスクやナレッジに変換するか（プロンプトや正規表現のルール）を定義する。
+- [x] **`03_Calendar_Sync_Logic.md` の作成**: `second-brain` にあるタスクやYAMLのルーティン予定を、Google Calendar APIにどう流し込むか（カレンダーへの登録条件、色分け、重複制御など）を定義する。
+- [x] **`04_Journaling_Prompt.md` の作成**: 朝のブリーフィングの出力フォーマット（Briefing.md）と、夜の対話でAgentが投げる「問い」の具体的な内容を定義する。
 
 ### Phase 2: 実装・環境構築
 - [ ] **サテライト環境の構築**: iCloud Drive上に `Satellite_Vault` フォルダ（01_Drop_Zone, 02_Briefing, 03_Reference等）を作成する。
