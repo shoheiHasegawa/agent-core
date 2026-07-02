@@ -36,7 +36,7 @@ tags: [automation, productivity, journaling]
 
 ### Phase 2: 実装・環境構築
 - [ ] **サテライト環境の構築**: iCloud Drive上に `Satellite_Vault` フォルダ（01_Drop_Zone, 02_Briefing, 03_Reference等）を作成する。
-- [ ] **iOSショートカットの作成**: iPhoneから `Drop_Zone` にメモを書き込むためのショートカットを作成し、ホーム画面に配置する。
+- [x] **iOSショートカットの作成**: iPhoneから `00_Inbox` に摩擦ゼロでメモを保存するためのショートカット（アクションボタン用メニュー）のレシピを設計・提供する。
 - [ ] **`core-service` 実装**: Google Calendar APIクライアントの構築と、Markdownタスクパーサーの実装（TDDで実行）。
 - [ ] **`agent-core` 実装**: 朝晩に `core-service` を叩くバッチ処理（cron/launchd）と、夜の対話用スキル（`journaling-coach`等）を実装する。
 
