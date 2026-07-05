@@ -17,8 +17,8 @@
 </workspace_awareness>
 
 ## <execution_flow>
-セッション開始時、または次の指示を求める際は、必要に応じて `agent-core/epics/` または `agent-core/queue/` を確認すること（※ Queue はパケット単位で扱うAgent間通信バッファであり、取得のタイミングは運用タスクによって異なる）。
-新しいプロジェクト（Epic）を開始する際は、`agent-core/workspaces/<Epic名>/` という**フラットな作業場**を作成し、階層化（`active` や `archived`）を行わないこと。作業が完了したフラットなワークスペースはクリーンアップ（削除）可能とする。
+- **【セッション管理（起動・終了）】**: セッション開始時、またはセッションを終了（中断）する際は、必ず `agent-core/skills/session-manager/SKILL.md` をロードし、記載された「イベント駆動ルーティング」および「Handoffプロトコル」に従って行動すること。
+- 新しいプロジェクト（Epic）を開始する際は、`agent-core/workspaces/<Epic名>/` という**フラットな作業場**を作成し、階層化（`active` や `archived`）を行わないこと。作業が完了したフラットなワークスペースはクリーンアップ（削除）可能とする。
 
 ## <progress_tracking>
 - 【記憶喪失の防止】LLMはコンテキストウィンドウに限界があるため、タスクに着手する際、および完了・中断する際は、必ず自身が作業しているディレクトリ（ワークスペース等）内にある `progress.md` （または `task.md`）のチェックボックスを更新すること。
@@ -28,6 +28,11 @@
 ## <continuous_documentation>
 - 【陳腐化の防止】タスク完了時（Harvest Report作成時）は、必ず今回変更した実装と「アーキテクチャ図群」「各リポジトリのREADME/INDEX」に乖離がないかをクロスチェックし、差分があれば自動同期・修正してからセッションを終了すること。
 </continuous_documentation>
+
+## <handoff_verification>
+- 【未検証コードの抑止】Agentは未検証のコードや未コミットの変更を残してセッションを終了してはならない。
+- セッション終了（Handoff）の条件（Definition of Done）として、全体の自動検証（`agent-core/scripts/pre_handoff_verify.sh`等）をパスし、変更がコミットおよびプッシュされている状態を要求する。
+</handoff_verification>
 </execution_flow>
 
 ## <governance>

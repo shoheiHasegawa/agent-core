@@ -1,129 +1,107 @@
-# 01. System Architecture & Data Flow (Dual-Vault Architecture)
+# 01. System Architecture & Data Flow (Secretary Agent Model)
 
-本ドキュメントでは、Epic 03「Action & Reflection Pipeline」を支えるシステム構成、Mac上のメイン環境とiPhone上の環境（Satellite Vault）の分離関係、およびデータフローを定義します。
+本ドキュメントでは、Epic 03「Action & Reflection Pipeline」を支えるシステム構成、および「CEO（人間）と秘書（AI）」の完全な役割分担に基づくデータフローを定義します。
 
-## 1. 新しい名称の提案（Mobile Vaultに代わる名称）
+## 1. コア思想（The Secretary Paradigm）
+過去の「人間がすべてを管理する（second-brainに未完了タスクを並べる）」というパラダイムを捨て、**「短期的なタスクのバックログは秘書（agent-core）が隠蔽して管理し、CEO（人間）には今日やるべきこと（Briefing）だけを提示する」**というアーキテクチャを採用します。
 
-iPhoneとMac間の情報のやり取りを仲介するバッファ（緩衝地帯）としての役割を明確にするため、旧称「Mobile Vault」に代わり、以下のいずれかの名称を提案します（本ドキュメントでは仮に **`Satellite_Vault`（衛星ボルト）** と呼称します）。
-
-* **候補1: `Satellite_Vault` (サテライトボルト)** - メイン（second-brain）の周囲を回り、情報を中継する衛星のイメージ。
-* **候補2: `Capture_Hub` (キャプチャハブ)** - iPhoneからの入力を「捕獲」し、集約する場所。
-* **候補3: `Transit_Vault` (トランジットボルト)** - 情報が永続化される前の一時的な経由地。
+*   **`second-brain`（CEOの脳）**: 人生の信念（Areas）、目標、永続的なナレッジ、および未分類の「種（タグ付きのInboxメモ）」のみを格納する純粋な領域。期限付きの細かいタスクは置かない。
+*   **`agent-core`（秘書の脳）**: CEOの短期的なタスク（M/S/W）のバックログ（正本）を保持・管理する領域。
 
 ---
 
 ## 2. システム構成図 (Architecture Diagram)
 
-`second-brain`（Git管理・清書済み）と `Satellite_Vault`（iCloud管理・一時バッファ）を**完全に別物**として扱うアーキテクチャです。
-
 ```mermaid
 graph TD
     %% ユーザー境界
-    User_iPhone["📱 User (iPhone)"]
-    User_Mac["💻 User (Mac)"]
+    User_iPhone["📱 CEO (iPhone)"]
+    User_Mac["💻 CEO (Mac)"]
 
     %% 外部サービス
     GCal["📅 Google Calendar API"]
-
-    %% クラウド同期
     iCloud(("☁️ iCloud Drive\n(Sync Buffer)"))
 
     %% Mobile側 (iPhone Environment)
-    subgraph Mobile_Environment ["iPhone Environment (Input/View)"]
-        Satellite_Vault["📂 Satellite_Vault\n(Obsidian Mobile)"]
-        iOS_Shortcuts["⚡️ iOS Shortcuts"]
-        iOS_Calendar["🗓️ iOS Calendar App"]
+    subgraph Mobile_Environment ["iPhone Environment (Interface)"]
+        Mobile_Inbox["📥 00_Inbox\n(アイデア/タスクの種)"]
+        Mobile_Dashboard["📊 10_Dashboard\n(今日のBriefing)"]
     end
 
     %% Mac/Server側 (you_inc)
     subgraph you_inc ["you_inc (Mac / Local Server)"]
-        agent-core["🤖 agent-core\n(Orchestration, Cron, Agent UI)"]
-        core-service["⚙️ core-service\n(Domain Logic, Formatter, API)"]
-        second-brain["🧠 second-brain\n(Git Managed / Master Data)"]
+        subgraph Agent_Core ["🤖 agent-core (秘書)"]
+            Task_Registry[("🗃️ Task Registry\n(タスクの正本: JSON/DB)")]
+            Orchestrator["指揮・ジャーナリング"]
+        end
+        core-service["⚙️ core-service\n(機能工場: パース/カレンダー同期)"]
+        second-brain["🧠 second-brain\n(信念・ナレッジの正本)"]
     end
 
     %% リレーションシップ
-    User_iPhone -->|View/Action| iOS_Calendar
-    User_iPhone -->|Tap| iOS_Shortcuts
-    User_iPhone -->|View| Satellite_Vault
-    User_Mac -->|Chat / Journaling| agent-core
+    User_iPhone -->|雑多な入力| Mobile_Inbox
+    User_iPhone -->|閲覧・実績入力| Mobile_Dashboard
+    User_Mac -->|ジャーナリング / 棚卸し| Orchestrator
 
-    iOS_Calendar -.-|Sync| GCal
-    iOS_Shortcuts -->|Write raw memo| Satellite_Vault
+    Mobile_Inbox -->|iCloud| Orchestrator
+    Mobile_Dashboard <-->|iCloud| Orchestrator
 
-    %% バッファを介した同期 (非同期通信)
-    Satellite_Vault <-->|iCloud Sync| iCloud
-    iCloud -->|1. Read raw memo| agent-core
-    agent-core -->|2. Write formatted data| second-brain
-    agent-core -->|3. Write Briefing| iCloud
+    Orchestrator -->|1. パース・整理指示| core-service
+    Orchestrator <-->|2. タスク保存・読み出し| Task_Registry
+    Orchestrator -->|3. 信念(Areas)の参照| second-brain
 
-    %% 内部連携
-    agent-core -->|Call Formatter/API| core-service
-    core-service -->|Create/Update Events| GCal
+    core-service -->|予定ブロック作成| GCal
 ```
-
-### 役割の明確化 (Separation of Concerns)
-1. **`second-brain`**: 
-   - Gitでバージョン管理される、あなた（CEO）の純度の高いナレッジベース本体。手書きの汚いメモは直接ここには入らない。
-2. **`Satellite_Vault` (on iCloud)**:
-   - iPhoneからの入力を貯める「受付窓口」。
-   - iPhoneで見るための「朝のサマリー（Briefing）」が置かれる「掲示板」。
-3. **`agent-core` & `core-service`**:
-   - `Satellite_Vault` に投げ込まれた生のメモを回収し、条件に合わせて清書（フォーマット処理）を行い、`second-brain` へGitコミットとともに格納する「データクレンジング・パイプライン」の役割を担う。
 
 ---
 
-## 3. 1日のデータフロー図 (Daily Operational Flow)
+## 3. データの配置場所と連携ルール
+
+### A. タスクの正本（Task Registry）
+*   **場所**: `agent-core/data/task_registry/` (JSONまたはSQLite)
+*   **役割**: 短期タスク（M/S/W）の完全なバックログ。CEOは直接見ず、Agentが管理する。
+
+### B. Areasとの連携（信念の適用）
+*   **場所**: `second-brain/10_Areas/`
+*   **役割**: Agentがタスクの優先順位を判断する際、このディレクトリ内のマークダウン（例: 「健康第一」「英語学習を習慣化」等）をLLMコンテキストとして読み込み、ポリシー（信念）に合致するタスクの優先度を上げる。
+
+### C. Inboxの種（Zettelkastenの担保）
+*   **場所**: `second-brain/00_Inbox/`
+*   **役割**: Mobile_Vaultから来たメモのうち、「ただのアイデア」や「いつかやりたいこと」はAgentが独立したアトミックノート（`Idea_XXX.md`）としてここに格納し、`#idea` などのタグだけを付与する。
+
+---
+
+## 4. 1日のデータフロー図 (Daily Operational Flow)
+
+単に自動実行するだけでなく、**「人間との対話（棚卸し）」と「システムの自動実行（スケジュール）」を分離**します。
 
 ```mermaid
 sequenceDiagram
-    actor User as 👤 User (iPhone)
-    participant SatVault as 📂 Satellite_Vault (iCloud)
-    participant Agent as 🤖 Agent (Mac)
-    participant Brain as 🧠 second-brain (Git)
+    actor CEO as 👤 CEO
+    participant MV as 📱 Mobile Vault
+    participant Sec as 🤖 秘書Agent (agent-core)
+    participant SB as 🧠 second-brain
     participant GCal as 📅 Google Calendar
 
-    %% 日中のキャプチャ
-    rect rgb(240, 240, 220)
-        Note over User, GCal: ☀️ Daytime Phase (Capture)
-        User->>User: 突発的なアイデアやタスクが発生
-        User->>SatVault: iOSショートカットで殴り書きメモを保存
-    end
-
-    %% 夜の内省とクレンジング
+    %% 夜の対話と棚卸し
     rect rgb(220, 200, 240)
-        Note over User, GCal: 🌙 Night Phase (Cleansing & Reflection)
-        User-->>Agent: (Macを開いた場合) チャットで振り返り
-        Note over Agent: 定期バッチ起動 (Cron)
-        Agent->>SatVault: 殴り書きメモを回収 (Read & Delete)
-        Agent->>Agent: メモをフォーマット処理・清書
-        Agent->>Brain: 清書済みデータを格納＆Git Commit
-        Agent->>GCal: (API) 明日のルーティン予定を仮押さえ
+        Note over CEO, GCal: 🌙 Night Phase (Journaling & Inventory)
+        CEO->>MV: 日中の雑多なメモをInboxに投下
+        CEO->>Sec: チャットで1日の振り返り（ジャーナリング）
+        Sec->>MV: Inboxのメモを回収・パース
+        Sec->>Sec: タスクは Task Registry へ登録
+        Sec->>SB: アイデアは 00_Inbox へタグ付きで保存
+        Sec->>SB: 10_Areas の方針を読み込み
+        Sec->>CEO: 「明日の優先タスクはこれらで良いですか？」と提案・整理
     end
 
-    %% 朝のブリーフィング
+    %% 朝の自動スケジューリング
     rect rgb(200, 220, 240)
-        Note over User, GCal: 🌅 Morning Phase (Briefing)
-        Note over Agent: 朝の定期バッチ起動 (Cron)
-        Agent->>Brain: 今日のタスクとコンパスを読み込み
-        Agent->>GCal: (API) 今日のタスクをTimeblocking
-        Agent->>SatVault: 今日のアクションプラン (Briefing.md) を生成
-        SatVault-->>User: iPhoneのObsidianでサマリーを確認
+        Note over CEO, GCal: 🌅 Morning Phase (Automated Scheduling)
+        Note over Sec: 朝 5:00 定期バッチ起動 (Cron)
+        Sec->>Sec: 棚卸し済みの「今日やるタスク」を抽出
+        Sec->>GCal: (API) 今日のタスクをTimeblocking
+        Sec->>MV: 今日のアクションプラン (Briefing.md) を Dashboard に出力
+        CEO->>MV: 起床後、洗練されたBriefingだけを見る
     end
 ```
-
----
-
-## 4. 必要なディレクトリ構成 (Satellite_Vault側)
-
-iPhone側のバッファとなる `Satellite_Vault` は、複雑な階層を持たず、情報の「入り口」と「出口」に特化したシンプルな構成とします。
-
-```text
-Satellite_Vault/ (iCloud上の既存ディレクトリを利用)
-├── 00_Inbox/         # 【入口】iPhoneからの殴り書きメモ、音声テキストが保存される場所（※Agentの回収対象）
-├── 10_Dashboard/     # 【出口】Agentが毎朝生成する「今日のサマリー」などが置かれる場所（※Agentの上書き対象）
-├── 30_Pocket/        # 【静的】Agentに回収・変更されない安全なエリア。iPhoneからサクッと見たい会社のメモなどを置く
-└── 99_System/        # 【システム設定】テンプレートや画像ファイル(Attachments)など、Obsidianの既存システム設定エリア
-```
-
-※ **Agentの動作ルール**: Agentの定期バッチがRead & Delete（回収）を行うのは `00_Inbox` のみとし、`30_Pocket` や `99_System` 等の静的エリアには一切干渉しないよう実装します。

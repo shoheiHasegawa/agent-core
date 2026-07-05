@@ -8,7 +8,7 @@ Agentは以下の境界と絶対安全ルールを厳守し、適切なリポジ
 2. 【Git安全装置】破壊的・大規模操作前は必ず事前に Commit し、復元可能にせよ。
 3. 【Shell安全装置】シェル実行時は `set -e` や `&&` を用い、エラー時即時停止させよ。
 4. 【Leave No Trace】一時ファイルは `.gitignore` された `scratch/` 等で使用し自律破棄せよ。
-5. 【Harvest Report】セッション終了時、運用改善案やActionableな報告は `agent-core/queue/harvest_reviews/` へ出力せよ。普遍的な教訓（Wisdom）の原石は `second-brain/90_Meta/Templates/Sense_Making_Template.md` を用いて `second-brain/20_Sense_Making/` へ蒸留せよ。
+5. 【Session Handoff & Wisdom Extraction】セッション終了時の進捗・申し送りは `agent-core/skills/session-manager/SKILL.md` のルールに従い `progress.md` と `handoff_*.md` を用いて行うこと。プロジェクトの枠を超えた普遍的な教訓（Wisdom）の原石が得られた場合のみ、 `second-brain/90_Meta/Templates/Sense_Making_Template.md` を用いて `second-brain/20_Sense_Making/` へ蒸留せよ。
 </global_rules_and_safety>
 
 ## <jit_routing>
