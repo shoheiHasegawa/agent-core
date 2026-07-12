@@ -378,6 +378,39 @@ function resetFormulas() {
   healLogFormulas(ss);
   healLogConditionalFormats(ss);
 
+  // --- IF_Legacy_Export シートの数式もリセット ---
+  const ifSheet = ss.getSheetByName("IF_Legacy_Export");
+  if (ifSheet) {
+    ifSheet.getRange("C1").setFormula("=ARRAY_CONSTRAIN(Progress_Master!K1:ZZ1, 1, 12)");
+    ifSheet.getRange("A2").setFormula('=ARRAYFORMULA(IF(Member_DB!A2:A="", "", Member_DB!A2:B))');
+    
+    const mappingLogic = [
+        `=ARRAY_CONSTRAIN(ARRAYFORMULA(IF($A2:$A="", "", `,
+        `  IFS(`,
+        `    Progress_Master!K2:ZZ="", "",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・届出有"), "○",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・遅刻・届出有"), "△",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・遅刻"), "▲",`,
+        `    Progress_Master!K2:ZZ="欠席・届出有", "-",`,
+        `    Progress_Master!K2:ZZ="無断欠席", "×",`,
+        `    Progress_Master!K2:ZZ="無断欠席(遅刻届のみ)", "×",`,
+        `    Progress_Master!K2:ZZ="欠席(遅刻30分超)", "×",`,
+        `    Progress_Master!K2:ZZ="対象外", "",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席"), "○",`,
+        `    TRUE, ""`,
+        `  )`,
+        `)), 1000, 12)`
+    ].join("");
+    ifSheet.getRange("C2").setFormula(mappingLogic);
+    
+    ifSheet.getRange("O2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!D2:D))');
+    ifSheet.getRange("P2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!G2:G))');
+    ifSheet.getRange("Q2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!H2:H))');
+    ifSheet.getRange("R2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!E2:E))');
+    ifSheet.getRange("S2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!I2:I))');
+    ifSheet.getRange("T2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!J2:J))');
+  }
+
   // --- 簡易版 Idea-17: 各シートのデータ型を正しい状態に強制修復 ---
   const ss2 = SpreadsheetApp.getActiveSpreadsheet();
   const memberDb = ss2.getSheetByName("Member_DB");

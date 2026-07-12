@@ -73,6 +73,9 @@ function buildSystem() {
         // --- Phase 4: Dashboard 構築・完了 ---
         _buildDashboard(newSS, formA, formB);
 
+        // --- Phase 5: 旧出欠表連携 (IF_Legacy_Export) シートの構築 ---
+        _buildIFLegacySheet(newSS);
+
         // 完了通知
         sheet.getRange(13, 1).setValue("✅ システム生成完了！").setFontColor("green");
         sheet.getRange(14, 1).setValue("管理スプレッドシートURL: ");
@@ -448,4 +451,67 @@ function _buildDashboard(newSS, formA, formB) {
     moveSheet("Schedule_DB",      5);
     moveSheet("Member_DB",        6);
     moveSheet("Log_ExternalSurvey", 7);
+    moveSheet("IF_Legacy_Export", 8);
+}
+
+// ============================================================
+// Phase 5: 旧出欠表連携 (IF_Legacy_Export) シート構築
+// ============================================================
+
+/**
+ * 旧出欠表（Excel等）と並行稼働させるためのコピペ用シートを生成する。
+ */
+function _buildIFLegacySheet(newSS) {
+    const ifSheet = newSS.insertSheet("IF_Legacy_Export");
+    const hdrDark = { bg: "#434343", fg: "#ffffff" };
+
+    ifSheet.getRange("A1").setValue("社員番号").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    ifSheet.getRange("B1").setValue("氏名").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    
+    // C1〜N1: 各回（Progress_Masterのヘッダを参照。最大12回に制限して#REF!エラーを防止）
+    ifSheet.getRange("C1").setFormula("=ARRAY_CONSTRAIN(Progress_Master!K1:ZZ1, 1, 12)").setBackground("#d9ead3").setFontColor("#000000").setFontWeight("bold");
+    
+    // 右側のサマリー項目 (O1〜U1)
+    ifSheet.getRange("O1").setValue("出席回数").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    ifSheet.getRange("P1").setValue("参加者アンケート").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    ifSheet.getRange("Q1").setValue("課題提出物").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    ifSheet.getRange("R1").setValue("リアル参加").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    ifSheet.getRange("S1").setValue("最終試験ローカル試験").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    ifSheet.getRange("T1").setValue("資格取得").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+    ifSheet.getRange("U1").setValue("備考欄").setBackground(hdrDark.bg).setFontColor(hdrDark.fg).setFontWeight("bold");
+
+    // データ展開用の数式 (行2)
+    // A列、B列: Member_DB をそのまま参照
+    ifSheet.getRange("A2").setFormula('=ARRAYFORMULA(IF(Member_DB!A2:A="", "", Member_DB!A2:B))');
+    
+    // C列: マッピング処理 (最大12回分に制限してスプレッドシートの崩壊を防ぐ)
+    const mappingLogic = [
+        `=ARRAY_CONSTRAIN(ARRAYFORMULA(IF($A2:$A="", "", `,
+        `  IFS(`,
+        `    Progress_Master!K2:ZZ="", "",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・届出有"), "○",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・遅刻・届出有"), "△",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・遅刻"), "▲",`,
+        `    Progress_Master!K2:ZZ="欠席・届出有", "-",`,
+        `    Progress_Master!K2:ZZ="無断欠席", "×",`,
+        `    Progress_Master!K2:ZZ="無断欠席(遅刻届のみ)", "×",`,
+        `    Progress_Master!K2:ZZ="欠席(遅刻30分超)", "×",`,
+        `    Progress_Master!K2:ZZ="対象外", "",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席"), "○",`,
+        `    TRUE, ""`,
+        `  )`,
+        `)), 1000, 12)`
+    ].join("");
+    ifSheet.getRange("C2").setFormula(mappingLogic);
+
+    // O2〜T2: サマリー項目をProgress_Masterから取得
+    ifSheet.getRange("O2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!D2:D))');
+    ifSheet.getRange("P2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!G2:G))');
+    ifSheet.getRange("Q2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!H2:H))');
+    ifSheet.getRange("R2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!E2:E))');
+    ifSheet.getRange("S2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!I2:I))');
+    ifSheet.getRange("T2").setFormula('=ARRAYFORMULA(IF($A2:$A="", "", Progress_Master!J2:J))');
+
+    // 書式設定
+    ifSheet.getRange("A:B").setNumberFormat("@");
 }
