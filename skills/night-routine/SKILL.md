@@ -1,6 +1,6 @@
 ---
 name: night-routine
-description: 1日の終わりに行う内省と明日への準備を統括するOrchestrator（Tier 1）スキル。カウンセリングとタスク計画のサブエージェントを順に呼び出す。
+description: 1日の終わりに行う内省と明日への準備を統括するOrchestrator（Tier 1）スキル。各フェーズのスキルを順次読み込み、Role Switchingによって対話を進行する。
 ---
 
 # Skill: Night Routine (Orchestrator)
@@ -17,22 +17,22 @@ description: 1日の終わりに行う内省と明日への準備を統括する
 このスキルはユーザーとの壁打ちを伴うため、サブエージェント（別プロセス）を起動してはならない（伝言ゲームを防ぐため）。
 **親エージェント（あなた自身）**が以下の順序でルールを読み込み、状態（Role）を切り替えながら進行すること。
 
-### Phase 1: Counselor Mode (`journaling-counselor`)
+### Phase 1: Inbox Triage Mode (`inbox-triage`)
+1. あなた自身が `agent-core/skills/inbox-triage/SKILL.md` のファイルを読み込み、そのプロンプトルールを自分自身に適用する。
+2. 当該スキルのルールに従ってInboxの仕分け業務を完遂する。
+3. 完了後、フェーズ2へ移行する。
+
+### Phase 2: Counselor Mode (`journaling-counselor`)
 1.  あなた自身が `agent-core/skills/journaling-counselor/SKILL.md` のファイルを読み込み、そのプロンプトルールを自分自身に適用する。
-2.  以下のコンテキスト（引数）を読み込んだ上で、ユーザーとの壁打ちを開始する。
-    - **実績データ**: `agent-core/data/task_registry/` および今日の `Briefing.md`
-    - **ルール**: 「『S』タスク（投資）の進捗を読み取り、まずは安心感を提示してから、エネルギーの増減について壁打ちを行え」
-3.  カウンセリングが一段落したら、フェーズ2へ移行する。
+2.  当該スキルのルールに従い、カウンセリング業務を完遂する。
+3.  カウンセリングが一段落したら、フェーズ3へ移行する。
 
-### Phase 2: Planner Mode (`priority-planner`)
+### Phase 3: Planner Mode (`priority-planner`)
 1.  カウンセリング完了後、あなた自身が `agent-core/skills/priority-planner/SKILL.md` のファイルを読み込み、そのプロンプトルールを自分自身に適用する。
-2.  以下のコンテキスト（引数）を読み込んだ上で、タスク計画の壁打ちを開始する。
-    - **タスク正本**: `agent-core/data/task_registry/`
-    - **方針データ**: `second-brain/10_Areas/`
-    - **ルール**: 「MUSTタスクの滞留数と現在の方針（Focus）を読み取って提示し、明日の方針についてヒアリングせよ。方針決定後は所定のJSONスキーマに従い正本を更新せよ」
-3.  タスクの更新と `validate_task_registry.py` によるPASS確認を完遂する。
+2.  当該スキルのルールに従い、明日へのタスク計画と更新を完遂する。
+3.  完了後、フェーズ4（クロージング）へ移行する。
 
-### Phase 3: クロージング
-1.  両方のサブエージェントの作業が完了したら、ユーザーに対して以下の旨を伝えてセッションを終了する。
+### Phase 4: クロージング
+1.  すべてのサブエージェントの作業が完了したら、ユーザーに対して以下の旨を伝えてセッションを終了する。
     *   「お疲れ様でした。明日の準備は完璧に整いました。」
     *   「明日の朝、あなたが起きる前に私が自動でカレンダーを最新化しておきます（Wake時の自動バッチ）。安心してゆっくり休んでください。」

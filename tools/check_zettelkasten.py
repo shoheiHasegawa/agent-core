@@ -8,15 +8,15 @@ AGENT_CORE_DIR = os.path.dirname(SCRIPT_DIR)
 if AGENT_CORE_DIR not in sys.path:
     sys.path.insert(0, AGENT_CORE_DIR)
 
-from factories.zettelkasten import get_zettelkasten_service
+from factories.second_brain_factory import SecondBrainFactory
 
 def main():
     print(f"🔍 Validating Zettelkasten rules...")
 
     # ファクトリからServiceを取得（Composition Rootへの依存）
-    service = get_zettelkasten_service()
+    service = SecondBrainFactory.create_service()
 
-    results = service.validate_all_notes()
+    results = service.audit_zettelkasten_rules()
 
     if not results:
         print("✅ All Permanent Notes are perfectly valid!")
