@@ -388,9 +388,9 @@ function resetFormulas() {
         `=ARRAY_CONSTRAIN(ARRAYFORMULA(IF($A2:$A="", "", `,
         `  IFS(`,
         `    Progress_Master!K2:ZZ="", "",`,
-        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・届出有"), "○",`,
-        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・遅刻・届出有"), "△",`,
-        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\\\(.*\\\\)・遅刻"), "▲",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\(.*\\)・届出有"), "○",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\(.*\\)・遅刻・届出有"), "△",`,
+        `    REGEXMATCH(Progress_Master!K2:ZZ, "出席\\(.*\\)・遅刻"), "▲",`,
         `    Progress_Master!K2:ZZ="欠席・届出有", "-",`,
         `    Progress_Master!K2:ZZ="無断欠席", "×",`,
         `    Progress_Master!K2:ZZ="無断欠席(遅刻届のみ)", "×",`,
@@ -419,12 +419,14 @@ function resetFormulas() {
   const logExt = ss2.getSheetByName("Log_ExternalSurvey");
   const prog = ss2.getSheetByName("Progress_Master");
   const sched = ss2.getSheetByName("Schedule_DB");
+  const ifLegacy = ss2.getSheetByName("IF_Legacy_Export");
 
   if (memberDb) memberDb.getRange("A:A").setNumberFormat("@");
   if (logAtt) logAtt.getRange("B:B").setNumberFormat("@");
   if (logNot) logNot.getRange("C:C").setNumberFormat("@");
   if (logExt) logExt.getRange("A:A").setNumberFormat("@");
   if (prog) prog.getRange("A:A").setNumberFormat("@");
+  if (ifLegacy) ifLegacy.getRange("A:B").setNumberFormat("@");
   if (sched) {
     sched.getRange("B2:B").setNumberFormat("yyyy/MM/dd");
     sched.getRange("D2:D").setNumberFormat("HH:mm");
