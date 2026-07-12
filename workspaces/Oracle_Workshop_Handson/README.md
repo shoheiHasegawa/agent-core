@@ -14,6 +14,6 @@ Image Builder による AMI の定期更新と、CloudFormation による一括 
 ## 構成ファイル
 
 - `ec2-auto-deploy.yaml` — EC2 一括起動用 CloudFormation テンプレート
-- `imagebuilder-windows-update-ami-pipeline.yaml` — AMI 自動生成パイプライン
+- `imagebuilder-linux-update-ami-pipeline.yaml` — AMI 自動生成パイプライン (Linux用)
 
 > **プロジェクトノート**: [second-brain/Oracle_Workshop_Infra](../../second-brain/10_Projects/Development/Oracle_Workshop_Infra/)

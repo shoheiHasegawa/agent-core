@@ -19,10 +19,10 @@
 以下のコマンドを実行して、最新の AMI ID を環境変数 `AMI_ID` にセットします。
 
 ```bash
-# AMI名を "HandsOnBase-Win-" で検索し、作成日順にソートして最新の1つを取得
+# AMI名を "HandsOnBase-Lin-" で検索し、作成日順にソートして最新の1つを取得
 export AMI_ID=$(aws ec2 describe-images \
   --owners self \
-  --filters "Name=name,Values=HandsOnBase-Win-*" \
+  --filters "Name=name,Values=HandsOnBase-Lin-*" \
   --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
   --output text)
 
@@ -88,14 +88,14 @@ aws ec2 describe-instances \
 
 
 
-### Step 5: リモートデスクトップ接続 & Oracle インストール
+### Step 5: SSH接続 & Oracle インストール
 
 各受講者に割り当てられた Public IP アドレスと、**Step 2 で設定した共通パスワード**を伝えます。
 
-*   **ユーザー名**: `Administrator`
+*   **ユーザー名**: `ec2-user`
 *   **パスワード**: (設定した共通パスワード)
 
-受講者はこの情報を使って RDP 接続し、Oracle Database のインストール作業を実施します。
+受講者はこの情報を使って SSH 接続し、Oracle Database のインストール作業を実施します。
 
 > [!NOTE]
 > もし共通パスワードでログインできない場合は、数分待ってから再試行してください。
@@ -209,10 +209,10 @@ Image Builder は、AMI 作成の最終工程で **Sysprep** (システム準備
 共通パスワードが反映されず、`C:\userdata_log.txt` も作成されていない場合、UserData 自体が実行されていない可能性があります。
 以下の手順で「Windows が実際に何を受け取ったか」を確認してください。
 
-1.  **RDP 接続**: 保険用キーペアを使って Administrator でログインします。
-2.  **PowerShell 実行**: 以下のコマンドで、インスタンスメタデータから UserData を取得します。
-    ```powershell
-    Invoke-RestMethod -Uri http://169.254.169.254/latest/user-data
+1.  **SSH 接続**: 保険用キーペアを使って ec2-user でログインします。
+2.  **コマンド実行**: 以下のコマンドで、インスタンスメタデータから UserData を取得します。
+    ```bash
+    curl http://169.254.169.254/latest/user-data
     ```
 3.  **結果の診断**:
     *   **正常**: `<powershell>...</powershell>` で囲まれたスクリプトが表示される。

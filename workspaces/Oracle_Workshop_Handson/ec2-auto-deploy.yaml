@@ -14,7 +14,7 @@ Parameters:
   KeyName:
     Type: String
     Description: (Optional) Name of an existing EC2 KeyPair for backup access
-    Default: Oracle-workshop-common-key-pair
+    Default: 251st_oracle
 
   SubnetId:
     Type: String
@@ -107,41 +107,31 @@ Resources:
                   count = len(tags)
                   print(f"Parsed {count} tags: {tags}")
 
-                  # Prepare UserData (Same as before)
+                  # Prepare UserData for Linux
                   script_lines = [
-                      "<powershell>",
-                      '$ErrorActionPreference = "Stop"',
-                      'Start-Transcript -Path "C:\\userdata_log.txt" -Append',
-                      'Write-Output "Starting Instance Setup (Optimized)"',
+                      "#!/bin/bash",
+                      "set -e",
+                      "exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1",
+                      "echo \"Starting Instance Setup (Linux Optimized)\"",
                       
-                      f'$Password = "{password}"',
-
-                      # --- 1. User & Password Setup ---
-                      'try {',
-                      '    Write-Output "Setting Administrator password..."',
-                      '    net user Administrator $Password',
-                      '    if ($LASTEXITCODE -eq 0) { Write-Output "Admin Password Set Success." }',
-                      '} catch { Write-Output "Error setting Admin password: $_" }',
-
-                      'try {',
-                      '    Write-Output "Creating OracleLab user..."',
-                      '    net user OracleLab $Password /add /yes',
-                      '    net localgroup Administrators OracleLab /add',
-                      '    if ($LASTEXITCODE -eq 0) { Write-Output "OracleLab User Created Success." }',
-                      '} catch { Write-Output "Error creating OracleLab user: $_" }',
-
-                      # --- 2. TimeZone (Safety Backup) ---
-                      'try {',
-                      '    Write-Output "Configuring TimeZone to Tokyo..."',
-                      '    Set-TimeZone -Id "Tokyo Standard Time"',
-                      '} catch { Write-Output "Error setting TimeZone: $_" }',
+                      f"COMMON_PASS=\"{password}\"",
                       
-                      'Write-Output "Setup Complete. Ready to use."',
-                      'Stop-Transcript',
-                      '</powershell>',
-                      '<persist>true</persist>'
+                      "# --- 1. Enable Password Authentication ---",
+                      "echo \"Enabling Password Authentication...\"",
+                      "sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config",
+                      "systemctl restart sshd",
+                      
+                      "# --- 2. Set ec2-user Password ---",
+                      "echo \"Setting ec2-user password...\"",
+                      "echo \"ec2-user:${COMMON_PASS}\" | chpasswd",
+                      
+                      "# --- 3. TimeZone ---",
+                      "echo \"Configuring TimeZone to Tokyo...\"",
+                      "timedatectl set-timezone Asia/Tokyo",
+                      
+                      "echo \"Setup Complete. Ready to use.\""
                   ]
-                  user_data_script = "\r\n".join(script_lines)
+                  user_data_script = "\n".join(script_lines)
                   
                   instances = []
                   for i in range(count):
@@ -158,8 +148,8 @@ Resources:
                           'UserData': user_data_script,
                           'BlockDeviceMappings': [
                               {
-                                  'DeviceName': '/dev/sda1',
-                                  'Ebs': {'VolumeSize': 50, 'VolumeType': 'gp2', 'DeleteOnTermination': True}
+                                  'DeviceName': '/dev/xvda',
+                                  'Ebs': {'VolumeSize': 50, 'VolumeType': 'gp3', 'DeleteOnTermination': True}
                               }
                           ],
                           'TagSpecifications': [{
@@ -233,8 +223,8 @@ Resources:
     Type: AWS::Scheduler::Schedule
     Properties:
       Name: !Sub "${AWS::StackName}-StartSchedule"
-      Description: Auto start instances on 3rd Tuesday at 19:30 JST
-      ScheduleExpression: "cron(30 19 ? * 3#3 *)"
+      Description: Auto start instances on 3rd Tuesday at 19:00 JST
+      ScheduleExpression: "cron(0 19 ? * 3#3 *)"
       ScheduleExpressionTimezone: "Asia/Tokyo"
       FlexibleTimeWindow:
         Mode: "OFF"
@@ -247,8 +237,8 @@ Resources:
     Type: AWS::Scheduler::Schedule
     Properties:
       Name: !Sub "${AWS::StackName}-StopSchedule"
-      Description: Auto stop instances on 3rd Tuesday at 22:10 JST
-      ScheduleExpression: "cron(10 22 ? * 3#3 *)"
+      Description: Auto stop instances on 3rd Tuesday at 22:20 JST
+      ScheduleExpression: "cron(20 22 ? * 3#3 *)"
       ScheduleExpressionTimezone: "Asia/Tokyo"
       FlexibleTimeWindow:
         Mode: "OFF"
