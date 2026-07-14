@@ -9,6 +9,7 @@
 - 会社のルール・戦略・指針: `second-brain/10_Areas/`
 - ドメインの設計ルール: `core-service/docs/rules/`
 - システム全体の構成図・データフロー: `agent-core/docs/architecture/`
+- **プロジェクト（Epic）とワークスペースの運用ルール**: `agent-core/docs/architecture/workspace_management.md`
 - 各種テンプレート: `second-brain/90_Meta/Templates/`
 </jit_routing>
 
@@ -18,7 +19,7 @@
 
 ## <execution_flow>
 - **【セッション管理（起動・終了）】**: セッション開始時、またはセッションを終了（中断）する際は、必ず `agent-core/skills/session-manager/SKILL.md` をロードし、記載された「イベント駆動ルーティング」および「Handoffプロトコル」に従って行動すること。
-- 新しいプロジェクト（Epic）を開始する際は、`agent-core/workspaces/<Epic名>/` という**フラットな作業場**を作成し、階層化（`active` や `archived`）を行わないこと。作業が完了したフラットなワークスペースはクリーンアップ（削除）可能とする。
+- **【プロジェクト運用】**: 新しいプロジェクト（Epic）を開始する際、およびワークスペースを運用する際は、必ず `agent-core/docs/architecture/workspace_management.md` のルール（`_index.md`, `docs/`, `tasks/`, `scratch/` の構造化）に従うこと。
 
 ## <progress_tracking>
 - 【記憶喪失の防止】LLMはコンテキストウィンドウに限界があるため、タスクに着手する際、および完了・中断する際は、必ず自身が作業しているディレクトリ（ワークスペース等）内にある `progress.md` （または `task.md`）のチェックボックスを更新すること。

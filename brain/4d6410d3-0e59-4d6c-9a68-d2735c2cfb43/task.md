@@ -1,0 +1,19 @@
+- `[ ]` **Step 1: Epics と Workspaces のアーキテクチャ再定義と整理**
+  - `[x]` 運用ルール（EpicとWorkspaceの役割分担）のドキュメント作成 (`docs/architecture/workspace_management.md`)
+  - `[x]` `AGENT.md` の `<jit_routing>` を更新し、運用ルールへのリンクを追記する
+  - `[x]` `Proj_Action_Reflection_Pipeline` 内のレガシーファイル (`Routines.md`) の削除
+  - `[x]` `epics/03_action_reflection_pipeline.md` の内容をルーティングインデックスとして整理する
+- `[x]` **Step 2: Areas の回収と更地化**
+  - `[x]` 現在の `10_Areas` の内容を読み込み・バックアップ
+  - `[x]` `10_Areas` 配下のファイル群を削除（Gitは履歴保持）
+- `[x]` **Step 3: Areas 壁打ちと再構築**
+  - `[x]` アーキテクチャの定義（4大ドメインとREADME作成）
+  - `[x]` 01_Identity の壁打ちとビジョン統合
+  - `[x]` その他のドメインへの再配布（02_Professions, 03_Passions, 04_Life_Systems）
+- `[x]` **Step 4: workspace-architect スキルの開発**
+  - `[x]` `SKILL.md` の実装
+  - `[x]` `skill-reviewer` による検証
+  - `[x]` 完了（Walkthrough更新）
+- `[x]` **Step 5: プロファイリング結果の保存と SKILL 化**
+  - `[x]` 完了時に `johari_profiling_report.md` を Resource へ保存
+  - `[x]` ジョハリ・プロファイリングの SKILL 化（johari-profiler 実装完了）

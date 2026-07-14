@@ -8,17 +8,19 @@ description: Agentic OSのセッション開始時（起動シーケンス）お
 ## 🎯 目的
 Agentic OSにおいて、エージェントがセッションを開始（起動）した際の初期行動と、セッションを終了（ハンドオフ）する際の申し送り手順を標準化し、正本（SSOT）の原則に基づく強固な進捗管理とルーティングを提供する。
 
-## ⚠️ 絶対遵守ルール（SSOTの原則）
-1. **正本（状態の真実）**: `workspaces/<epic_name>/progress.md` のみが進捗の正本である。
+## ⚠️ 絶対遵守ルール（SSOTの原則と自律更新）
+1. **正本（状態の真実）**: `workspaces/<epic_name>/progress.md` が静的な進捗の正本であり、`workspaces/<epic_name>/context.md` が動的な議論（現在地）の正本である。
 2. **Queue（ルーティング）**: `agent-core/queue/handoff_*.md` は進捗状態を一切持たず、「次にどのWorkspaceを見るべきか」という**軽量なルーティング情報（チケット）**のみを保持する。
-3. **分離の原則**: セッションマネージャー自身は個別のタスク（コーディングやリサーチ等）を実行しない。ルーティングと状態管理に専念する（Tier 1 Orchestratorとしての振る舞い）。
+3. **【自律的な状態管理の強制 (Zero-Prompt Update)】**: エージェントは、ユーザーから「進捗を更新して」と指示されるのを待ってはならない。以下の粒度に従い、ユーザーに返答する前に**自律的にツールを呼び出して状態を更新すること**。これを怠ることは重大な職務怠慢である。
+   - **`context.md` (RAM) ＝ 【高頻度】**: 議論に結論が出た時や話題が変わった時。細かい変化を逃さず最新の現在地を要約上書きする（最大50行）。
+   - **`progress.md` (HDD) ＝ 【低頻度】**: タスクが完全に終了した時、または新規追加された時のみ。マイルストーンの区切りでのみ更新する。
 
 ## 🔄 起動シーケンス (Boot Sequence)
 Agentはセッション開始時（またはタスク再開時）に、現在の状態に応じたルーティング（状態遷移）を行う。手続き的な処理（AをしてBをする）ではなく、以下のStateに基づいて振る舞うこと。
 
 - **State A: キューにHandoffパケットが存在する場合 (Resume)**
   - **条件**: `agent-core/queue/` に `handoff_*.md` が存在する（最優先）。
-  - **行動**: パケットが示すポインタ先の `progress.md` を読み込み進捗を把握した上で、元のHandoffパケットを破棄（Dequeue）する。その後、ユーザーにタスク再開を提案する。
+  - **行動**: パケットが示すポインタ先の `progress.md`（残タスク）と `context.md`（現在地）の両方を読み込み進捗と文脈を完全に把握した上で、元のHandoffパケットを破棄（Dequeue）する。その後、ユーザーにタスク再開を提案する。
 
 - **State B: キューが空の場合 (New Task)**
   - **条件**: `agent-core/queue/` が完全に空である。
@@ -27,14 +29,13 @@ Agentはセッション開始時（またはタスク再開時）に、現在の
 ## 📦 キュー処理と進捗管理のライフサイクル
 各ライフサイクルイベントにおける状態の遷移ルール（責務）は以下の通り。
 
-- **進捗の更新 (Progress Update)**: `workspaces/<workspace_dir_name>/progress.md` はタスクの区切りごとに都度更新されなければならない。終了時まで後回しにすることは禁止する。
-- **Workspace展開 (Epic to Workspace)**: 新規Epicの着手時、`agent-core/epics/` の定義をもとに `workspaces/<workspace_dir_name>/` ディレクトリと `agent-core/templates/Workspace_Progress_Template.md` に基づく `progress.md` が作成されなければならない。
+- **状態の自律更新 (Autonomous Update)**: 上記の絶対遵守ルール3に従い、セッション中は Agent 自身が `progress.md` と `context.md` をバックグラウンドで維持管理し続ける。
+- **Workspace展開 (Epic to Workspace)**: 新規Epicの着手時、`progress.md` と `context.md` がテンプレートに基づき生成されなければならない。
 - **Pre-Handoff Verification (事前検証とコミット)**: セッション終了の準備として、Agentは以下の手順を必ず実行しなければならない。
-  1. `agent-core/` ディレクトリに移動し、`bash scripts/pre_handoff_verify.sh` を実行する。
-  2. エラーが出た場合はエラー内容を修正し、成功するまで繰り返す。
+  1. `context.md` に「次回のセッションで考えるべき論点（Current Focus）」が書き残されていることを確認する。
+  2. `agent-core/` ディレクトリに移動し、`bash scripts/pre_handoff_verify.sh` を実行する。
   3. 検証にパスしたら、作業したリポジトリで `git add . && git commit -m "chore: Handoff - [作業のサマリ]" && git push` を実行する。
-- **Enqueue（申し送り）**: 上記の検証とコミットが完了した後、`agent-core/templates/Handoff_Packet_Template.md` に基づくパケットを `agent-core/queue/handoff_<workspace_dir_name>.md` として生成（上書き）しなければならない。**【重要】パケットの宛先やファイル名には「Epic 04」のような抽象的な名称や番号を絶対に使わず、必ず物理的に一意なワークスペースのディレクトリ名を使用すること。**
-
+- **Enqueue（申し送り）**: 上記のコミット完了後、`agent-core/templates/Handoff_Packet_Template.md` に基づくパケットを生成する。**【重要】パケットには作業ログなどの状態を一切書き込まず、単なるポインタ（チケット）として純粋なルーティング情報のみを記述すること。**
 ## 🛠️ トリガー
 *   セッションが開始され、「次に何をすべきか」を尋ねられた時
 *   セッションを終了、あるいは中断し、状態を保存・申し送りするよう指示された時

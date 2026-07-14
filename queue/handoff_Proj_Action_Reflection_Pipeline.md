@@ -1,20 +1,23 @@
-# Handoff Packet: Proj_Action_Reflection_Pipeline
+---
+status: pending
+epic: Epic 05 - Onboarding & Trial
+target_workspace: Proj_Action_Reflection_Pipeline
+created_at: "2026-07-12T15:28:00+09:00"
+---
 
-## 1. Status Summary
-- **Current Epic**: Epic 04-B システムガバナンスと安全装置の実装
-- **Status**: ✅ Completed
-- **Next Epic**: Epic 05 実運用テスト
+# Handoff Packet
 
-## 2. Work Completed in This Session
-- **ガバナンス・安全装置の構築**:
-  - Agentがセッションを終了（Handoff）する際、未検証のコードや未コミットの変更を残して逃げられないようにするための物理的・ルール的な安全装置を構築しました。
-  - **agent-core**: `scripts/pre_handoff_verify.sh` を作成し、検証のオーケストレーションを一元化しました。また `AGENT.md`（ポリシー）と `session-manager/SKILL.md`（行動アルゴリズム）を改修し、「Handoff前に全体検証スクリプトを通し、コミット＆プッシュする」という明確なルールを敷きました。
-  - **core-service**: `.git/hooks/pre-commit` を作成し、コミット時に自動で `make check-all`（Lint, Test, SDD Validation）が走るようにしました。これにより検証エラーがある状態でのコミットが物理的にブロックされます。
+## 📍 申し送り事項 (Context)
+- Epic 04-C (アーキテクチャの最適化とガバナンス強化) が完了しました。
+- 次のフェーズは Epic 05 (本番移行・試験運用フェーズ) です。
+- ユーザー（社長）と壁打ちを行い、Epic 05 を「運用基盤セットアップ」「データ棚卸し」「E2E試験運用」の3つのフェーズに再構築し、`progress.md` に合意済みの状態として記録しました。
 
-## 3. Context & Insights
-- **アーキテクチャへの適合**: 「検証の起点を agent-core に一元化する」という判断は、You_Incのアーキテクチャ思想（agent-core＝司令塔、core-service＝ステートレス工場、second-brain＝データ）に完全に合致するものでした。
-- **責務の分離**: 「AGENT.md（なぜやるのか、何を要求するか）」と「SKILL.md（どうやるか、具体的なステップ）」の役割分担がより明確になり、Agentのプロンプトエンジニアリングにおけるベストプラクティスが蓄積されました。
+## 🎯 次のアクション (Next Actions)
+次のセッションでは、以下の **Phase 1: 運用基盤の初期セットアップ** の未完了タスクから着手してください。
 
-## 4. Next Steps
-- 次のセッションでは、構築したシステム（特に `night-routine` 等の自動スケジュール機能）の実稼働テストに入ります。
-- 当初のスコープにあったCLIやWebのDashboard開発は**対象外としてEpicから除外**しています。純粋な機能テストとフィードバックループの構築に注力してください。
+1. 対象カレンダーIDの設定確認 (`.env` 等への登録)
+2. `10_Areas` の見直しと整理（ShouldとWantの属性定義を含む）
+3. 生活リズム・パラメータ（起床・就寝・昼食時刻等）の初期設定
+4. 朝の自動スケジューリングバッチ (`daily_scheduler_batch.py`) の Cron 登録
+
+※ 詳細は `workspaces/Proj_Action_Reflection_Pipeline/progress.md` の「🚀 次のアクション」を参照すること。
