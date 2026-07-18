@@ -31,7 +31,7 @@ graph TD
     %% Mac/Server側 (you_inc)
     subgraph you_inc ["you_inc (Mac / Local Server)"]
         subgraph Agent_Core ["🤖 agent-core (秘書)"]
-            Task_Registry[("🗃️ Task Registry\n(タスクの正本: JSON/DB)")]
+            Task_Registry[("🗃️ Task Registry\n(タスクの正本: SQLite)")]
             Orchestrator["指揮・ジャーナリング"]
         end
         core-service["⚙️ core-service\n(機能工場: パース/カレンダー同期)"]
@@ -58,7 +58,7 @@ graph TD
 ## 3. データの配置場所と連携ルール
 
 ### A. タスクの正本（Task Registry）
-*   **場所**: `agent-core/data/task_registry/` (JSONまたはSQLite)
+*   **場所**: `core-service/you_inc_ops.db` (SQLite)
 *   **役割**: 短期タスク（M/S/W）の完全なバックログ。CEOは直接見ず、Agentが管理する。
 
 ### B. Areasとの連携（信念の適用）
@@ -105,3 +105,58 @@ sequenceDiagram
         CEO->>MV: 起床後、洗練されたBriefingだけを見る
     end
 ```
+
+---
+
+## 5. カレンダーとDashboardの責務境界
+
+このシステムにおいて、Google CalendarとDashboard（Briefing.md）は以下の明確な責務境界を持ちます。
+
+### 📅 Googleカレンダー（The Timeline）
+*   **責務**: 「時間の確保（Time-blocking）」と「外部との約束（固定予定）」の絶対的な制約。
+*   **管理対象**: 時間や場所が完全に固定されているもの（会議、出社、毎週のゴルフなど）。
+*   **運用**: Agentはこれを「時間の壁（空き時間計算の制約）」としてのみ扱い、流動タスクをこの空き枠に提案（ブロッキング）します。
+
+### 📊 Dashboard / Briefing.md（The Checklist）
+*   **責務**: 「今日1日のミッション（Action Plan）」の提示と「実績の回収」インターフェース。
+*   **管理対象**: カレンダー上の固定予定であれ、流動タスクであれ、社長が今日実行すべきすべてのタスク（チェックリスト）。AgentがTask Registryから抽出してここに並べます。
+
+### 💡 なぜ「固定予定（ゴルフ）」もTask Registryで一元管理するのか？
+ゴルフなどの時間固定イベントを単にGoogleカレンダーに置くだけでは、「予定を立てた」で終わってしまいます。
+Agent側の `Task Registry` （設定マスタ）で一元管理し、Dashboardへ出力させることで、**社長が `[x]`（完了）を付けた実績をシステムが回収し、「今週は自分を回復させるための [W] (Want) の時間をちゃんと取れたか」というウェルネス・トラッキングのデータとして活用する**ことが可能になります。
+
+---
+
+## 6. 逆方向の実績回収フロー (Reverse Recovery Flow)
+
+社長がMobile側でDashboard（Briefing.md）のタスクを完了（`[x]`）した際、その実績は以下のフローで自動的に `Task Registry` に回収されます。
+
+1.  **同期**: Mobile上で `- [x] タスク名` にチェックを入れると、iCloud経由でMacローカルの `Briefing.md` が更新される。
+2.  **Night Batch (Recovery Parser)**: 夜のジャーナリング開始前（または深夜バッチ）で、`core-service` のパーサーが起動する。
+3.  **状態のパース**: パーサーが `Briefing.md` のMarkdownテキストを解析し、行頭が `- [x]` となっているタスクを正規表現等で抽出する。
+4.  **Task Registry の更新**:
+    *   **単発タスク**: Task Registry (SQLite) 上で当該タスクのステータスを完了に更新する（Soft Deleteによる論理アーカイブ）。
+    *   **定期タスク**: 実績を記録した上で、再帰ルール（例: 毎月末日）に基づき「次回のタスクレコード」を自動生成する。
+5.  **リストの再生成**: 翌朝のMorning Batchにて、未完了タスクと新規タスクのみを抽出し、新たな `Briefing.md` としてMobileへ上書き配信する。
+
+---
+
+## 7. ワークスペースのライフサイクルと退避ルール (Workspace Demotion Rule)
+
+`agent-core/workspaces` は、P.A.R.Aメソッドにおける `Projects`（現在アクティブに工事中の現場）に該当します。
+プロジェクトが「完了」または「休眠（着手予定なし）」状態になった場合、現場から撤収しなければなりません。
+
+*   **資料の退避**: 構想メモや関連資料は、アイデアであれば `second-brain/00_Inbox` へ、確立されたシステムや価値観であれば `second-brain/10_Areas` へ移動させます。
+*   **着手予定の退避**: いつか再開する予定がある場合は、単一のタスクレコードとして `Task Registry` (SQLite) に発行し、退避先のファイルへリンクを貼ります。
+*   **撤収**: 最後に、ワークスペースディレクトリ自体を削除（または40_Archivesへ移動）し、アクティブなプロジェクト一覧を常にクリーンに保ちます。
+
+---
+
+## 8. 依存関係の単方向ルール (Unidirectional Dependency)
+
+タスク（`agent-core`）と知識（`second-brain`）の間には、厳密な**一方向の依存関係（疎結合）**を維持します。
+
+*   ⭕️ **タスク -> 知識**: タスクを実行する上で必要なアイデアやマニュアルがある場合、Task Registryのレコード内に `second-brain` へのリンクを保持する。
+*   ❌ **知識 -> タスク**: `second-brain` のMarkdownファイル内に、特定のタスク（DBのIDやURL）へのリンクをハードコードしてはならない。
+
+`second-brain` 側のナレッジは「誰から参照されているか」「どのタスクのために存在するか」を知る必要がありません。これにより、タスクが完了・消滅しても、second-brain側のナレッジに不要なゴミリンクが残らず、純粋な知識ベースとして持続可能性を保つことができます。
