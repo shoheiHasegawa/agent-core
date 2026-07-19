@@ -17,3 +17,8 @@ description: Use this skill when developing, refactoring, or testing features in
   - ⚠️ **[CRITICAL] Factory内でのハードコード禁止**: `factories/` のコード内にパスやURL等のリテラルを直書きしてはいけません。必ず `config/conf.env` 等から動的に読み込む実装にしてください。
 
 👉 詳細は `core-service/docs/rules/dependency_injection.md` および `agent-core/factories/zettelkasten.py` の実装手本を参照してください。
+
+## 3. アーキテクチャ命名規則（Naming Conventions）
+ドメイン層とインフラ層の関心事を分離し、AIのハルシネーション（エイリアス等）を防ぐため、以下の命名規則を厳守してください。
+- **Interface Naming Rule (Domain層)**: インターフェース名はドメイン概念をそのまま表す名称（例: `TaskRepository`, `IssueParser`）を使用してください。C#やJavaに見られるようなインターフェース特有の接頭辞（例: `ITaskRepository`）を付与してはなりません。
+- **Implementation Naming Rule (Infrastructure層)**: 実装クラスには必ず技術的詳細を示す接頭辞を冠してください（例: `SqlTaskRepository`, `LocalFileMobileVaultRepository`）。インターフェースと同名にすることは（importエイリアスが必要になるため）厳禁です。
