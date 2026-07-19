@@ -5,9 +5,8 @@
 - ワークスペースの統廃合（`Personal_Finance`, `Harness_Construction`のInboxへの退避、`Systematic_Trading`の統合）およびルール明文化が完了。
 
 ## 次回の論点 (Next Focus)
-- **逆方向の実績回収（Reverse Recovery Flow）の詳細仕様決定と実装**
-  - Dashboard（`Briefing.md`）のチェックボックス実績をパースしてTask Registryを更新するフローの実装。
-  - 実装前に以下の3点についてユーザーと壁打ちを行うこと：
-    1. MarkdownとJSONの紐付け方法（IDマッピング：不可視コメント、リンク、完全一致など）
-    2. 定期タスク（ルーティン）完了時の挙動（クローン生成など）
-    3. 実績回収パーサーの起動タイミング（深夜バッチ vs ジャーナリング直前フック）
+- **E2E試験運用（Phase 3）の実施**
+  - 初期データの流し込み（Task Registryへの登録）
+  - 朝のバッチ（`generate_daily_briefing.py`）から夜の回収バッチ（`sync_worklogs.py`）までのエンドツーエンドの挙動確認
+  - `night-routine` による振り返りフィードバックサイクルの検証
+  - Macの `cron` や `launchd` による完全自動化（ハンズフリー化）のセットアップ
