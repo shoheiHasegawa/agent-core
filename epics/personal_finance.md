@@ -1,26 +1,26 @@
 ---
 type: epic
 status: active
-tags: [infrastructure, oracle, aws]
+tags: [finance, automation, gas]
 ---
 
-# Epic 10: Oracle Workshop Hands-on Environment
+# Epic: Personal Finance Automation
 
 ## 📖 Background (背景と課題)
-7月頭までに改修してサブ講師として利用する予定のアクティブなプロジェクト。
-旧 `daily-tools-legacy/oracle-workshop` からそのままディレクトリごと昇格・移動してきた。
-ハンズオン用の環境準備を手動で行うとコストと手間がかかるため、自動化が必要。
+家計簿、支払い履歴、トレード、資産管理など、個人のお金にまつわる情報の集約・効率化を行う自動化プロジェクト。
+旧 `daily-tools-legacy` 等で散発的に作られていたGASスクリプトや財務用モジュールが分散しており、管理・運用コストが高くなっているため、一元管理が必要。
 
 ## 🎯 Goal (目的)
-- ハンズオン環境（Windows AMI、EC2インスタンス）の迅速な展開と破棄。
-- 勉強会終了後の確実なリソース削除によるコスト最適化。
+- 楽天Pay等の決済履歴の自動収集とZaim等の家計簿ツールへの同期。
+- 資産状況の可視化とダッシュボード化。
 
 ## 🚧 Scope (やらないこと・境界)
-- 現状のCloudFormationやスクリプトベースの展開ロジックの抜本的な書き換え（Terraform化など）は当面行わない。既存資産を活かす。
+- 複雑な資産運用アルゴリズムの開発はスコープ外（別途 Systematic Trading Architecture などのEpicで扱う）。
+- ここでは日々のキャッシュフローと家計簿の自動化に焦点を絞る。
 
 ## ✅ DoD (完了条件)
-- [ ] 7月の勉強会用の環境が1コマンドで立ち上がる状態にする。
-- [ ] 終了後に確実にリソースをクリーニングできる仕組みを確認する。
+- [ ] 決済履歴の自動収集パイプラインが稼働する。
+- [ ] 分散していたGASスクリプトが `agent-core` 管轄下で一元管理または置換される。
 
 ## 🛡️ 【必須】開発・実装の制約と前提知識 (TO-BE Architecture)
 このEpicに紐づく機能開発を行うAgent（Implementer等）は、以下のルールを絶対に遵守せよ。

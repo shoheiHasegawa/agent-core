@@ -3,7 +3,7 @@ status: icebox
 created: "2026-06-21"
 ---
 
-# Epic 04: Agentic OS Harness Construction
+# Epic: Agentic OS Harness Construction
 
 ## 概要
 移行プロジェクト（Proj_Playground_Reconstruction）にて「リポジトリ構造の分離とデータの移行」は完了したが、TO-BEアーキテクチャで描かれた「Agentが自律的かつ安全に自動運転するためのインフラ（Harness）」は未実装である。

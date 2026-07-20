@@ -8,7 +8,7 @@ tags: [trading, systematic]
 
 ## コンテキスト
 自動取引システムのアーキテクチャ設計と実装。
-ワークスペース: `agent-core/workspaces/Proj_Systematic_Trading_Architecture/`
+ワークスペース: `agent-core/workspaces/systematic_trading/`
 
 ### 📓 トレード記録と学習サイクル (追加要件)
 単なる自動取引ロジックだけでなく、トレードの「記録（ログ）」をどのように取得し、そこからどのようにZettelkasten（または他のデータストア）への「学びのサイクル（Feedback Loop）」を構築するかの仕組みも本Epic内で設計する。

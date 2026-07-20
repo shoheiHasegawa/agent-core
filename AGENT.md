@@ -42,5 +42,7 @@
 - **[Local Rule Override]**: 他リポジトリ（`second-brain`や`core-service`等）を操作する際は、必ずそのリポジトリ直下の `AGENT.md` をロードし、**当該リポジトリ内においてはそのローカルルールを最優先（agent-coreのルールをオーバーライド）して適用**すること。
 - **[Dependency Injection]**: `core-service`（ステートレス工場）を実行する際は、必ず `agent-core/config/` から設定を読み込み、`agent-core/factories/` 配下で Service-Config パターンに従って依存性を組み立て（DI）してから実行すること。
 - **[Execution]**: 実行スクリプトは用途に応じて `jobs/` または `tools/` に配置すること。
-- **[_index.md の配置例外ルール]**: サブディレクトリ作成時は自己記述の `_index.md` を作成するが、フラットなデータプール領域（Leaf: 例 `Permanent_Notes` 等）には作成を禁止する。構造の分岐点（Node）にのみ配置せよ。
+- **[_index.md の配置ルール（Context Engineering）]**: Agentのコンテキストルーティングのため、以下の基準で配置すること。
+  1. **配置する場所**: サブディレクトリが並ぶ「構造の分岐点（Node）」。特に各ワークスペースの直下など、ローカルな文脈と読み順の指定が必要な場所にエントリーポイントとして配置する。
+  2. **配置しない場所**: Markdown等の「ファイル」が並ぶフラットな領域（Leaf: 例 `epics/`, `Permanent_Notes/`）には配置しない。また、上位の `INDEX.md` で既に用途が説明されている中間ディレクトリ（例: `workspaces/` 直下）にも重複となるため配置しない。
 </governance>

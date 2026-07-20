@@ -4,7 +4,7 @@ status: backlogged
 tags: [automation, productivity, journaling]
 ---
 
-# Epic 03: Action & Reflection Pipeline (行動と内省の自動化)
+# Epic: Action & Reflection Pipeline (行動と内省の自動化)
 
 ## 📖 プロジェクト概要 (Context & Goal)
 日々のタスク管理やカレンダー設定にかかる認知コスト（計画疲れ）をなくし、「実行（Action）」にのみ集中できる環境を構築する。
@@ -13,7 +13,7 @@ tags: [automation, productivity, journaling]
 ## 📍 詳細と実体 (Workspace Routing)
 本プロジェクトの決定事項、アーキテクチャの設計根拠、詳細なTODOバックログ、および現在の進行状況については、以下のワークスペース（SSOT）を参照すること。
 
-👉 **[Proj_Action_Reflection_Pipeline Workspace](file:///Users/shoheihasegawa/you_inc/agent-core/workspaces/Proj_Action_Reflection_Pipeline/)**
+👉 **[action_reflection_pipeline Workspace](file:///Users/shoheihasegawa/you_inc/agent-core/workspaces/action_reflection_pipeline/)**
 - **進捗とTODO**: `progress.md` 
 - **決定事項と設計**: `00_Design_Decisions_and_Paradigms.md` を中心とする設計ドキュメント群
 
