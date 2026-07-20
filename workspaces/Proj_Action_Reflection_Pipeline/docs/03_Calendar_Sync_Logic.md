@@ -34,3 +34,13 @@ Google Calendarの全予定の詳細（Description）には、以下のディー
 obsidian://open?vault=Satellite_Vault&file=10_Dashboard%2FBriefing.md
 ```
 これにより、ユーザーはカレンダーの通知（リマインダー）をタップするだけで、即座にObsidianのタスクリスト（実績入力枠）へジャンプでき、UXの摩擦を極小化します。
+
+## 4. データ同期の原則 (Sync Model vs CRUD)
+Agentとカレンダー間の不整合を防ぐため、Agent向けに「予定の個別更新・削除ツール（Update/Delete）」は提供しません。
+カレンダー操作は以下の**一方向の再構築（Sync）モデル**に限定します。
+
+1. **Single Source of Truth**: 予定の正本は常にDB（Task Registry）に持ちます。
+2. **操作フロー**: ユーザーから「リスケして」「予定を消して」と依頼された場合、Agentは**DB上のタスクデータを修正**します。
+3. **一括再構築 (Sync)**: その後、同期ツール（`sync_calendar.py`）を実行します。このツールは、今日のカレンダー上のAgent作成イベントを一度クリアし、最新のDB状態からスケジュールを引き直して全登録します。
+
+この設計により、Agentは複雑なイベントIDの管理から解放され、カレンダーとDBの状態は常に冪等（べきとう）に保たれます。

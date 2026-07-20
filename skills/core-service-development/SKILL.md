@@ -22,3 +22,6 @@ description: Use this skill when developing, refactoring, or testing features in
 ドメイン層とインフラ層の関心事を分離し、AIのハルシネーション（エイリアス等）を防ぐため、以下の命名規則を厳守してください。
 - **Interface Naming Rule (Domain層)**: インターフェース名はドメイン概念をそのまま表す名称（例: `TaskRepository`, `IssueParser`）を使用してください。C#やJavaに見られるようなインターフェース特有の接頭辞（例: `ITaskRepository`）を付与してはなりません。
 - **Implementation Naming Rule (Infrastructure層)**: 実装クラスには必ず技術的詳細を示す接頭辞を冠してください（例: `SqlTaskRepository`, `LocalFileMobileVaultRepository`）。インターフェースと同名にすることは（importエイリアスが必要になるため）厳禁です。
+
+## 4. リソース管理のベストプラクティス（DBセッション等）
+エントリポイント（バッチスクリプトやCLIツール）等においてデータベースのセッションを生成・管理する際は、必ず `with SessionLocal() as session:` のようにコンテキストマネージャー（with 句）を使用し、異常時にも確実にリソースが解放される堅牢な設計（PEP 343準拠）を標準方針としてください。`try-finally` によるレガシーな手動クローズ管理は禁止とします。
