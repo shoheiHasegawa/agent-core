@@ -1,12 +1,21 @@
-scratch/
-config/secret.env
-config/credentials.json
+# 1. Environment & Credentials
+config/*.env
+config/*.json
+!config/*.enc.*
+!config/conf.env
 
-# Caches and Runtime Data
+# 2. Runtime Data & Queues
+data/*
+!data/.gitkeep
+queue/*
+!queue/.gitkeep
+!queue/handoff_*.md
+
+# 3. Agent Sandbox (唯一の公式作業領域)
+scratch/
+
+# 4. Python Caches & Logs
 __pycache__/
 *.py[cod]
 .pytest_cache/
-brain/
-queue/errors/
-data/task_archive/
-data/task_registry/
+*.log

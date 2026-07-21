@@ -49,7 +49,7 @@ def main():
         try:
             service = TaskManagementFactory.create_daily_action_service(session)
             print("  - Executing DailyActionService.plan_day()...")
-            briefing = service.plan_day(target_date)
+            briefing = service.plan_day(target_date, sync_to_calendar=True)
             session.commit()
             print(f"  - Loaded {len(briefing.scheduled_tasks)} tasks.")
         except Exception:
