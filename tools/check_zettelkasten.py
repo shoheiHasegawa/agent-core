@@ -23,11 +23,8 @@ def main():
         sys.exit(0)
     
     print("❌ Zettelkasten Validation Failed!\n")
-    for filepath, errors in results.items():
-        print(f"File: {filepath}")
-        for err in errors:
-            print(f"  - {err.message}")
-        print()
+    for err_msg in results:
+        print(f"  - {err_msg}")
     
     sys.exit(1)
 

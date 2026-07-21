@@ -13,7 +13,7 @@ if str(CORE_SERVICE_SRC) not in sys.path:
 
 from application.second_brain.config import SecondBrainConfig
 from application.second_brain.service import SecondBrainService
-from infrastructure.second_brain.local_file_repository import LocalFileRepository
+from infrastructure.second_brain.local_file_second_brain_repository import LocalFileSecondBrainRepository
 
 class SecondBrainFactory:
     """
@@ -57,6 +57,6 @@ class SecondBrainFactory:
             forbidden_patterns=["10_Areas", "10_Projects"]
         )
         
-        repository = LocalFileRepository(base_path=str(sb_base))
+        repository = LocalFileSecondBrainRepository(base_path=str(sb_base))
         
         return SecondBrainService(config=config, repository=repository)
