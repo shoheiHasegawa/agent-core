@@ -11,6 +11,7 @@ Agentは以下の境界と絶対安全ルールを厳守し、適切なリポジ
 5. 【Session Handoff & Wisdom Extraction】セッション終了時の進捗・申し送りは `agent-core/skills/session-manager/SKILL.md` のルールに従い `progress.md` と `handoff_*.md` を用いて行うこと。プロジェクトの枠を超えた普遍的な教訓（Wisdom）の原石が得られた場合のみ、 `second-brain/90_Meta/Templates/Sense_Making_Template.md` を用いて `second-brain/20_Sense_Making/` へ蒸留せよ。
 6. 【Agentic OS Protocol (初動と完了の儀式)】タスク着手時は、必ず対象ディレクトリの `AGENT.md` や関連 `SKILL.md` を読み込み、`task.md` の Phase 0 として「ルールに基づくテスト/実装プロセス」を明記せよ。また、実装完了の条件として、独立したReviewer Agentの承認または自動テスト（pytestカバレッジ等）のパスログの提出を必須とする。自動テストのない独断での完了報告は不適合とする。
 7. 【職務分離の原則 (Separation of Duties)】Tier 1 Agentは、`core-service/src` 配下のプロダクションコードを自ら直接編集してはならない。コード変更は必ず仕様(Spec)を定義し、サブエージェント(Implementer/Tester等)に委譲して実行させよ。
+8. 【Secret Management (機密情報の物理的隔離)】パスワードやAPIキーなどのシークレット情報は、リポジトリ内のコードに直書きしたり、トラッキング対象のファイルに保存してはならない。シークレットは必ず `config/secret.env` のような局所的かつ明示的に `.gitignore` された専用領域にのみ配置せよ。また `.gitignore` の指定は無差別なワイルドカード（例: `*.json`）を避け、対象ファイル・ディレクトリを明示的にスコープすること。
 </global_rules_and_safety>
 
 ## <jit_routing>
