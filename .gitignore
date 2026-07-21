@@ -8,3 +8,5 @@ __pycache__/
 .pytest_cache/
 brain/
 queue/errors/
+data/task_archive/
+data/task_registry/
