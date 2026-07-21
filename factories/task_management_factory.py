@@ -39,13 +39,13 @@ from infrastructure.calendar.config import CalendarConfig
 from infrastructure.calendar.google_calendar_repository import GoogleCalendarRepository
 from domain.interfaces.calendar_repository import CalendarRepository
 
+from infrastructure.task_management.briefing_repository import MobileVaultBriefingRepository
+from infrastructure.mobile_vault.local_file_mobile_vault_repository import LocalFileMobileVaultRepository
+import os
+
 class DummyScheduleGateway(ScheduleGateway):
     def sync_schedule(self, target_date: date, tasks: List[Task]) -> None:
         print(f"[DummyGateway] Synced {len(tasks)} tasks to Google Calendar for {target_date}")
-
-class DummyBriefingRepository(BriefingRepository):
-    def save(self, briefing: DailyBriefing) -> None:
-        print(f"[DummyBriefing] Saved briefing for {briefing.target_date}")
 
 class TaskManagementFactory:
     """
@@ -74,8 +74,9 @@ class TaskManagementFactory:
 
     @staticmethod
     def create_briefing_repository() -> BriefingRepository:
-        # TODO: iCloud(Satellite Vault) へのMarkdown出力アダプターを実装し差し替える
-        return DummyBriefingRepository()
+        inbox_dir = os.environ.get("ICLOUD_MOBILE_INBOX", "/tmp/mobile_inbox")
+        mobile_vault_repo = LocalFileMobileVaultRepository()
+        return MobileVaultBriefingRepository(mobile_vault_repo, inbox_dir)
 
     @staticmethod
     def create_calendar_repository() -> CalendarRepository:

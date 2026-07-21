@@ -37,13 +37,7 @@ def main():
         # JSTで日付を取得
         target_date = datetime.now(ZoneInfo("Asia/Tokyo")).date()
         
-        briefing_file = agent_core_dir.parent / f"Briefing_{target_date.strftime('%Y-%m-%d')}.md"
-        
-        # 上書きロスト防止策
-        if briefing_file.exists():
-            print(f"⚠️ [WARNING] {briefing_file.name} already exists. Skipping generation to prevent data loss.")
-            sys.exit(0)
-            
+
         print("  - Injecting dependencies with Unit of Work...")
         session = TaskManagementFactory.get_session()
         try:
@@ -58,26 +52,7 @@ def main():
         finally:
             session.close()
         
-        # Markdownの生成
-        with open(briefing_file, "w", encoding="utf-8") as f:
-            f.write(f"# Daily Briefing ({target_date.strftime('%Y-%m-%d')})\n\n")
-            
-            if briefing.warning_flags:
-                f.write("## ⚠️ Warnings\n")
-                for w in briefing.warning_flags:
-                    f.write(f"- {w.value}\n")
-                f.write("\n")
-                
-            f.write("## Today's Tasks\n")
-            for t in briefing.scheduled_tasks:
-                # 新しいルーズUXフォーマット
-                f.write(f"- [ ] {t.title} (予定: {t.estimated_minutes}m) <!-- id: {t.id} -->\n")
-                # 日跨ぎタスクのメモがあれば出力
-                if getattr(t, "last_memo", None):
-                    f.write(f"  前回メモ: {t.last_memo}\n")
-                    
-            print(f"  - Generated {briefing_file.name}")
-        
+        print("  - Saved daily briefing to Mobile Vault via BriefingRepository.")
         print("✅ Daily Action Planner completed successfully.")
         
     except Exception as e:
