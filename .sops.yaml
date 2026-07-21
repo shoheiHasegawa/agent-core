@@ -1,0 +1,3 @@
+creation_rules:
+  - path_regex: config/.*
+    pgp: '227AAFEA29E631344BDAB96EBAEEE8C5A1F5F99D'
