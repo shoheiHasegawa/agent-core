@@ -1,3 +1,10 @@
 scratch/
 config/secret.env
 config/credentials.json
+
+# Caches and Runtime Data
+__pycache__/
+*.py[cod]
+.pytest_cache/
+brain/
+queue/errors/
