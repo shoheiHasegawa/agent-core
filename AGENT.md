@@ -32,7 +32,7 @@
 
 ## <handoff_verification>
 - 【未検証コードの抑止】Agentは未検証のコードや未コミットの変更を残してセッションを終了してはならない。
-- セッション終了（Handoff）の条件（Definition of Done）として、全体の自動検証（`agent-core/scripts/pre_handoff_verify.sh`等）をパスし、変更がコミットおよびプッシュされている状態を要求する。
+- セッション終了（Handoff）の条件（Definition of Done）として、全体の自動検証（`agent-core/tools/pre_handoff_verify.sh`等）をパスし、変更がコミットおよびプッシュされている状態を要求する。
 </handoff_verification>
 </execution_flow>
 
