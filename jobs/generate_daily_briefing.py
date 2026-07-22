@@ -37,7 +37,7 @@ def main():
         finally:
             session.close()
 
-        print("  - Saved daily briefing to Mobile Vault via BriefingRepository.")
+        print("  - Saved daily briefing to Mobile Vault via BriefingGateway.")
         print("✅ Daily Action Planner completed successfully.")
         
     except Exception as e:

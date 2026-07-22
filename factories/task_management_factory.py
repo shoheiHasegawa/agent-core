@@ -25,7 +25,7 @@ from infrastructure.db.models import Base
 Base.metadata.create_all(_engine)
 SessionLocal = sessionmaker(bind=_engine)
 
-from domain.task_management.repository import ScheduleGateway, BriefingRepository
+from domain.task_management.repository import ScheduleGateway, BriefingGateway
 from domain.task_management.task import Task, DailyBriefing
 from application.task_management.daily_action_service import DailyActionService
 from typing import List
@@ -36,11 +36,11 @@ load_dotenv(agent_core_dir / "config" / "conf.env")
 load_dotenv(agent_core_dir / "config" / "secret.env")
 
 from infrastructure.calendar.config import CalendarConfig
-from infrastructure.calendar.google_calendar_repository import GoogleCalendarRepository
-from domain.interfaces.calendar_repository import CalendarRepository
+from infrastructure.calendar.google_calendar_gateway import GoogleCalendarGateway
+from domain.interfaces.calendar_gateway import CalendarGateway
 
-from infrastructure.task_management.briefing_repository import MobileVaultBriefingRepository
-from infrastructure.mobile_vault.local_file_mobile_vault_repository import LocalFileMobileVaultRepository
+from infrastructure.task_management.briefing_gateway import MobileVaultBriefingGateway
+from infrastructure.mobile_vault.local_file_mobile_vault_gateway import LocalFileMobileVaultGateway
 from domain.system_events.gateway import SystemEventGateway
 from infrastructure.system_events.queue_system_event_gateway import QueueSystemEventGateway
 import os
@@ -75,17 +75,17 @@ class TaskManagementFactory:
         return DummyScheduleGateway()
 
     @staticmethod
-    def create_briefing_repository() -> BriefingRepository:
+    def create_briefing_gateway() -> BriefingGateway:
         inbox_dir = os.environ.get("ICLOUD_MOBILE_INBOX", "/tmp/mobile_inbox")
-        mobile_vault_repo = LocalFileMobileVaultRepository()
-        return MobileVaultBriefingRepository(mobile_vault_repo, inbox_dir)
+        mobile_vault_repo = LocalFileMobileVaultGateway()
+        return MobileVaultBriefingGateway(mobile_vault_repo, inbox_dir)
 
     @staticmethod
-    def create_calendar_repository() -> CalendarRepository:
+    def create_calendar_gateway() -> CalendarGateway:
         calendar_id = os.environ.get("TARGET_CALENDAR_ID", "primary")
         credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "")
         config = CalendarConfig(calendar_id=calendar_id, credentials_path=credentials_path)
-        return GoogleCalendarRepository(config)
+        return GoogleCalendarGateway(config)
 
     @staticmethod
     def create_system_event_gateway() -> SystemEventGateway:
@@ -101,8 +101,8 @@ class TaskManagementFactory:
         task_repo = cls.create_task_repository(session)
         worklog_repo = cls.create_worklog_repository(session)
         schedule_gateway = cls.create_schedule_gateway()
-        briefing_repo = cls.create_briefing_repository()
-        calendar_repo = cls.create_calendar_repository()
+        briefing_repo = cls.create_briefing_gateway()
+        calendar_repo = cls.create_calendar_gateway()
         
         return DailyActionService(
             task_repo=task_repo,
@@ -116,14 +116,14 @@ class TaskManagementFactory:
     def create_sync_worklogs_service(cls, session: Session):
         from application.task_management.sync_worklogs_service import SyncWorklogsService
         
-        mobile_vault_repo = LocalFileMobileVaultRepository()
+        mobile_vault_repo = LocalFileMobileVaultGateway()
         task_repo = cls.create_task_repository(session)
         worklog_repo = cls.create_worklog_repository(session)
         inbox_dir = os.environ.get("ICLOUD_MOBILE_INBOX", "/tmp/mobile_inbox")
         archive_dir = os.environ.get("ICLOUD_MOBILE_ARCHIVE", "/tmp/mobile_archive")
         
         return SyncWorklogsService(
-            mobile_vault_repository=mobile_vault_repo,
+            mobile_vault_gateway=mobile_vault_repo,
             task_repository=task_repo,
             worklog_repository=worklog_repo,
             inbox_dir=inbox_dir,
