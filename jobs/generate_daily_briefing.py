@@ -16,21 +16,7 @@ if str(core_src_dir) not in sys.path:
     sys.path.insert(0, str(core_src_dir))
 
 from factories.task_management_factory import TaskManagementFactory
-
-def notify_error(message: str):
-    """Macの通知センターにエラーを表示し、エラーログを保存する"""
-    print(f"🚨 [FATAL ERROR] {message}")
-    error_dir = agent_core_dir / "queue" / "errors"
-    error_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    error_file = error_dir / f"scheduler_error_{timestamp}.log"
-    with open(error_file, "w", encoding="utf-8") as f:
-        f.write(f"Timestamp: {timestamp}\nError: {message}\nTraceback:\n{traceback.format_exc()}")
-    try:
-        subprocess.run(["osascript", "-e", "on run argv", "-e", 'display notification (item 1 of argv) with title "Agent-Core Error" sound name "Basso"', "-e", "end run", message], check=False)
-    except:
-        pass
-
+from factories.system_event_factory import SystemEventFactory
 def main():
     try:
         print("🌅 Starting Daily Action Planner (generate_daily_briefing)...")
@@ -56,7 +42,9 @@ def main():
         print("✅ Daily Action Planner completed successfully.")
         
     except Exception as e:
-        notify_error(f"スケジュール生成が失敗しました: {str(e)}")
+        error_details = f"スケジュール生成が失敗しました: {str(e)}\nTraceback:\n{traceback.format_exc()}"
+        gateway = SystemEventFactory.create_gateway()
+        gateway.publish_error("generate_daily_briefing", error_details)
         sys.exit(1)
 
 if __name__ == "__main__":

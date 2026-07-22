@@ -25,3 +25,9 @@ description: Use this skill when developing, refactoring, or testing features in
 
 ## 4. リソース管理のベストプラクティス（DBセッション等）
 エントリポイント（バッチスクリプトやCLIツール）等においてデータベースのセッションを生成・管理する際は、必ず `with SessionLocal() as session:` のようにコンテキストマネージャー（with 句）を使用し、異常時にも確実にリソースが解放される堅牢な設計（PEP 343準拠）を標準方針としてください。`try-finally` によるレガシーな手動クローズ管理は禁止とします。
+
+## 5. Gateway パターンの標準化 (外部システム連携)
+DDDの厳格な責務分離に基づき、インターフェースの使い分けを以下のように標準化します。
+- **Repository**: ドメインオブジェクト（Aggregate）のDB永続化や復元にのみ使用すること。
+- **Gateway**: 外部システム（API、Event Bus、Queue、OS通知など）への単方向通信や連携には、必ず `Gateway` という名称を用いたPort（インターフェース）を定義して使用すること（例: `SystemEventGateway`）。
+  - エラーハンドリングやログ出力などのシステムイベントを発行する際も、必ずこのGateway経由でQueueにパケットとして投函（Publish）すること。独自のログファイル出力処理を実装することはアーキテクチャ違反とする。
