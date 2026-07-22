@@ -104,3 +104,21 @@ class TaskManagementFactory:
             worklog_repo=worklog_repo,
             calendar_repo=calendar_repo
         )
+
+    @classmethod
+    def create_sync_worklogs_service(cls, session: Session):
+        from application.task_management.sync_worklogs_service import SyncWorklogsService
+        
+        mobile_vault_repo = LocalFileMobileVaultRepository()
+        task_repo = cls.create_task_repository(session)
+        worklog_repo = cls.create_worklog_repository(session)
+        inbox_dir = os.environ.get("ICLOUD_MOBILE_INBOX", "/tmp/mobile_inbox")
+        archive_dir = os.environ.get("ICLOUD_MOBILE_ARCHIVE", "/tmp/mobile_archive")
+        
+        return SyncWorklogsService(
+            mobile_vault_repository=mobile_vault_repo,
+            task_repository=task_repo,
+            worklog_repository=worklog_repo,
+            inbox_dir=inbox_dir,
+            archive_dir=archive_dir
+        )

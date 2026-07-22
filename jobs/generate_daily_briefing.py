@@ -45,10 +45,7 @@ def main():
             print("  - Executing DailyActionService.plan_day()...")
             briefing = service.plan_day(target_date, sync_to_calendar=True)
             session.commit()
-        except FileExistsError:
-            session.rollback()
-            print(f"⚠️ [WARNING] 本日のDaily Briefingは既に存在します。既存のチェックマーク消失を防ぐため、新規作成をスキップしました。")
-            sys.exit(0)
+
         except Exception:
             session.rollback()
             raise
