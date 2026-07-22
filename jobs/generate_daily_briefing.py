@@ -16,7 +16,6 @@ if str(core_src_dir) not in sys.path:
     sys.path.insert(0, str(core_src_dir))
 
 from factories.task_management_factory import TaskManagementFactory
-from factories.system_event_factory import SystemEventFactory
 def main():
     try:
         print("🌅 Starting Daily Action Planner (generate_daily_briefing)...")
@@ -43,7 +42,7 @@ def main():
         
     except Exception as e:
         error_details = f"スケジュール生成が失敗しました: {str(e)}\nTraceback:\n{traceback.format_exc()}"
-        gateway = SystemEventFactory.create_gateway()
+        gateway = TaskManagementFactory.create_system_event_gateway()
         gateway.publish_error("generate_daily_briefing", error_details)
         sys.exit(1)
 

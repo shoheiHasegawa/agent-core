@@ -41,6 +41,8 @@ from domain.interfaces.calendar_repository import CalendarRepository
 
 from infrastructure.task_management.briefing_repository import MobileVaultBriefingRepository
 from infrastructure.mobile_vault.local_file_mobile_vault_repository import LocalFileMobileVaultRepository
+from domain.system_events.gateway import SystemEventGateway
+from infrastructure.system_events.queue_system_event_gateway import QueueSystemEventGateway
 import os
 
 class DummyScheduleGateway(ScheduleGateway):
@@ -84,6 +86,11 @@ class TaskManagementFactory:
         credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "")
         config = CalendarConfig(calendar_id=calendar_id, credentials_path=credentials_path)
         return GoogleCalendarRepository(config)
+
+    @staticmethod
+    def create_system_event_gateway() -> SystemEventGateway:
+        queue_dir_str = os.environ.get("AGENT_QUEUE_DIR", "/Users/shoheihasegawa/you_inc/agent-core/queue")
+        return QueueSystemEventGateway(queue_dir=Path(queue_dir_str))
 
     @classmethod
     def create_daily_action_service(cls, session: Session) -> DailyActionService:

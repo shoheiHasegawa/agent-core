@@ -17,7 +17,6 @@ if str(core_src_dir) not in sys.path:
     sys.path.insert(0, str(core_src_dir))
 
 from factories.task_management_factory import TaskManagementFactory
-from factories.system_event_factory import SystemEventFactory
 from domain.task_management.task import Worklog
 
 
@@ -161,7 +160,7 @@ if __name__ == "__main__":
             print("Done.")
         except Exception as e:
             error_details = f"Worklog Sync Failed: {str(e)}\nTraceback:\n{traceback.format_exc()}"
-            gateway = SystemEventFactory.create_gateway()
+            gateway = TaskManagementFactory.create_system_event_gateway()
             gateway.publish_error("sync_worklogs", error_details)
             sys.exit(1)
     else:
