@@ -19,7 +19,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "core-service", editable = "../core-service" },
+    { name = "core-service", git = "https://github.com/shoheiHasegawa/core-service.git?branch=main" },
     { name = "python-dotenv" },
     { name = "sqlalchemy" },
 ]
@@ -208,7 +208,7 @@ wheels = [
 [[package]]
 name = "core-service"
 version = "0.1.0"
-source = { editable = "../core-service" }
+source = { git = "https://github.com/shoheiHasegawa/core-service.git?branch=main#c031066a98c11775cfafaf2a5baaed744e7ee050" }
 dependencies = [
     { name = "google-api-python-client" },
     { name = "google-auth-httplib2" },
@@ -216,24 +216,6 @@ dependencies = [
     { name = "holidays" },
     { name = "python-dotenv" },
     { name = "sqlalchemy" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "google-api-python-client", specifier = ">=2.198.0" },
-    { name = "google-auth-httplib2", specifier = ">=0.4.0" },
-    { name = "google-auth-oauthlib", specifier = ">=1.4.0" },
-    { name = "holidays", specifier = ">=0.100" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
-    { name = "sqlalchemy" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "freezegun", specifier = ">=1.5.5" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-cov", specifier = ">=7.1.0" },
-    { name = "ruff", specifier = ">=0.15.18" },
 ]
 
 [[package]]

@@ -11,4 +11,4 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-core-service = { path = "../core-service", editable = true }
+core-service = { git = "https://github.com/shoheiHasegawa/core-service.git", branch = "main" }
