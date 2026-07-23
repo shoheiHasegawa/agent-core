@@ -43,11 +43,13 @@ def main():
         sb_service = get_core_service_container().get_second_brain_service()
         
         if args.type == "inbox":
-            saved = sb_service.register_inbox_note(
+            from application.second_brain.register_inbox_note_dto import RegisterInboxNoteDto
+            dto = RegisterInboxNoteDto(
                 title=args.title,
                 content=body_content,
                 tags=tags_list
             )
+            saved = sb_service.register_inbox_note(dto)
         elif args.type == "sense_making":
             saved = sb_service.register_sense_making_note(
                 title=args.title,
@@ -56,13 +58,15 @@ def main():
                 tags=tags_list
             )
         elif args.type == "permanent":
-            saved = sb_service.register_permanent_note(
+            from application.second_brain.register_permanent_note_dto import RegisterPermanentNoteDto
+            dto = RegisterPermanentNoteDto(
                 title=args.title,
                 claim=args.claim or body_content, # fallback if body_file used instead of claim
                 context=args.context,
                 connections=args.connections,
                 tags=tags_list
             )
+            saved = sb_service.register_permanent_note(dto)
         else:
             raise ValueError(f"Unknown type: {args.type}")
 

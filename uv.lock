@@ -208,7 +208,7 @@ wheels = [
 [[package]]
 name = "core-service"
 version = "0.1.0"
-source = { git = "https://github.com/shoheiHasegawa/core-service.git?branch=main#c031066a98c11775cfafaf2a5baaed744e7ee050" }
+source = { git = "https://github.com/shoheiHasegawa/core-service.git?branch=main#df486a60096dc32f57980e360d88f8fc9c58f57a" }
 dependencies = [
     { name = "google-api-python-client" },
     { name = "google-auth-httplib2" },

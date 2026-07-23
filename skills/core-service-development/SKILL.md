@@ -5,10 +5,13 @@ description: Use this skill when developing, refactoring, or testing features in
 
 # 🛡️ Core-Service Development Skill
 
-## 1. 責務の分離原則
-`core-service` は純粋なドメインロジックの集合（ステートレス工場）です。
-- **外部環境へのアクセス禁止**: `core-service` 内に `.env` を読んだり、APIキーをハードコードしてはいけません。
+## 1. 開発原則（SDD/TDD/DDD/SOLID/Context Engineering）の遵守
+`core-service` リポジトリのすべての設計ルール、アーキテクチャ制約、およびコードレビュー基準は `core-service/docs/architecture.md` を起点とするドキュメント群（正本）に定義されています。
+**[CRITICAL]** タスクの計画や実装を開始する前に、必ず `core-service/docs/architecture.md` およびそのリンク先（`rules/` 配下）を読み込み、これら5大原則の設計思想を理解した上で作業を行ってください。SKILLファイルに設計思想を直書きすることは禁止されています。
+
+## 2. 実行環境とDIの制約
 - **実行は `agent-core` へ**: 自身を実行するスクリプト（バッチやツール）は `core-service` に置かず、`agent-core` の `jobs/` または `tools/` に配置してください。
+- `core-service` は純粋なドメインロジックの集合（ステートレス工場）です。環境変数や外部設定を内部で解決せず、必ず `agent-core` の `app_context.py` (Composition Root) から注入してください。
 
 ## 2. Service-Config パターン（依存性注入）
 機密情報やパス情報は必ず「Service-Config」パターンを用いて外部から注入（DI）してください。
