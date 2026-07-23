@@ -40,7 +40,7 @@
 - 「メーカー（実装）」と「チェッカー（検証）」の分離体制を基本とする。
 - 破壊的変更を伴うタスクは親エージェント（または人間）が直接操作し、ファイル生成等のタスクはサブエージェント（Implementer等）に委譲すること。
 - **[Local Rule Override]**: 他リポジトリ（`second-brain`や`core-service`等）を操作する際は、必ずそのリポジトリ直下の `AGENT.md` をロードし、**当該リポジトリ内においてはそのローカルルールを最優先（agent-coreのルールをオーバーライド）して適用**すること。
-- **[Dependency Injection]**: `core-service`（ステートレス工場）を実行する際は、必ず `agent-core/config/` から設定を読み込み、`agent-core/factories/` 配下で Service-Config パターンに従って依存性を組み立て（DI）してから実行すること。
+- **[Dependency Injection & Package Ecosystem]**: `core-service`（ステートレス工場）への依存は `pyproject.toml` に定義し、`uv` などの標準エコシステムでパスを解決すること（`sys.path` ハックは厳禁）。実行する際は、必ず `agent-core/config/` から設定を読み込み、`agent-core/app_context.py` (Composition Root) を通じて DI コンテナを構築してから実行すること（旧来の `factories/` ラッパーは廃止）。
 - **[Execution]**: 実行スクリプトは用途に応じて `jobs/` または `tools/` に配置すること。
 - **[_index.md の配置ルール（Context Engineering）]**: Agentのコンテキストルーティングのため、以下の基準で配置すること。
   1. **配置する場所**: サブディレクトリが並ぶ「構造の分岐点（Node）」。特に各ワークスペースの直下など、ローカルな文脈と読み順の指定が必要な場所にエントリーポイントとして配置する。

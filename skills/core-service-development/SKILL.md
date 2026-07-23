@@ -13,10 +13,8 @@ description: Use this skill when developing, refactoring, or testing features in
 ## 2. Service-Config パターン（依存性注入）
 機密情報やパス情報は必ず「Service-Config」パターンを用いて外部から注入（DI）してください。
 - `core-service` 側には、機能が必要とする設定の型（`dataclass`）のみを定義します。
-- `agent-core` 側の `factories/` ディレクトリ内で、実際の設定ファイルを読み込んで Config インスタンスを組み立て、Service に注入します。
-  - ⚠️ **[CRITICAL] Factory内でのハードコード禁止**: `factories/` のコード内にパスやURL等のリテラルを直書きしてはいけません。必ず `config/conf.env` 等から動的に読み込む実装にしてください。
-
-👉 詳細は `core-service/docs/rules/dependency_injection.md` および `agent-core/factories/zettelkasten.py` の実装手本を参照してください。
+- `agent-core` 側の `app_context.py`（Composition Root）内で、実際の設定ファイル（`.env` 等）を読み込んで Config インスタンスを組み立て、`core-service` の `CoreServiceContainer` を初期化します。
+  - ⚠️ **[CRITICAL] DIコンテナの外部呼び出し**: 旧来の `factories/` ラッパーは廃止されました。実行スクリプトからは `from app_context import get_core_service_container` を呼び出して Service を取得してください。
 
 ## 3. アーキテクチャ命名規則（Naming Conventions）
 ドメイン層とインフラ層の関心事を分離し、AIのハルシネーション（エイリアス等）を防ぐため、以下の命名規則を厳守してください。
@@ -30,4 +28,15 @@ description: Use this skill when developing, refactoring, or testing features in
 DDDの厳格な責務分離に基づき、インターフェースの使い分けを以下のように標準化します。
 - **Repository**: ドメインオブジェクト（Aggregate）のDB永続化や復元にのみ使用すること。
 - **Gateway**: 外部システム（API、Event Bus、Queue、OS通知など）への単方向通信や連携には、必ず `Gateway` という名称を用いたPort（インターフェース）を定義して使用すること（例: `SystemEventGateway`）。
+  - さらに責務を細分化する場合、`Publisher`, `Reader`, `Receiver` などの粒度の細かいユビキタス言語をPort名として使用することも推奨します。
   - エラーハンドリングやログ出力などのシステムイベントを発行する際も、必ずこのGateway経由でQueueにパケットとして投函（Publish）すること。独自のログファイル出力処理を実装することはアーキテクチャ違反とする。
+
+## 6. Application 層と Composition Root の設計原則
+- **Facade と UseCase の分離**: Application層では、すべての処理を1つのクラスに詰め込む「ファットサービス」を禁止します。入り口として Facade パターン (`~Service`) を配置し、外の世界に対してはシンプルでわかりやすいAPIを提供してください。その上で、実際の複雑なビジネスロジックはSRP（単一責任の原則）に基づく個別の `~UseCase` クラスに委譲する設計を標準とします。
+- **Composition Root (DI)**: インフラの実装とUseCaseを結合し、Serviceを組み立てる依存性注入（DI）のロジックは、Application層の内部に置いてはいけません（インフラへの依存逆流を防ぐため）。必ず `core-service/src/di/` というトップレベルのディレクトリ（Composition Root）に配置し、`agent-core` などのコンシューマーに組み立て済みの Service インスタンスを提供する SDK 的な責務を持たせてください。
+
+## 7. テストとコンプライアンスチェッカー (`validate_sdd.py`) の遵守事項
+`core-service` のテストは `validate_sdd.py` によって厳格に監視されます。以下のルールを厳守してください。
+- **配置の厳格化**: `@patch` や `MagicMock` を使用するテストは「Unitテスト」とみなし、必ず `tests/unit/` 配下に配置してください。DBや外部システムへの実際の結合をテストするものは `tests/integration/` に配置します。
+- **Empty Assertion 検知への対応**: `validate_sdd.py` は、テストコード内にネイティブな `assert` キーワードが存在するかを字句レベルで検査します。`mock.assert_called_once()` などのモックアサーションメソッドを呼んでいる場合でも、スクリプトを通すために必ず `assert mock.called` あるいは `assert True` のようなネイティブな `assert` 文を含める必要があります。
+- **Fake Mocking 禁止**: `MagicMock` や `@patch` を使用する際は、シグネチャの不一致による偽陽性を防ぐため、必ず `autospec=True` または `spec=True` を付与してください。
