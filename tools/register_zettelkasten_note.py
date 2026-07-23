@@ -6,9 +6,7 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-core_service_path = repo_root / "core-service" / "src"
-sys.path.append(str(agent_core_path))
-sys.path.append(str(core_service_path))
+
 
 from app_context import get_core_service_container, SessionLocal
 

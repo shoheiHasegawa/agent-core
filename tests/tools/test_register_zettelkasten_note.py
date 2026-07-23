@@ -10,11 +10,13 @@ sys.path.insert(0, str(agent_core_dir / "tools"))
 import register_zettelkasten_note
 
 class TestRegisterZettelkastenNote(unittest.TestCase):
-    @patch('register_zettelkasten_note.SecondBrainFactory')
+    @patch('register_zettelkasten_note.get_core_service_container')
     @patch('sys.argv', ['register_zettelkasten_note.py', '--type', 'inbox', '--title', 'Test Title'])
-    def test_read_body_from_stdin(self, mock_factory):
+    def test_read_body_from_stdin(self, mock_get_container):
+        mock_container = MagicMock()
         mock_service = MagicMock()
-        mock_factory.create_service.return_value = mock_service
+        mock_get_container.return_value = mock_container
+        mock_container.get_second_brain_service.return_value = mock_service
         mock_service.register_inbox_note.return_value = True
 
         # stdin がパイプ経由であることをモックする (isatty = False)

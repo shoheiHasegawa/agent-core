@@ -6,11 +6,9 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(agent_core_path))
-sys.path.insert(0, str(core_src_path))
+agent_core_path = repo_root / "agent-core"
 
 from app_context import get_core_service_container, SessionLocal
-from application.task_management.task_management_service import TaskManagementService
 
 def main():
     parser = argparse.ArgumentParser(description="Update/Refine an existing task.")
@@ -24,8 +22,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        task_repo = TaskManagementFactory.create_task_repository()
-        task_service = TaskManagementService(task_repo=task_repo)
+        task_service = get_core_service_container().get_task_operations_service()
         
         # refine_task は現状タスクIDを受け取って洗練するロジック
         # 実際には引数として更新項目を渡せるように実装される予定

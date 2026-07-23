@@ -5,7 +5,7 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-sys.path.append(str(agent_core_path))
+agent_core_path = repo_root / "agent-core"
 
 from app_context import get_core_service_container, SessionLocal
 
@@ -29,7 +29,7 @@ def backup_queue():
 
 def main():
     try:
-        service = MobileVaultFactory.create_service()
+        service = get_core_service_container().get_mobile_vault_service()
         count = service.fetch_to_queue()
         print(f"Total fetched bundles: {count}")
         

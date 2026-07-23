@@ -8,11 +8,9 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(agent_core_path))
-sys.path.insert(0, str(core_src_path))
+agent_core_path = repo_root / "agent-core"
 
 from app_context import get_core_service_container, SessionLocal
-from application.task_management.task_management_service import TaskManagementService
 from domain.task_management.task import TaskCategory, TaskType
 
 def commit_deletion(packet_dir: Path, msg: str):
@@ -46,7 +44,6 @@ def main():
     args = parser.parse_args()
 
     # Queue DIR
-    MobileVaultFactory.load_config()
     queue_dir_env = os.getenv("AGENT_QUEUE_DIR")
     queue_dir = Path(queue_dir_env).resolve() if queue_dir_env else (agent_core_path / "queue").resolve()
     
@@ -83,9 +80,8 @@ def main():
             commit_deletion(packet_dir, f"chore(queue): processed idea and removed bundle {args.packet_name}")
 
         elif args.action == "task":
-            # TaskManagementService 経由で登録
-            task_repo = TaskManagementFactory.create_task_repository()
-            task_service = TaskManagementService(task_repo=task_repo)
+            # TaskOperationsService 経由で登録
+            task_service = get_core_service_container().get_task_operations_service()
             
             title = args.title or "Untitled Task"
             

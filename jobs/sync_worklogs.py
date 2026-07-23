@@ -12,9 +12,9 @@ def main():
     
     session = SessionLocal()
     try:
-        service = TaskManagementFactory.create_sync_worklogs_service(session)
-        print("  - Executing SyncWorklogsService.sync()...")
-        service.sync()
+        service = get_core_service_container().get_daily_planning_service()
+        print("  - Executing DailyPlanningService.sync_worklogs()...")
+        service.sync_worklogs(session)
         session.commit()
         print("✅ Worklog Sync completed successfully.")
     except Exception as e:
