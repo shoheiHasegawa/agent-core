@@ -1,8 +1,6 @@
 # 1. Environment & Credentials
-config/*.env
-config/*.json
-!config/*.enc.*
-!config/conf.env
+config/secret.env
+config/credentials.json
 
 # 2. Runtime Data & Queues
 data/*
