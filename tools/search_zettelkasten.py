@@ -5,12 +5,8 @@ import argparse
 
 # agent-coreディレクトリへのパスを通す
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-AGENT_CORE_DIR = os.path.dirname(SCRIPT_DIR)
-if AGENT_CORE_DIR not in sys.path:
-    sys.path.insert(0, AGENT_CORE_DIR)
-
 # ファクトリをインポート（これにより core-service へのパスも通る）
-from factories.second_brain_factory import SecondBrainFactory
+from app_context import get_core_service_container, SessionLocal
 
 def main():
     parser = argparse.ArgumentParser(description="Zettelkasten Search")
@@ -19,7 +15,7 @@ def main():
     parser.add_argument('--alias', help="Alias to search")
     args = parser.parse_args()
 
-    service = SecondBrainFactory.create_service()
+    service = get_core_service_container().get_second_brain_service()
     
     # In SecondBrainService, search takes a string. We use keyword if provided.
     query_str = args.keyword or args.tag or args.alias or ""

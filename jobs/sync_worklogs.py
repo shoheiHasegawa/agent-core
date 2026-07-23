@@ -4,20 +4,13 @@ import traceback
 from pathlib import Path
 
 # パス解決
-current_dir = Path(__file__).parent.resolve()
-agent_core_dir = current_dir.parent
-core_src_dir = agent_core_dir.parent / "core-service" / "src"
-if str(agent_core_dir) not in sys.path:
-    sys.path.insert(0, str(agent_core_dir))
-if str(core_src_dir) not in sys.path:
-    sys.path.insert(0, str(core_src_dir))
 
-from factories.task_management_factory import TaskManagementFactory
+from app_context import get_core_service_container, SessionLocal
 
 def main():
     print("🔄 Starting Worklog Sync (sync_worklogs)...")
     
-    session = TaskManagementFactory.get_session()
+    session = SessionLocal()
     try:
         service = TaskManagementFactory.create_sync_worklogs_service(session)
         print("  - Executing SyncWorklogsService.sync()...")

@@ -6,12 +6,11 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-agent_core_path = repo_root / "agent-core"
 core_service_path = repo_root / "core-service" / "src"
 sys.path.append(str(agent_core_path))
 sys.path.append(str(core_service_path))
 
-from factories.second_brain_factory import SecondBrainFactory
+from app_context import get_core_service_container, SessionLocal
 
 def main():
     parser = argparse.ArgumentParser(description="Register a note into Zettelkasten via core-service.")
@@ -43,7 +42,7 @@ def main():
     tags_list = [t.strip() for t in args.tags.split(",") if t.strip()]
 
     try:
-        sb_service = SecondBrainFactory.create_service()
+        sb_service = get_core_service_container().get_second_brain_service()
         
         if args.type == "inbox":
             saved = sb_service.register_inbox_note(

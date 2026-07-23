@@ -5,10 +5,9 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-agent_core_path = repo_root / "agent-core"
 sys.path.append(str(agent_core_path))
 
-from factories.mobile_vault_factory import MobileVaultFactory
+from app_context import get_core_service_container, SessionLocal
 
 def backup_queue():
     """Fetch直後に同期的にQueueの状態をGitにコミットして保存する（データ消失防止）"""

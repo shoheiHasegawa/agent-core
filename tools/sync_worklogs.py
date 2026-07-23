@@ -7,16 +7,9 @@ from pathlib import Path
 from datetime import datetime
 
 # パス解決
-current_dir = Path(__file__).parent.resolve()
-agent_core_dir = current_dir.parent
-core_src_dir = agent_core_dir.parent / "core-service" / "src"
 
-if str(agent_core_dir) not in sys.path:
-    sys.path.insert(0, str(agent_core_dir))
-if str(core_src_dir) not in sys.path:
-    sys.path.insert(0, str(core_src_dir))
 
-from factories.task_management_factory import TaskManagementFactory
+from app_context import get_core_service_container, SessionLocal
 from domain.task_management.task import Worklog
 
 
@@ -24,8 +17,7 @@ from domain.task_management.task import Worklog
 class SyncWorklogsTool:
     def __init__(self, workspace_root: str):
         self.workspace_root = Path(workspace_root)
-        self.agent_core_dir = self.workspace_root / "agent-core"
-        self.queue_dir = self.agent_core_dir / "queue"
+        self.        self.queue_dir = self.agent_core_dir / "queue"
 
     def run(self, briefing_path: str):
         filepath = Path(briefing_path)
@@ -125,9 +117,9 @@ class SyncWorklogsTool:
             return
 
         # App Service経由での統合保存（トランザクション保護）
-        session = TaskManagementFactory.get_session()
+        session = SessionLocal()
         try:
-            service = TaskManagementFactory.create_daily_action_service(session)
+            service = get_core_service_container().get_daily_planning_service()
             service.record_worklogs(worked_date, worklogs)
             session.commit()
             print(f"Successfully processed {len(worklogs)} tasks via DailyActionService.")
@@ -150,8 +142,7 @@ class SyncWorklogsTool:
 if __name__ == "__main__":
     import sys
     workspace = str(Path(__file__).parent.parent.parent.resolve())
-    agent_core_dir = Path(workspace) / "agent-core"
-    
+        
     if len(sys.argv) > 1:
         briefing_path = sys.argv[1]
         tool = SyncWorklogsTool(workspace)
@@ -160,7 +151,7 @@ if __name__ == "__main__":
             print("Done.")
         except Exception as e:
             error_details = f"Worklog Sync Failed: {str(e)}\nTraceback:\n{traceback.format_exc()}"
-            gateway = TaskManagementFactory.create_system_event_gateway()
+            gateway = get_core_service_container().get_system_event_gateway()
             gateway.publish_error("sync_worklogs", error_details)
             sys.exit(1)
     else:

@@ -6,12 +6,10 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-agent_core_path = repo_root / "agent-core"
-core_src_path = repo_root / "core-service" / "src"
 sys.path.insert(0, str(agent_core_path))
 sys.path.insert(0, str(core_src_path))
 
-from factories.task_management_factory import TaskManagementFactory
+from app_context import get_core_service_container, SessionLocal
 from application.task_management.task_management_service import TaskManagementService
 
 def main():

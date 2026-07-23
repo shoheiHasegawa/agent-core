@@ -8,14 +8,10 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
-agent_core_path = repo_root / "agent-core"
-core_src_path = repo_root / "core-service" / "src"
 sys.path.insert(0, str(agent_core_path))
 sys.path.insert(0, str(core_src_path))
 
-from factories.mobile_vault_factory import MobileVaultFactory
-from factories.second_brain_factory import SecondBrainFactory
-from factories.task_management_factory import TaskManagementFactory
+from app_context import get_core_service_container, SessionLocal
 from application.task_management.task_management_service import TaskManagementService
 from domain.task_management.task import TaskCategory, TaskType
 
@@ -66,7 +62,7 @@ def main():
 
     try:
         if args.action == "idea":
-            sb_service = SecondBrainFactory.create_service()
+            sb_service = get_core_service_container().get_second_brain_service()
             title = args.title or args.packet_name
             tags_list = [t.strip() for t in args.tags.split(",") if t.strip()]
             body = ""

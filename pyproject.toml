@@ -1,0 +1,14 @@
+[project]
+name = "agent-core"
+version = "0.1.0"
+description = "Agent Core executing jobs and tools"
+authors = [{ name = "You_Inc", email = "info@example.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "core-service",
+    "python-dotenv",
+    "sqlalchemy",
+]
+
+[tool.uv.sources]
+core-service = { path = "../core-service", editable = true }

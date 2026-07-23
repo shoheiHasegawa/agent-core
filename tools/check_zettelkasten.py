@@ -4,17 +4,13 @@ import os
 
 # agent-coreディレクトリへのパスを通す
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-AGENT_CORE_DIR = os.path.dirname(SCRIPT_DIR)
-if AGENT_CORE_DIR not in sys.path:
-    sys.path.insert(0, AGENT_CORE_DIR)
-
-from factories.second_brain_factory import SecondBrainFactory
+from app_context import get_core_service_container, SessionLocal
 
 def main():
     print(f"🔍 Validating Zettelkasten rules...")
 
     # ファクトリからServiceを取得（Composition Rootへの依存）
-    service = SecondBrainFactory.create_service()
+    service = get_core_service_container().get_second_brain_service()
 
     results = service.audit_zettelkasten_rules()
 
