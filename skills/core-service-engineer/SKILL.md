@@ -51,7 +51,7 @@ TDDにおける確証バイアスを防ぐため、あなたは必ず以下の�
 *   **入力 (Input)**: Implementerが実装したコード
 *   **アクション (Action)**: 再度 `QA Reviewer Agent` を起動し、以下の観点で最終レビューを行わせる。
     1. **ドメイン貧血の防止**: ドメインモデル（エンティティ）が適切にロジックを持っており、Service層が肥大化していないか。DDDやSOLID原則に違反していないか。
-    2. **Gate（自動検証）**: 実装完了前に `scripts/validate_sdd.py` の実行結果を確認し、Pass していなければならない。Integration Test側で `spec.md` の仕様IDが100%網羅されているかをチェックする。
+    2. **Gate（自動検証）**: 実装完了前に `../agent-core/tools/validate_sdd.py` の実行結果を確認し、Pass していなければならない。Integration Test側で `spec.md` の仕様IDが100%網羅されているかをチェックする。
     3. Reviewerから「全Gateを通過（Pass）」の報告を得られない限り完了してはいけない。Rejectされた場合は再度Implementerを起動して修正させ、再検証ループを回すこと。
 *   **出力 (Output)**: ReviewerからのApprove
 

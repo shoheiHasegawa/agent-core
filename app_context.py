@@ -16,7 +16,9 @@ load_dotenv(agent_core_dir / "config" / "conf.env")
 load_dotenv(agent_core_dir / "config" / "secret.env")
 
 # DB Setup
-_db_path = f"sqlite:///{core_src_dir.parent.parent}/you_inc_ops.db"
+_db_path = os.environ.get("DB_PATH")
+if not _db_path:
+    raise ValueError("DB_PATH is not set in config/conf.env")
 _engine = create_engine(_db_path, echo=False)
 Base.metadata.create_all(_engine)
 SessionLocal = sessionmaker(bind=_engine)
@@ -32,7 +34,6 @@ def get_core_service_container() -> CoreServiceContainer:
         db_path=_db_path,
         mobile_inbox_dir=os.environ.get("ICLOUD_MOBILE_INBOX", "/tmp/mobile_inbox"),
         mobile_dashboard_dir=os.environ.get("ICLOUD_MOBILE_DASHBOARD", "/tmp/mobile_dashboard"),
-        mobile_archive_dir=os.environ.get("ICLOUD_MOBILE_ARCHIVE", "/tmp/mobile_archive"),
         agent_queue_dir=os.environ.get("AGENT_QUEUE_DIR", str(agent_core_dir / "queue")),
         google_calendar_id=os.environ.get("TARGET_CALENDAR_ID", "primary"),
         google_credentials_path=os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ""),
@@ -44,7 +45,7 @@ def get_core_service_container() -> CoreServiceContainer:
         sb_inbox_template_path=os.environ.get("ZETTELKASTEN_INBOX_TEMPLATE", ""),
         sb_sense_making_template_path=os.environ.get("ZETTELKASTEN_SENSE_MAKING_TEMPLATE", ""),
         sb_permanent_note_template_path=os.environ.get("ZETTELKASTEN_PERMANENT_TEMPLATE", ""),
-        sb_forbidden_patterns=["90_Meta", "attachments"]
+        sb_forbidden_patterns=os.environ.get("ZETTELKASTEN_FORBIDDEN_PATTERNS", "90_Meta,attachments").split(",")
     )
     session = SessionLocal()
     return CoreServiceContainer(config, session)

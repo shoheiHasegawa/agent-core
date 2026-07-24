@@ -38,8 +38,9 @@ DDDの厳格な責務分離に基づき、インターフェースの使い分�
 - **Facade と UseCase の分離**: Application層では、すべての処理を1つのクラスに詰め込む「ファットサービス」を禁止します。入り口として Facade パターン (`~Service`) を配置し、外の世界に対してはシンプルでわかりやすいAPIを提供してください。その上で、実際の複雑なビジネスロジックはSRP（単一責任の原則）に基づく個別の `~UseCase` クラスに委譲する設計を標準とします。
 - **Composition Root (DI)**: インフラの実装とUseCaseを結合し、Serviceを組み立てる依存性注入（DI）のロジックは、Application層の内部に置いてはいけません（インフラへの依存逆流を防ぐため）。必ず `core-service/src/di/` というトップレベルのディレクトリ（Composition Root）に配置し、`agent-core` などのコンシューマーに組み立て済みの Service インスタンスを提供する SDK 的な責務を持たせてください。
 
-## 7. テストとコンプライアンスチェッカー (`validate_sdd.py`) の遵守事項
-`core-service` のテストは `validate_sdd.py` によって厳格に監視されます。以下のルールを厳守してください。
+## 7. テストとコンプライアンスチェッカー (`agent-core/tools/validate_sdd.py`) の遵守事項
+`core-service` のテストは `agent-core/tools/validate_sdd.py` によって厳格に監視されます。以下のルールを厳守してください。
+
 - **配置の厳格化**: `@patch` や `MagicMock` を使用するテストは「Unitテスト」とみなし、必ず `tests/unit/` 配下に配置してください。DBや外部システムへの実際の結合をテストするものは `tests/integration/` に配置します。
 - **Empty Assertion 検知への対応**: `validate_sdd.py` は、テストコード内にネイティブな `assert` キーワードが存在するかを字句レベルで検査します。`mock.assert_called_once()` などのモックアサーションメソッドを呼んでいる場合でも、スクリプトを通すために必ず `assert mock.called` あるいは `assert True` のようなネイティブな `assert` 文を含める必要があります。
 - **Fake Mocking 禁止**: `MagicMock` や `@patch` を使用する際は、シグネチャの不一致による偽陽性を防ぐため、必ず `autospec=True` または `spec=True` を付与してください。

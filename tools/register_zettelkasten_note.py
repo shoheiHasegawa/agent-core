@@ -51,12 +51,14 @@ def main():
             )
             saved = sb_service.register_inbox_note(dto)
         elif args.type == "sense_making":
-            saved = sb_service.register_sense_making_note(
+            from application.second_brain.register_sense_making_note_dto import RegisterSenseMakingNoteDto
+            dto = RegisterSenseMakingNoteDto(
                 title=args.title,
                 content=body_content,
                 source=args.source,
                 tags=tags_list
             )
+            saved = sb_service.register_sense_making_note(dto)
         elif args.type == "permanent":
             from application.second_brain.register_permanent_note_dto import RegisterPermanentNoteDto
             dto = RegisterPermanentNoteDto(
