@@ -6,10 +6,10 @@
 - `03_Sessions_Design_Draft.md` の作成（ETAサイクル、Project Xの伏線リレー）
 - `00_Course_Design_Philosophy.md` の作成
 
-## [ ] フェーズ2: 第1回 教材実装（Implementation - Session 1）
-- [ ] 第1回講義用マークダウン原稿のアウトライン作成
-- [ ] Project Xの初期チャット履歴（E: 経験用）の作成
-- [ ] スライド/原稿の執筆
+## [x] フェーズ2: 第1回 教材実装（Implementation - Session 1）
+- [x] 第1回講義用マークダウン原稿のアウトライン作成
+- [x] Project Xの初期チャット履歴（E: 経験用）の作成
+- [x] スライド/原稿の執筆
 
 ## [ ] フェーズ3: 第2回〜第6回 教材実装（Implementation - Session 2~6）
 - [ ] 各回の原稿およびObsidian Vault（Project X）用データの作成
