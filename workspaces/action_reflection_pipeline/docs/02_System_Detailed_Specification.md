@@ -21,7 +21,7 @@
 *   **When**: 毎晩（ただしユーザーが疲労時はスキップ可能）。
 *   **Where**: Mac (主体: `agent-core`, 計算・永続化委譲: `core-service`) ➡️ `second-brain` (Git)
 *   **How**:
-    1.  **回収とパース**: `agent-core`（Orchestrator）が `core-service`（UseCase）を呼び出し、LLMを用いて入力を3分類（`[M] Must`, `[S] Should`, `[W] Want`）してタスクDBへ格納。
+    1.  **壁打ちと選択的パース (Triage)**: `agent-core` (Orchestrator内のWorkerスキル) が、直接Mobile VaultをPeekして未処理パケットの一覧を取得し、Triage Planを作成する。ユーザーと壁打ちを行い、「回収するもの」と「モバイルに残すもの」を合意した上で、対象のみを分類してタスクDBへ格納、またはアイデアとして保存する。
     2.  **実績の集計（偽の免罪符防止）**:
         *   **【QA修正】** カレンダー上の予定をそのまま実績とは見なさない。夜の振り返り時、Agentが「今日の `[S]` は予定通り終わりましたか？」と確認し、ユーザーの「Yes/No」をもって初めて実績時間として集計する。
     3.  **ジャーナリング（エスケープハッチ）**:

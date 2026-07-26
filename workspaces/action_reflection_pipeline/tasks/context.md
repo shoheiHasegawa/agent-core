@@ -6,8 +6,7 @@
 - 冪等性を担保したスケジュール登録処理がテスト(Red->Green)を通過し、実カレンダーへの同期が手動実行で確認された。
 
 ## Current Focus (次回の論点・着手領域)
+- **スケジュール設定（cron/launchd等）の完了 (Phase 1)**
+  - まだスケジュール設定されていない `generate_daily_briefing.py` と `sync_worklogs.py` (または他のJob) の2つのジョブについて、Macの `cron` や `launchd` による自動起動設定を行う。
 - **E2E試験運用の継続 (Phase 3)**
-  - 朝の配信: 生成されたタスク一覧（`Briefing.md` 等）が Mobile Vault に同期されるか検証する。
-  - 夜のジャーナリング: `night-routine` がパケットを検知し、実績サマリをもとにタスク整理のフィードバックループを回せるかを検証する。
-  - Macの `cron` や `launchd` による完全自動化（ハンズフリー化）のセットアップ。
-  - DBへのステータス反映（`sync_worklogs.py`）の稼働確認。
+  - 朝の配信・夜のジャーナリングのパイプライン稼働テスト。

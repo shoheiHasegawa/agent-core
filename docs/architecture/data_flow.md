@@ -18,9 +18,8 @@ sequenceDiagram
     
     %% フェーズ1: 投入と整形
     User->>Mobile: アイデア・メモを書き込む
-    note over Mobile,Queue: Agentが未整形データを回収
-    Mobile->>Queue: 1つのパケットとして投函
-    Queue->>Inbox: フォーマットして格納（バックログ化）
+    note over Mobile,Inbox: Agentが壁打ちを経て選択的に回収 (Peek & Process)
+    Mobile->>Inbox: フォーマットして格納（バックログ化）
     
     %% フェーズ2: プロジェクト実行
     note over User,Inbox: 人間がトリガーとなりEpic化
@@ -38,7 +37,7 @@ sequenceDiagram
 ```
 
 ### 各フェーズの詳細
-1. **投入と整形 (Input & Format)**: 人間からの入力は Mobile 等から `agent-core/queue/` に入り、Agentが検索可能な形に整形してから `second-brain/00_Inbox/` に格納します。
+1. **投入と整形 (Input & Format)**: 人間からの入力は Mobile 側から Agent が壁打ちを経て選択的に回収（Peek & Process）し、検索可能な形に整形してから `Task Registry` や `second-brain/00_Inbox/` に格納します。
 2. **アイデアの保管 (`00_Inbox`)**: ここは「整形済みのバックログ」として、人間からの指示を待ちます。
 3. **プロジェクト実行 (`epics` & `workspaces`)**: 人間がトリガーとなってInboxのアイデアがEpic（プロジェクト）になり、フラットな作業場を展開して実行されます。
 4. **出力と抽出 (`Sense_Making`)**: タスク完了の都度、普遍的な学びや運用改善案などのメタ知識はすべて `20_Sense_Making/` へ直接送られます（自己改善ループ）。

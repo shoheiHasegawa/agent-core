@@ -9,7 +9,7 @@ agent_core_dir = current_dir
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from infrastructure.db.models import Base
+from infrastructure.sqlalchemy.base import Base
 
 # load config from conf.env and secret.env
 load_dotenv(agent_core_dir / "config" / "conf.env")
@@ -34,6 +34,7 @@ def get_core_service_container() -> CoreServiceContainer:
         db_path=_db_path,
         mobile_inbox_dir=os.environ.get("ICLOUD_MOBILE_INBOX", "/tmp/mobile_inbox"),
         mobile_dashboard_dir=os.environ.get("ICLOUD_MOBILE_DASHBOARD", "/tmp/mobile_dashboard"),
+        mobile_attachments_dir=os.environ.get("ICLOUD_MOBILE_ATTACHMENTS", "/tmp/mobile_attachments"),
         agent_queue_dir=os.environ.get("AGENT_QUEUE_DIR", str(agent_core_dir / "queue")),
         google_calendar_id=os.environ.get("TARGET_CALENDAR_ID", "primary"),
         google_credentials_path=os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ""),

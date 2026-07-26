@@ -1,1 +1,0 @@
-# Proposal Approval Template

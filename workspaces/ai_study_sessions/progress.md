@@ -30,9 +30,9 @@
 - [x] Session 1〜6: `README.md` へ「動機づけ（絶望の提示）」と「セルフチェック（合格基準）」の追加
 
 ### Phase 6: フェーズ2 評価システム（Google Form）の構築
-- [ ] テスト問題の設計（壁打ち）
-- [ ] 問題データ（JSON/Markdown）の定義
-- [ ] GASによるGoogle Form自動生成スクリプトの実装
+- [x] テスト問題の設計（60問の生成とレビュー完了）
+- [x] 問題データ（JSON/Markdown）の定義と変換
+- [x] GASによるGoogle Form自動生成スクリプトの実装
 
 ### Phase 7: フェーズ3 配信準備
 - [ ] 教材（Vault）のZIP化/Driveアップロード

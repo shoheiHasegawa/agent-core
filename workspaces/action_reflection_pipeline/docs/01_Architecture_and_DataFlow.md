@@ -95,9 +95,12 @@ sequenceDiagram
         Note over CEO, GCal: 🌙 Night Phase (Journaling & Inventory)
         CEO->>MV: 日中の雑多なメモをInboxに投下
         CEO->>Sec: チャットで1日の振り返り（ジャーナリング）
-        Sec->>MV: Inboxのメモを回収・パース
+        Sec->>MV: InboxのメモをPeek (覗き見) して一覧取得
+        Sec->>CEO: Triage Planを提示し壁打ち（回収・残留の判断）
+        CEO->>Sec: プラン承認 (トレード日誌等は残留)
+        Sec->>MV: 指定されたメモと画像をセットで回収 (Process)
         Sec->>Sec: タスクは Task Registry へ登録
-        Sec->>SB: アイデアは 00_Inbox へタグ付きで保存
+        Sec->>SB: アイデアと画像は 00_Inbox/Attachments へ保存
         Sec->>SB: 10_Areas の方針を読み込み
         Sec->>CEO: 「明日の優先タスクはこれらで良いですか？」と提案・整理
     end
