@@ -35,7 +35,7 @@ def main():
         
     except Exception as e:
         error_details = f"スケジュール生成が失敗しました: {str(e)}\nTraceback:\n{traceback.format_exc()}"
-        gateway = get_core_service_container().get_system_event_gateway()
+        gateway = get_core_service_container().system_event_gateway
         gateway.publish_error("generate_daily_briefing", error_details)
         sys.exit(1)
 

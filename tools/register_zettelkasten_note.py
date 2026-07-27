@@ -6,9 +6,13 @@ from pathlib import Path
 
 # パス解決
 repo_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(repo_root / "agent-core"))
+sys.path.insert(0, str(repo_root / "core-service" / "src"))
 
-
-from app_context import get_core_service_container, SessionLocal
+from app_context import get_core_service_container
+from application.second_brain.register_inbox_note_dto import RegisterInboxNoteDto
+from application.second_brain.register_sense_making_note_dto import RegisterSenseMakingNoteDto
+from application.second_brain.register_permanent_note_dto import RegisterPermanentNoteDto
 
 def main():
     parser = argparse.ArgumentParser(description="Register a note into Zettelkasten via core-service.")
@@ -43,7 +47,6 @@ def main():
         sb_service = get_core_service_container().get_second_brain_service()
         
         if args.type == "inbox":
-            from application.second_brain.register_inbox_note_dto import RegisterInboxNoteDto
             dto = RegisterInboxNoteDto(
                 title=args.title,
                 content=body_content,
@@ -51,7 +54,6 @@ def main():
             )
             saved = sb_service.register_inbox_note(dto)
         elif args.type == "sense_making":
-            from application.second_brain.register_sense_making_note_dto import RegisterSenseMakingNoteDto
             dto = RegisterSenseMakingNoteDto(
                 title=args.title,
                 content=body_content,
@@ -60,7 +62,6 @@ def main():
             )
             saved = sb_service.register_sense_making_note(dto)
         elif args.type == "permanent":
-            from application.second_brain.register_permanent_note_dto import RegisterPermanentNoteDto
             dto = RegisterPermanentNoteDto(
                 title=args.title,
                 claim=args.claim or body_content, # fallback if body_file used instead of claim

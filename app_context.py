@@ -8,7 +8,7 @@ core_src_dir = you_inc_dir / "core-service" / "src"
 agent_core_dir = current_dir
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 from infrastructure.sqlalchemy.base import Base
 
 # load config from conf.env and secret.env
@@ -16,11 +16,14 @@ load_dotenv(agent_core_dir / "config" / "conf.env")
 load_dotenv(agent_core_dir / "config" / "secret.env")
 
 # DB Setup
-_db_path = os.environ.get("DB_PATH")
-if not _db_path:
+_db_path_env = os.environ.get("DB_PATH")
+if not _db_path_env:
     raise ValueError("DB_PATH is not set in config/conf.env")
+_db_path: str = _db_path_env
+
 _engine = create_engine(_db_path, echo=False)
-Base.metadata.create_all(_engine)
+with _engine.begin() as conn:
+    Base.metadata.create_all(bind=conn)
 SessionLocal = sessionmaker(bind=_engine)
 
 from di.config import CoreServiceConfig
@@ -48,5 +51,5 @@ def get_core_service_container() -> CoreServiceContainer:
         sb_permanent_note_template_path=os.environ.get("ZETTELKASTEN_PERMANENT_TEMPLATE", ""),
         sb_forbidden_patterns=os.environ.get("ZETTELKASTEN_FORBIDDEN_PATTERNS", "90_Meta,attachments").split(",")
     )
-    session = SessionLocal()
+    session: Session = SessionLocal()
     return CoreServiceContainer(config, session)
