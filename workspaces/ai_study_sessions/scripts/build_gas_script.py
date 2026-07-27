@@ -15,18 +15,23 @@ GAS_TEMPLATE = """
  */
 
 function generateForms() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getActiveSheet();
+  sheet.setName("Links");
   sheet.appendRow(["Title", "Edit URL", "Published URL"]);
   
   // Pythonスクリプトによって埋め込まれたJSONデータ
   const sessionsData = {JSON_DATA_PLACEHOLDER};
   
+  const sheetNames = [];
+  
   // テスト用フォームの生成
-  sessionsData.forEach(session => {
+  sessionsData.forEach((session, index) => {
     Logger.log("Creating form for: " + session.sessionTitle);
     const form = FormApp.create("【AI活用勉強会 テスト】" + session.sessionTitle);
     form.setIsQuiz(true); 
     form.setAllowResponseEdits(false);
+    form.setCollectEmail(true); // ダッシュボード集計用にメールアドレスを収集
     
     session.questions.forEach(q => {
       let item;
@@ -46,14 +51,62 @@ function generateForms() {
       item.setChoices(choices);
     });
     
+    // スプレッドシートのシート数（ID）を記録してからDestinationを設定
+    const beforeIds = ss.getSheets().map(s => s.getSheetId());
+    form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
+    SpreadsheetApp.flush();
+    Utilities.sleep(3000); // シート作成完了を待つ
+    
+    // 新しく追加されたシートを見つけてリネーム
+    const afterSheets = ss.getSheets();
+    const newSheet = afterSheets.find(s => !beforeIds.includes(s.getSheetId()));
+    const targetSheetName = "Session" + (index + 1) + "_Answer";
+    if (newSheet) {
+      newSheet.setName(targetSheetName);
+      sheetNames.push(targetSheetName);
+    } else {
+      // フェイルセーフ（見つからない場合は手動で名前を合わせる想定）
+      sheetNames.push("Session" + (index + 1) + "_Answer");
+    }
+    
     // Add URLs to sheet
     sheet.appendRow([session.sessionTitle + " テスト", form.getEditUrl(), form.getPublishedUrl()]);
   });
+  
+  // --- Dashboardの生成 ---
+  Logger.log("Creating Dashboard...");
+  let dashSheet = ss.getSheetByName("Dashboard");
+  if (!dashSheet) {
+    dashSheet = ss.insertSheet("Dashboard", 1); // 2番目のタブに
+  } else {
+    dashSheet.clear();
+  }
+  
+  // Dashboard Header
+  dashSheet.getRange("A1").setValue("メールアドレス");
+  sheetNames.forEach((name, i) => {
+    dashSheet.getRange(1, 2 + i).setValue("Session " + (i + 1) + " スコア (最新)");
+  });
+  
+  // Dashboard Formula: Email list (UNIQUE across all answer sheets)
+  if (sheetNames.length > 0) {
+    const emailRanges = sheetNames.map(name => `'${name}'!B2:B`).join("; ");
+    dashSheet.getRange("A2").setFormula(`=IFERROR(QUERY(UNIQUE({${emailRanges}}), "where Col1 <> ''"), "")`);
+    
+    // Dashboard Formula: Latest Score for each session
+    sheetNames.forEach((name, i) => {
+      const colLetter = String.fromCharCode(66 + i); // 66 = B, 67 = C...
+      // B:B(Email), C:C(Score), A:A(Timestamp) の配列を作り、Timestampで降順ソートしてVLOOKUP
+      const formula = `=ARRAYFORMULA(IF($A2:$A="","", IFERROR(VLOOKUP($A2:$A, SORT({ '${name}'!B:B, '${name}'!C:C, '${name}'!A:A }, 3, FALSE), 2, FALSE), "未回答")))`;
+      dashSheet.getRange(`${colLetter}2`).setFormula(formula);
+    });
+  }
   
   // --- ここからアンケートフォームの生成 ---
   Logger.log("Creating survey form...");
   const surveyForm = FormApp.create("【AI活用勉強会 基礎編】講座評価アンケート");
   surveyForm.setDescription("全6回の勉強会お疲れ様でした。今後の改善のため、率直なご意見をお聞かせください。");
+  surveyForm.setCollectEmail(true); // アンケートもメールアドレス収集
   
   // Q1
   surveyForm.addScaleItem()
@@ -97,6 +150,18 @@ function generateForms() {
     .setBounds(0, 10)
     .setLabels("全く思わない", "非常にそう思う")
     .setRequired(true);
+    
+  // アンケートの回答先もスプレッドシートに指定
+  const beforeSurveyIds = ss.getSheets().map(s => s.getSheetId());
+  surveyForm.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
+  SpreadsheetApp.flush();
+  Utilities.sleep(3000);
+  
+  const afterSurveySheets = ss.getSheets();
+  const newSurveySheet = afterSurveySheets.find(s => !beforeSurveyIds.includes(s.getSheetId()));
+  if (newSurveySheet) {
+    newSurveySheet.setName("Survey_Answer");
+  }
     
   sheet.appendRow(["講座評価アンケート", surveyForm.getEditUrl(), surveyForm.getPublishedUrl()]);
 
