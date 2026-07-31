@@ -19,8 +19,11 @@ def main():
         print("✅ Worklog Sync completed successfully.")
     except Exception as e:
         session.rollback()
-        print(f"🚨 [FATAL ERROR] Worklog Sync failed: {str(e)}")
-        traceback.print_exc()
+        error_details = f"Worklog Sync failed: {str(e)}\nTraceback:\n{traceback.format_exc()}"
+        print(f"🚨 [FATAL ERROR] {error_details}")
+        
+        gateway = get_core_service_container().system_event_gateway
+        gateway.publish_error("sync_worklogs", error_details)
         sys.exit(1)
     finally:
         session.close()

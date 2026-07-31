@@ -27,7 +27,7 @@ uv run python3 agent-core/tools/sync_worklogs.py "agent-core/Briefing_YYYY-MM-DD
 
 ## ⚠️ 実行ルール (Tier 1 制約)
 *   **自身で作業しない**: このスキル自身はカウンセリングやタスクデータの書き換えを行わない。
-*   **カレンダー同期の禁止**: スケジュール同期バッチ（`daily_scheduler_batch.py`）を起動してはならない（同期は朝の自動バッチにロックされているため）。
+*   **カレンダー同期の再キック**: 必要に応じて、サブエージェントがスケジュール同期のジョブネットをキックすることを許可する。
 
 ## 🛠️ 実行手順 (Role Switching)
 
