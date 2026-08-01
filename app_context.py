@@ -29,7 +29,7 @@ SessionLocal = sessionmaker(bind=_engine)
 from di.config import CoreServiceConfig
 from di.container import CoreServiceContainer
 
-def get_core_service_container() -> CoreServiceContainer:
+def get_core_service_container(session: Session = None) -> CoreServiceContainer:
     """
     環境変数から設定を読み込み、Core ServiceのDIコンテナを構築して返す。
     """
@@ -51,5 +51,6 @@ def get_core_service_container() -> CoreServiceContainer:
         sb_permanent_note_template_path=os.environ.get("ZETTELKASTEN_PERMANENT_TEMPLATE", ""),
         sb_forbidden_patterns=os.environ.get("ZETTELKASTEN_FORBIDDEN_PATTERNS", "90_Meta,attachments").split(",")
     )
-    session: Session = SessionLocal()
+    if session is None:
+        session = SessionLocal()
     return CoreServiceContainer(config, session)

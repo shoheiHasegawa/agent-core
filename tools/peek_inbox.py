@@ -12,8 +12,8 @@ from app_context import get_core_service_container
 def main():
     container = get_core_service_container()
     service = container.get_mobile_vault_service()
-    packets = service.peek_inbox()
-    print(json.dumps(packets, indent=2, ensure_ascii=False))
+    inbox_items = service.peek_inbox()
+    print(json.dumps(inbox_items, indent=2, ensure_ascii=False))
 
 if __name__ == "__main__":
     main()

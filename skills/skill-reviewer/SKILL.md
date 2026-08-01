@@ -16,13 +16,16 @@ description: 既存または新規作成されたスキルの品質を、SOLID�
    - **チェック内容**: Leave No Trace や 事前コミットなどの「システムの大原則・Philosophy」に違反する設計をしていないか。
 
 2. **【設計・実装方針チェック (Design Guidelines)】**
-   - **参照元**: `agent-core/docs/skill_design_principles.md`
+   - **参照元**:
+     - `agent-core/docs/skill_design_principles.md`
+     - `agent-core/docs/architecture/document_architecture_principles.md`
    - **チェック内容**: 以下のアンチパターンに該当していないか。
-     1. **単一責任の違反**: プロンプト内で「Aをして、次にBをして、さらにCをする」といった長大な手順が含まれていないか？（→責務ごとに分割すべき）
-     2. **実行モデルの誤り (Role Switching vs Subagent)**: 「ユーザーとの対話」が主目的であるにも関わらず `invoke_subagent` を使って伝言ゲームを起こそうとしていないか？ 対話はRole Switching（自己状態遷移）、バックグラウンド作業はSubagent委譲となっているか厳格にチェックする。
-     3. **暗黙の依存**: `second-brain` などの外部リポジトリのパスや、特定のドメイン知識がプロンプトにハードコードされていないか？（→外部注入やRAGに切り替えるべき）
-     4. **立法と司法の分離の違反**: スキルプロンプト内に特定のルールや制約（DDD, DIなど）がハードコードされていないか？ルールの外部化と動的JITロードのアルゴリズムに分離されているか？
-     5. **フォーマット**: YAMLフロントマター（`name`, `description`）が正しく設定されているか？また「実行手順」が `Input`, `Action`, `Constraints`, `Output` の4つの標準タグに厳密に従っているか？独自タグ（指示、絶対制約等）を使用していないか？
+     1. **Document Architecture 違反 (God Promptの禁止)**: SKILLは純粋な「実行手順」のみを記述する場所である。抽象論や特定の設計制約（How）がハードコードされ、Fat化（God Prompt化）していないか？（制約はLinterや外部ルールに移譲すべき）
+     2. **単一責任の違反**: プロンプト内で「Aをして、次にBをして、さらにCをする」といった長大な手順が含まれていないか？（→責務ごとに分割すべき）
+     3. **実行モデルの誤り (Role Switching vs Subagent)**: 「ユーザーとの対話」が主目的であるにも関わらず `invoke_subagent` を使って伝言ゲームを起こそうとしていないか？
+     4. **暗黙の依存**: `second-brain` などの外部リポジトリのパスや、特定のドメイン知識がプロンプトにハードコードされていないか？
+     5. **立法と司法の分離の違反**: スキルプロンプト内に特定のルールや制約（DDD, DIなど）がハードコードされていないか？
+     6. **フォーマット**: YAMLフロントマター（`name`, `description`）が正しく設定されているか？実行手順が `Input`, `Action`, `Constraints`, `Output` の標準タグに厳密に従っているか？
 
 ## 🛠️ 実行手順
 

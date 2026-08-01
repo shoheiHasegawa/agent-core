@@ -11,7 +11,7 @@ from app_context import get_core_service_container
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--packet_id", required=True)
+    parser.add_argument("--item_id", required=True)
     parser.add_argument("--action", choices=["idea", "task", "delete"], required=True)
     parser.add_argument("--title", default="")
     parser.add_argument("--tags", default="") # comma separated
@@ -23,17 +23,17 @@ def main():
     container = get_core_service_container()
     service = container.get_mobile_vault_service()
     
-    success = service.process_packet(
-        packet_id=args.packet_id,
+    success = service.process_inbox_item(
+        item_id=args.item_id,
         action=args.action,
         title=args.title,
         tags=tags,
         energy_level=args.energy_level
     )
     if success:
-        print(f"Successfully processed {args.packet_id} as {args.action}")
+        print(f"Successfully processed {args.item_id} as {args.action}")
     else:
-        print(f"Failed to process {args.packet_id}")
+        print(f"Failed to process {args.item_id}")
         sys.exit(1)
 
 if __name__ == "__main__":

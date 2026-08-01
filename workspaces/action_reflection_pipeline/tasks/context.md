@@ -12,7 +12,7 @@
 
 ## Current Focus (次回の論点・着手領域)
 - **E2E試験運用の継続 (Phase 3)**
-  - 夜のジャーナリング (`night-routine`) のパケット検知とフィードバックループの検証。
+  - 夜のジャーナリング (`night-routine`) のInboxItem検知とフィードバックループの検証。
   - 朝の配信 (`generate_daily_briefing.py`) による Mobile Vault への同期（既存ファイル退避ロジック含む）の検証。
 - **初期データの棚卸し (Phase 2)**
   - `inbox-triage` を用いた未完了タスクの仕分け・登録。

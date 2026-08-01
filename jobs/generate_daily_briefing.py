@@ -21,7 +21,7 @@ def main():
         print("  - Injecting dependencies with Unit of Work...")
         session = SessionLocal()
         try:
-            service = get_core_service_container().get_daily_planning_service()
+            service = get_core_service_container(session).get_daily_planning_service()
             print("  - Executing DailyActionService.plan_day()...")
             briefing = service.plan_day(target_date, sync_to_calendar=True)
             session.commit()
@@ -37,6 +37,7 @@ def main():
         
     except Exception as e:
         error_details = f"スケジュール生成が失敗しました: {str(e)}\nTraceback:\n{traceback.format_exc()}"
+        print(f"🚨 [FATAL ERROR] {error_details}")
         gateway = get_core_service_container().system_event_gateway
         gateway.publish_error("generate_daily_briefing", error_details)
         sys.exit(1)

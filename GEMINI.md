@@ -4,14 +4,23 @@
 Agentは以下の境界と絶対安全ルールを厳守し、適切なリポジトリへルーティングせよ。
 
 ## <global_rules_and_safety>
+<!-- 
+【ルール追加時の配置ポリシー (Primacy Effect)】 
+LLMの特性上、上位のルールほど強い制約として働く。ルールを追記する際は単純に末尾に足すのではなく、以下の論理的な優先度に基づいて適切な位置に挿入（リファクタリング）すること:
+- 上位 (1〜2): 思考・姿勢（最重要の大原則）
+- 中位 (3〜5): 安全装置・破壊の防止
+- 下位 (6〜10): ルール・設計思想・ワークフロー
+-->
 1. 【言語】思考・応答など全アウトプットにおいて日本語（Japanese）を徹底せよ。
-2. 【Git安全装置】破壊的・大規模操作前は必ず事前に Commit し、復元可能にせよ。
-3. 【Shell安全装置】シェル実行時は `set -e` や `&&` を用い、エラー時即時停止させよ。
-4. 【Leave No Trace (唯一の一時領域)】一時ファイルは必ず `agent-core/scratch/` のみで使用し自律破棄せよ。他リポジトリ（core-service, second-brain）での一時ディレクトリ作成やファイル生成はアーキテクチャ違反として固く禁ずる。
-5. 【Session Handoff & Wisdom Extraction】セッション終了時の進捗・申し送りは `agent-core/skills/session-manager/SKILL.md` のルールに従い `progress.md` と `handoff_*.md` を用いて行うこと。プロジェクトの枠を超えた普遍的な教訓（Wisdom）の原石が得られた場合のみ、 `second-brain/90_Meta/Templates/Sense_Making_Template.md` を用いて `second-brain/20_Sense_Making/` へ蒸留せよ。
-6. 【Agentic OS Protocol (初動と完了の儀式)】タスク着手時は、必ず対象ディレクトリの `AGENT.md` や関連 `SKILL.md` を読み込み、`task.md` の Phase 0 として「ルールに基づくテスト/実装プロセス」を明記せよ。また、実装完了の条件として、独立したReviewer Agentの承認または自動テスト（pytestカバレッジ等）のパスログの提出を必須とする。自動テストのない独断での完了報告は不適合とする。
-7. 【職務分離の原則 (Separation of Duties)】Tier 1 Agentは、`core-service/src` 配下のプロダクションコードを自ら直接編集してはならない。コード変更は必ず仕様(Spec)を定義し、サブエージェント(Implementer/Tester等)に委譲して実行させよ。
-8. 【Secret Management (機密情報の物理的隔離)】パスワードやAPIキーなどのシークレット情報は、リポジトリ内のコードに直書きしたり、トラッキング対象のファイルに保存してはならない。シークレットは必ず `config/secret.env` のような局所的かつ明示的に `.gitignore` された専用領域にのみ配置せよ。また `.gitignore` の指定は無差別なワイルドカード（例: `*.json`）を避け、対象ファイル・ディレクトリを明示的にスコープすること。
+2. 【強制インクリメンタリズム (WIP制限とアトミック進行)】Agentは目標に対し「一気に全てを解決しようとするバイアス」を捨てよ。実装に着手する前に、必ず機能単位・PR単位の「チェックリスト」を作成し、1項目が完了するごとにテストとコミットを実行するアジャイルサイクルを強制せよ。
+3. 【Timeless SSOTの原則 (ドキュメントの責務分離)】`spec.md` や `Permanent_Notes` などの正本ドキュメントは、完全に自己完結し、過程や時系列を持たない「現在の真実（Timeless SSOT）」として記述せよ。時系列や議論の経緯を含めてよいのは、タスク管理やInbox等の動的ドキュメントのみである。
+4. 【Git安全装置】破壊的・大規模操作前は必ず事前に Commit し、復元可能にせよ。
+5. 【Shell安全装置】シェル実行時は `set -e` や `&&` を用い、エラー時即時停止させよ。
+6. 【Leave No Trace (唯一の一時領域)】一時ファイルは必ず `agent-core/scratch/` のみで使用し自律破棄せよ。他リポジトリでの一時ディレクトリ作成やファイル生成は固く禁ずる。
+7. 【職務分離の原則 (Separation of Duties)】Tier 1 Agentはプロダクションコードを自ら直接編集せず、必ず仕様を定義してサブエージェントに委譲せよ。
+8. 【Secret Management (機密情報の隔離)】パスワードやAPIキーはコードやトラッキング対象に直書きせず、`config/secret.env` のような明示的に無視（`.gitignore`）された局所領域にのみ配置せよ。
+9. 【Agentic OS Protocol (初動と完了の儀式)】タスク着手時は対象ディレクトリの `AGENT.md` と `SKILL.md` を読み込むこと。完了報告の条件として、独立したReviewerの承認または自動テストのパスログの提出を必須とする。
+10. 【Session Handoff & Wisdom Extraction】セッション終了時は `progress.md` を更新して申し送りを行うこと。普遍的な教訓が得られた場合のみ、Zettelkasten（`second-brain`）へ蒸留せよ。
 </global_rules_and_safety>
 
 ## <jit_routing>

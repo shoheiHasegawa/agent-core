@@ -9,7 +9,9 @@ description: ユーザーの要求に基づいて新しいスキル（Agentの�
 Agentic OSのエージェントが使用する「Skill」を設計・生成する。システムプロンプトの記述からディレクトリ構成の作成までを一貫して行う。
 
 ## ⚠️ 絶対遵守ルール
-スキルを設計・実装する前に、**必ず** `agent-core/docs/skill_design_principles.md` （Skill Design Principles）を読み込み（`view_file`）、以下の原則に違反していないかをチェックすること。
+スキルを設計・実装する前に、**必ず**以下のドキュメントを読み込み（`view_file`）、原則に違反していないかをチェックすること。
+1. `agent-core/docs/skill_design_principles.md` （Skill Design Principles）
+2. `agent-core/docs/architecture/document_architecture_principles.md` （Document Architecture Principles / 記憶の3層モデル）
 1. **2-Tier Architectureと実行モデルの選択**:
    - 作成しようとしているスキルは「オーケストレーター（Tier 1）」か「ワーカー（Tier 2）」かを明確に定義すること。
    - オーケストレーターの場合、呼び出すワーカーの性質に応じて**「Role Switching（親エージェント自身の状態遷移による直接対話）」**か**「Subagent Delegation（サブエージェントへの委譲・バックグラウンド処理）」**のどちらが適切かを判断し、プロンプトに明記すること。

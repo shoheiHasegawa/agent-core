@@ -14,7 +14,7 @@ def main():
     
     session = SessionLocal()
     try:
-        service = get_core_service_container().get_daily_planning_service()
+        service = get_core_service_container(session).get_daily_planning_service()
         print("  - Executing DailyPlanningService.sync_worklogs()...")
         service.sync_worklogs()
         session.commit()
