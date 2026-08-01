@@ -7,6 +7,8 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 # パス解決
+sys.path.append(str(Path(__file__).parent.parent.resolve()))
+sys.path.append(str(Path(__file__).parent.parent.parent / "core-service" / "src"))
 
 from app_context import get_core_service_container, SessionLocal
 def main():

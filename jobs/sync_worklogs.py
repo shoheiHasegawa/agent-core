@@ -4,6 +4,8 @@ import traceback
 from pathlib import Path
 
 # パス解決
+sys.path.append(str(Path(__file__).parent.parent.resolve()))
+sys.path.append(str(Path(__file__).parent.parent.parent / "core-service" / "src"))
 
 from app_context import get_core_service_container, SessionLocal
 
@@ -14,7 +16,7 @@ def main():
     try:
         service = get_core_service_container().get_daily_planning_service()
         print("  - Executing DailyPlanningService.sync_worklogs()...")
-        service.sync_worklogs(session)
+        service.sync_worklogs()
         session.commit()
         print("✅ Worklog Sync completed successfully.")
     except Exception as e:
