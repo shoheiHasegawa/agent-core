@@ -55,12 +55,36 @@
 - `[x]` **5. ナレッジの蒸留（Zettelkasten登録）**
   - `[x]` 普遍的教訓5件の Sense-Making 登録完了
   - `[x]` 「自律ループエンジニアリングにおける監視ポイントと4大アンチパターン」の Sense-Making 登録完了
+- `[ ]` **6. 既存実装・ドキュメントの新標準への適合（Migration & Test Audit）**
+  - `[x]` **Step 1: `mobile_vault` パッケージの標準化＆テスト漏れ監査**
+    - `[x]` 現状の仕様・テストの棚卸しと未決事項・設計判断の洗い出し（ユーザー壁打ち）
+    - `[x]` `spec.md` の新標準化（Rationale, Contract, 要求ID体系）
+    - `[x]` テスト漏れ（未検証シナリオ・エッジケース・Mock排除）の補強
+    - `[x]` `README.md` のルーティングポータル化
+    - `[x]` `make check-all` 検証とアトミックコミット
+  - `[x]` **Step 2: `second_brain` パッケージの標準化＆テスト漏れ監査**
+    - `[x]` 現状の仕様・テストの棚卸しと未決事項・設計判断の洗い出し（ユーザー壁打ち）
+    - `[x]` `spec.md` の新標準化（Rationale, Contract, 要求ID体系）
+    - `[x]` テスト漏れ（未検証シナリオ・エッジケース・Mock排除）の補強
+    - `[x]` `README.md` のルーティングポータル化
+    - `[x]` `make check-all` 検証とアトミックコミット
+  - `[x]` **Step 3: `task_operations` パッケージの標準化＆テスト漏れ監査**
+    - `[x]` 現状の仕様・テストの棚卸しと未決事項・設計判断の洗い出し（ユーザー壁打ち）
+    - `[x]` `spec.md` の新標準化（Rationale, Contract, 要求ID体系）
+    - `[x]` テスト漏れ（未検証シナリオ・エッジケース・Mock排除）の補強
+    - `[x]` `README.md` のルーティングポータル化
+    - `[x]` `make check-all` 検証とアトミックコミット
+  - `[x]` **Step 4: 全体結合・フルカバレッジ総合監査 (`make check-all`)**
+    - `[x]` カバレッジ >= 90%（現在 92.63%）
+    - `[x]` SDD 仕様トレーサビリティの完全一致
+    - `[x]` Linter / 静的解析の完全パス
+    - `[x]` 孤立スクリプト監査（`audit_orphan_scripts.py`）
+    - `[x]` 最終コミット
 
 ---
 
 ## 📌 Next Epic / Backlog (今後の発展ロードマップ)
-今回のEpic（`reinforce_sdd_loop`）により、**ローカルにおける完全自律のダブルループTDDパイプライン基盤は100%完成**した。
-次の段階として検討可能なEpic：
+今回のEpic（`reinforce_sdd_loop`）完了後、次の段階として検討可能なEpic：
 - `[ ]` **Epic: CI/CDパイプラインとリモート自動化の確立**: 
   - TDD完了後の自動PR作成
   - GitHub Actions 等でのリモート自動CI/CD（Linter / Test / SDD検証）
@@ -69,7 +93,6 @@
 ---
 
 ## 📝 メモ・コンテキスト (Scratchpad)
-- **【完了報告】2026-08-02 Loop Engineering Epic 完了**:
-  - Epic「`reinforce_sdd_loop`（SDD/TDDプロセスとループエンジニアリングの強化）」の全工程を完遂。
-  - 立法（ルール）・司法（Linter/ハードゲート）・行政（Worker SKILL）・統括（Orchestrator）の三権分立が完全に確立。
-  - 独立レビュアーの監査を経て、アンチパターン（God Prompt, Testing the Mock, Zombie Loop, Leaky Handoff）への物理防御がすべて実装・検証済み。
+- **【方針】既存資産マイグレーションの進め方**:
+  - 各ステップごとに「仕様棚卸し → ユーザーとの壁打ち（設計判断） → spec.md/テスト補強 → README作成 → make check-all → コミット」のサイクルを厳守する。
+  - AIが自己判断で勝手に仕様を決めつけず、未決事項や設計の迷いが生じた場合は必ずユーザーに設計判断を仰ぐ。
