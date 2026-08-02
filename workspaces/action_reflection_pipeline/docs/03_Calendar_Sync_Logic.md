@@ -1,9 +1,9 @@
 # 03. Calendar Sync Logic (カレンダー連携・配置仕様)
 
-本仕様書は、Obsidian (second-brain) 内で管理されているタスクや目標を、Google Calendarとどう同期させ、視覚的な安心感（免罪符）をどう表現するかを定義します。
+本仕様書は、DB（Task Registry）内で管理されているタスクや目標を、Google Calendarとどう同期させ、視覚的な安心感（免罪符）をどう表現するかを定義します。
 
 ## 1. カレンダーブロックの生成ルール (Time-blocking)
-Agentは毎朝のバッチで、その日のGoogle Calendarの空き枠にタスクを自動配置（ブロック）します。
+Agentは日次パイプライン（`DailyPlanningService.plan_day(sync_to_calendar=True)`）で、その日のGoogle Calendarの空き枠にタスクを自動配置（ブロック）します。
 
 ### A. 配置の優先順位とトリアージ
 1.  **無敵感のセットアップ**: `[S]` の中で、朝一番に実施すべき「黄金ルーティン（例: 早朝勉強）」を最優先で配置。
@@ -15,7 +15,7 @@ Agentは毎朝のバッチで、その日のGoogle Calendarの空き枠にタス
 前日までの `[S]` の実績が目標に達している（または当日のスケジュールで達する見込み）場合、残りの空き枠に `[W]` の予定を「保護された時間」として配置します。
 
 ## 2. カレンダー上の視覚的表現 (Visual Presentation)
-カレンダーを一目見ただけで「やるべきこと」と「勝ち取った自由」が直感的に伝わるよう、以下の命名規則と色分けを強制します。
+カレンダーを一目見ただけで「やるべきこと」と「勝ち取った自由」が直感的に伝わるよう、以下の命名規則と色分けを適用します。
 
 *   **プレフィックスと絵文字**:
     *   `[M] 〇〇` (例: `[M] 住民税支払い`)
@@ -27,11 +27,11 @@ Agentは毎朝のバッチで、その日のGoogle Calendarの空き枠にタス
     *   Want: 黄色・ゴールド系 (Banana etc.)
 
 ## 3. シームレスな連携 (Deep Linking)
-Google Calendarの全予定の詳細（Description）には、以下のディープリンクを必ず埋め込みます。
+Google Calendarの全予定の詳細（Description）には、以下のディープリンクを埋め込みます。
 
 ```text
 詳細と実績の入力はこちら:
-obsidian://open?vault=Satellite_Vault&file=10_Dashboard%2FBriefing.md
+obsidian://open?vault=Mobile_Vault&file=Dashboard%2FBriefing_YYYY-MM-DD.md
 ```
 これにより、ユーザーはカレンダーの通知（リマインダー）をタップするだけで、即座にObsidianのタスクリスト（実績入力枠）へジャンプでき、UXの摩擦を極小化します。
 
@@ -39,8 +39,8 @@ obsidian://open?vault=Satellite_Vault&file=10_Dashboard%2FBriefing.md
 Agentとカレンダー間の不整合を防ぐため、Agent向けに「予定の個別更新・削除ツール（Update/Delete）」は提供しません。
 カレンダー操作は以下の**一方向の再構築（Sync）モデル**に限定します。
 
-1. **Single Source of Truth**: 予定の正本は常にDB（Task Registry）に持ちます。
+1. **Single Source of Truth**: 予定の正本は常にDB（Task Registry: `tasks` / `recurring_tasks`）に持ちます。
 2. **操作フロー**: ユーザーから「リスケして」「予定を消して」と依頼された場合、Agentは**DB上のタスクデータを修正**します。
-3. **一括再構築 (Sync)**: その後、同期処理（現在は `agent-core` の `DailyPlanningService` 経由）を実行します。この処理は、今日のカレンダー上のAgent作成イベントを一度クリアし、最新のDB状態からスケジュールを引き直して全登録します。
+3. **一括再構築 (Sync)**: その後、同期処理（`DailyPlanningService.plan_day(sync_to_calendar=True)`）を実行します。この処理は、当日のカレンダー上のAgent管理イベントを取得・更新し、最新のDB状態からスケジュールを引き直して同期（INSERT/UPDATE）します。
 
 この設計により、Agentは複雑なイベントIDの管理から解放され、カレンダーとDBの状態は常に冪等（べきとう）に保たれます。

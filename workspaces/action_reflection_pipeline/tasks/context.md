@@ -7,6 +7,7 @@
   - **OSレベル自動化**: `launchd`（`com.youinc.dailypipeline`）による毎晩23:00の自動実行エージェントが常駐化。
   - **対話・トリアージ基盤**: `night-routine`, `inbox-triage`, `priority-planner` 等のスキル群が連動。
 
-## Next Milestones (次のステップ)
-- **日常運用**: 毎晩の自動バッチ実行および夜のジャーナリング対話を通じた運用の継続。
-- **次のEpic**: `corporate_goal_integration`（会社のABC目標統合）の仕様策定・進行。
+## Next Focus (次回の着手領域)
+- **Epicクローズの実施**:
+  - `action_reflection_pipeline` ワークスペースの最終確認・クローズ処理。
+  - クローズ完了後、次期Epic（`corporate_goal_integration` など）への移行準備。

@@ -1,6 +1,6 @@
 # 00. Core Paradigms & Design Decisions
 
-本ドキュメントは、Epic 03「Action & Reflection Pipeline」の設計段階において、人間（CEO）とAI（秘書）の対話を通じて決定された**重要なパラダイムシフトとアーキテクチャの意思決定**を記録したものです。今後の実装および拡張における「憲法」として機能します。
+本ドキュメントは、Epic「Action & Reflection Pipeline」の設計段階において、人間（CEO）とAI（秘書）の対話を通じて決定された**重要なパラダイムシフトとアーキテクチャの意思決定**を記録したものです。今後の実装および拡張における「憲法」として機能します。
 
 ## 1. The Secretary Paradigm（秘書モデルへの移行）
 過去の「人間がすべてのタスクリストを監視・管理する」というパラダイムから脱却し、**「agent-coreを自律的な秘書とし、タスクの正本（バックログ）を秘書の脳内に隠蔽する」**という画期的なアーキテクチャを採用しました。
@@ -16,34 +16,35 @@ You_IncのAgentic OSにおいて、「スケジュールの正本（SoR）」は
     *   会議や他人との約束など、外部から制約を受けるスケジュールはGCalを正本とする。
     *   **終日予定のメタデータ化原則**: GCalの「時間指定イベント」はスケジュール生成時の**物理的な壁（ブロック）**として扱う。一方、「終日イベント（有給、ゴミの日など）」は枠を占有するブロックではなく、その日のコンテキストを決定するための**メタデータ（フラグ）**として扱う。
     *   AgentはGCalを**Read-Only**で読み取り、スケジューリング時の制約事項として扱う。
-*   **内部要因（Internal Routine）の SoR = Agentic OS DB (`recurring_tasks`)**
+*   **内部要因（Internal Routine）の SoR = Agentic OS DB (`recurring_tasks` / `tasks`)**
     *   筋トレ、Deep Work、ジャーナリングなど、自身の裁量で動かすルーティンや自己投資タスクはDB（SQLite）を正本とする。
     *   **Context Aware Scheduling**: Agentは曜日だけでなく、日本の祝日（`holidays.JP`）や終日予定の「有休」フラグを判定し、自律的に `WORKDAY` と `HOLIDAY` を切り替えて振る舞う。
-    *   Agentは内部タスクを**Write権限**を持って動的にパズルし、最終的な出力結果としてGCalの専用カレンダーに「流し込む（Export）」する。期間限定の集中ルーティン（Lifestyle Experimentation）などの変更もすべてDB側で完結させる。
+    *   Agentは内部タスクを**Write権限**を持って動的にパズルし、最終的な出力結果としてGCalの専用カレンダーに「流し込む（一方向Sync）」する。期間限定の集中ルーティン（Lifestyle Experimentation）などの変更もすべてDB側で完結させる。
 
 ## 3. Zettelkasten（アトミック性）の厳守
 `second-brain/00_Inbox` に雑多なメモを1ファイルにまとめる（Ideas.md等）という初期案を廃止し、Zettelkastenの「1ノート1アイデア」の原則を厳守する方針を決定しました。
 *   iPhoneから入力された雑多なメモは、秘書Agentがパースして「タスク」はTask Registryへ引き抜き、「アイデア」は独立したファイル（例: `Idea_XXX.md`）としてタグ付け（`#idea`）して格納します。これにより強力なタグ検索の威力が維持されます。
 
-## 3. 夜の「ジャーナリング」と朝の「自動実行」のフェーズ分離
+## 4. 夜の「ジャーナリング」と「日次パイプライン」のフェーズ分離
 システムを単なる自動化ツールにせず、「内省（Reflection）」の時間を担保するため、システム運用フローを2段階に分割しました。
-1.  **Night Phase (棚卸しとジャーナリング)**: 秘書Agentが `10_Areas` の信念を読み込み、明日の優先タスク案を提示し、CEOと壁打ちをして優先順位を確定させます。
-2.  **Morning Phase (自動スケジューリング)**: 確定したスケジュールをバッチ処理でGCalへ同期し、ダッシュボードに出力します。
+1.  **Night Phase (棚卸しとジャーナリング)**: 秘書Agent（`night-routine` スキル）が `10_Areas` の信念を読み込み、明日の優先タスク案を提示し、CEOと壁打ちをして優先順位を確定させます。
+2.  **Pipeline Phase (日次実行ジョブ)**: 確定したスケジュールをバッチ処理（`jobs/run_daily_pipeline.sh`）でGCalへ同期し、ダッシュボード（`Briefing_YYYY-MM-DD.md`）に出力します。夜の対話終了時または早朝に実行可能です。
 
-## 4. 心理的安全性（免罪符）と M/S/W 分類
+## 5. 心理的安全性（免罪符）と M/S/W 分類
 単純な「High/Medium/Low」の優先順位付けではなく、ユーザー心理（生産性による精神的摩耗の回避）に基づき、タスクを以下の3つに分類（M/S/W）します。
 *   **[M] Must (義務)**: 期限や他者への責任があるタスク
 *   **[S] Should (投資)**: 資格勉強など、未来の自分のためのタスク
 *   **[W] Want (余暇)**: 遊びや純粋な楽しみ
 システムは[M]を消化した実績を「安心の見える化（免罪符）」として提示し、罪悪感なく[W]を実行できる体験（UX）を提供します。
 
-## 5. DDDアーキテクチャの洗練とサービス分割 (Phase 5)
-旧来の `*UseCase` による過度なクラス細分化を廃止し、ドメインコンテキスト名を `task_management` に統合・リネームしました。
-また業務フロー単位でオーケストレーションを行うため、Service層を以下の2つに明確に再編・分割し、意図が直感的に伝わる美しいコードベースを実現しました。
-*   **`DailyActionService`**: ユーザーの1日の行動（Dailyの計画作成と実績回収）に特化したフローのオーケストレーションを担う。
-*   **`TaskManagementService`**: Task Registry (SQLite) に対する永続化処理や状態管理など、データライフサイクルの管理に専念する。
+## 6. DDDアーキテクチャの洗練とサービス分割
+業務フロー単位でオーケストレーションを行うため、Service層を以下のドメイン責務に明確に分割し、直感的なコードベースを実現しました。
+*   **`DailyPlanningService`**: ユーザーの1日の行動（Dailyの計画作成 `PlanDayUseCase`、実績回収 `SyncWorklogsUseCase`、実績記録 `RecordWorklogsUseCase`）に特化したフローのオーケストレーションを担う。
+*   **`TaskOperationsService`**: Task Registry (SQLite) に対する永続化処理や状態管理（`RegisterTaskUseCase`, `RefineTaskUseCase`）など、タスクデータライフサイクルの管理に専念する。
+*   **`MobileVaultService`**: Mobile Inboxの覗き見（`PeekInboxUseCase`）、回収・振り分け（`ProcessInboxItemUseCase`）、ダッシュボード配置（`PlaceDashboardUseCase`）を担う。
+*   **`SecondBrainService`**: Zettelkastenノートの登録・検索・監査を担う。
 
-## 6. ロジックと振る舞いの境界線 (core-service vs agent-core SKILL)
+## 7. ロジックと振る舞いの境界線 (core-service vs agent-core SKILL)
 高度なスケジューリングルール（WIP制限や逆算思考など）を実装する際、システムとAIの責務を以下のように厳格に分離して実装します。
 
 *   **`core-service`（計算エンジン）**:
@@ -51,4 +52,4 @@ You_IncのAgentic OSにおいて、「スケジュールの正本（SoR）」は
     *   **実装内容**: 時間ブロックの配置、WIP上限のエラー弾き、生体リズム（エネルギー）に合わせた配置、[M]と[W]の割合計算と警告フラグ（`warning_flag`）の出力など、Pythonのドメインロジックとして実装します。
 *   **`agent-core`（秘書の振る舞い）**:
     *   **責務**: ユーザー心理に寄り添う「インタラクションとコーチング」。
-    *   **実装内容**: 専用の**SKILL**（例: `daily-secretary-coach`）として実装します。`core-service` が出力した「[W]不足の警告フラグ」や「目的のない孤立タスク」を検知し、「社長、明日は義務タスクばかりです。何か遊ぶ予定を入れませんか？」と能動的に問いかけるなど、対話を通じたUXを提供します。
+    *   **実装内容**: 専用の**SKILL**（`night-routine` スキルのRole Switching）として実装します。`core-service` が出力した「[W]不足の警告フラグ」や「目的のない孤立タスク」を検知し、「社長、明日は義務タスクばかりです。何か遊ぶ予定を入れませんか？」と能動的に問いかけるなど、対話を通じたUXを提供します。
