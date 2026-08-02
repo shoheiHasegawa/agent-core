@@ -72,7 +72,7 @@ CEO（社長）が管理のプレッシャーから解放され、高いパフ�
     - `[x]` 早朝: バッチ処理をキックし、Googleカレンダーへの自動スケジューリング・予定登録を検証する。（手動連携で成功確認済）
     - `[x]` 朝の配信: 生成されたタスク一覧（`Briefing.md` 等）が Mobile Vault に確実かつ安全に同期・クリーンアップ（Sync ➡ 削除 ➡ 新規生成のサイクル）されるか検証する。（完了）
 
-- `[ ]` **Epic 06: 試験運用における不具合修正と同期・持ち越しロジックの改善 (Hardening & Bug Fixes)**
+- `[x]` **Epic 06: 試験運用における不具合修正と同期・持ち越しロジックの改善 (Hardening & Bug Fixes)** 🏆 COMPLETED
   - 🔍 **根本原因の総括**:
     - **Epic内の設計決定漏れ**:
       1. 「一回限りタスク（One-off）」と「定期ルーティン（Recurring）」のライフサイクル差異（休日の未完了ルーティンを平日に持ち越すべきではないという境界ルール）の未定義。
@@ -81,19 +81,12 @@ CEO（社長）が管理のプレッシャーから解放され、高いパフ�
       1. `test_google_calendar_gateway.py` が `mock_build.called` のみを確認し、送信ペイロード（`dateTime` vs `date`）を検証する Contract Test を欠いていた。
       2. `test_auto_assign_tasks_usecase.py` に「定期タスク（Recurring）が未完了だった場合のロールオーバー除外」の複合シナリオテストが抜けていた。
 
-  - `[ ]` **Issue 1: Google Calendar同期の時刻指定化（`dateTime` への移行）**
-    - **現象**: カレンダー登録が全て終日（`date`）となり、計算されたタイムブロック（開始・終了時刻）が反映されない。また `end.date` に同日を設定しているためGoogle Calendarの排他仕様により前日にズレて表示される。
-    - **原因**: `GoogleCalendarGateway.sync_daily_briefing` で `start: {"date": target_date}`, `end: {"date": target_date}` が固定使用され、`ScheduleBuilder` の計算結果（`task.start_time` / `task.end_time`）が渡されていない。またテストがモック呼び出し有無しか検証していなかった。
-    - **対象コード**: `core-service/src/infrastructure/google_api/google_calendar_gateway.py`, `core-service/tests/unit/infrastructure/google_api/test_google_calendar_gateway.py`
+  - `[x]` **Issue 1: Google Calendar同期の時刻指定化（`dateTime` への移行）**
+    - **対応内容**: `GoogleCalendarGateway.sync_daily_briefing` を改修し、時刻指定（`dateTime` + `Asia/Tokyo`）と終日予定（翌日排他）の正確な分岐出力を実装。Contract Test でペイロードを厳密検証。
+  - `[x]` **Issue 2: 定期タスク（Recurring Tasks）の不適切な翌日持ち越し抑止**
+    - **対応内容**: `RecurringTask.to_task` で `task_type=TaskType.RECURRING` を明示設定し、`AutoAssignTasksUseCase` / `SqlTaskRepository` で `ONE_OFF` タスクのみをロールオーバーするよう改修。TDDによりテストケースを完備。
+  - `[x]` **Issue 3: カレンダーの完全洗い替え（Reconciliation）の実装**
+    - **対応内容**: 一回限りの使い捨てスクリプトではなく、`GoogleCalendarGateway.sync_daily_briefing` 内部に「既存 `you_inc` イベントの差分検知と余剰イベントの自動 `delete`」を実装。毎回冪等にカレンダーが完全同期されるように恒久対策を完了。
 
-  - `[ ]` **Issue 2: 定期タスク（Recurring Tasks）の不適切な翌日持ち越し抑止**
-    - **現象**: 休日専用タスク（日曜の「ローテーション家事」等）が未完了だった場合、翌平日（月曜）のダッシュボードに持ち越されてしまう。
-    - **原因**: `AutoAssignTasksUseCase` のロールオーバー処理（`get_uncompleted_past_tasks`）において、通常タスクと定期タスクを区別せず、無差別に `target_date` を翌日に更新している。
-    - **対象コード**: `core-service/src/application/daily_planning/auto_assign_tasks_usecase.py`, `core-service/src/infrastructure/sqlalchemy/task_repository.py`, `core-service/tests/unit/application/daily_planning/test_auto_assign_tasks_usecase.py`
-
-  - `[ ]` **Issue 3: 過去の同期重複イベントのクリーンアップ**
-    - **現象**: 過去のテスト・同期処理の複数回実行により、同一タスクの終日イベントがカレンダー上に重複残留している。
-    - **原因**: 同期処理時に該当日（および前後）の既存 `source=you_inc` イベントを適切に洗い替え・クリーンアップするロジックの不足。
-    - **対象コード**: `core-service/src/infrastructure/google_api/google_calendar_gateway.py`
 
 
