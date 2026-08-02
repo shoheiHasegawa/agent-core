@@ -71,7 +71,7 @@ def extract_scenarios_from_tests(test_dir: Path, is_integration: bool = False) -
                         )
 
         for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef) and (node.name.startswith("test_") or node.name.endswith("_test")):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and (node.name.startswith("test_") or node.name.endswith("_test")):
                 # 1. Skip / Skipif デコレータの検知
                 has_skip = False
                 for decorator in node.decorator_list:
@@ -158,7 +158,8 @@ def extract_scenarios_from_tests(test_dir: Path, is_integration: bool = False) -
 
                 matches = SCENARIO_PATTERN.findall(docstring)
                 if not matches:
-                    errors.append(f"Function '{node.name}' in {filepath.name} lacks spec ID in docstring.")
+                    if is_integration:
+                        errors.append(f"Integration Test '{node.name}' in {filepath.name} lacks spec ID in docstring.")
                 else:
                     scenarios.update(matches)
 

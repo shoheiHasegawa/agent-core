@@ -79,18 +79,18 @@ def verify_outer_red(target_test: str | None = None) -> Dict[str, Any]:
                 "details": combined[-1000:],
             }
 
-    if "FAILED" in combined or "AssertionError" in combined:
+    if "FAILED" in combined or "AssertionError" in combined or "NotImplementedError" in combined:
         return {
             "success": True,
             "phase": "outer-red",
-            "message": "Outer Red Verified: Test scenario failed with expected assertion failure.",
+            "message": "Outer Red Verified: Test scenario failed with expected assertion or NotImplementedError failure.",
             "summary": [line for line in combined.splitlines() if "FAILED" in line or "passed" in line][-5:],
         }
 
     return {
         "success": False,
         "phase": "outer-red",
-        "error": f"Outer Red Failed: Test exited with code {retcode} but no standard assertion failure was detected.",
+        "error": f"Outer Red Failed: Test exited with code {retcode} but no standard assertion/NotImplementedError failure was detected.",
         "details": combined[-1000:],
     }
 
@@ -146,7 +146,7 @@ def verify_green(target_test: str | None = None) -> Dict[str, Any]:
 def verify_quality_gate() -> Dict[str, Any]:
     """Quality Gate (make check-all + validate_sdd.py + Coverage >= 90%) を検証する。"""
     # 1. make check-all
-    retcode, stdout, stderr = run_command_capture(["uv", "run", "make", "check-all"], CORE_SERVICE_DIR)
+    retcode, stdout, stderr = run_command_capture(["make", "check-all"], CORE_SERVICE_DIR)
     combined = stdout + "\n" + stderr
 
     if retcode != 0:

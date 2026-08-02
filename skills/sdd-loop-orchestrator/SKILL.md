@@ -53,9 +53,12 @@ description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gat
 *   **Action**: `invoke_subagent` を用いて `tdd-green-refactorer` を起動。`spec.md` と `tests/integration/` のテストパスを渡し、実装および `tests/unit/` の単体テスト補強を行わせる。
 *   **Gate Check**:
     ```bash
+    # 1. 新規テストのパス確認
     uv run python ../agent-core/tools/verify_loop_state.py --phase green --target <test_file_path>
+    # 2. 全体テストのパス（リグレッション・デグレがないことの検証）
+    uv run python ../agent-core/tools/verify_loop_state.py --phase green
     ```
-*   **判定**: `success: true` であれば Phase 4 へ。
+*   **判定**: 両方が `success: true` であれば Phase 4 へ。失敗時はエラーログを添えて `tdd-green-refactorer` に修正を指示。
 
 ### Phase 4: Quality Gate Verification (司法)
 *   **Gate Check**:
