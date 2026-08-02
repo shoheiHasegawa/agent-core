@@ -80,10 +80,20 @@ def verify_outer_red(target_test: str | None = None) -> Dict[str, Any]:
             }
 
     if "FAILED" in combined or "AssertionError" in combined or "NotImplementedError" in combined:
+        failure_type = "AssertionError" if "AssertionError" in combined else ("NotImplementedError" if "NotImplementedError" in combined else "FAILED")
+        from datetime import datetime, timezone
+        now_iso = datetime.now(timezone.utc).astimezone().isoformat()
+        
         return {
             "success": True,
             "phase": "outer-red",
             "message": "Outer Red Verified: Test scenario failed with expected assertion or NotImplementedError failure.",
+            "proof_of_red": {
+                "verified_at": now_iso,
+                "target": target_test or "tests/integration/",
+                "failure_type": failure_type,
+                "summary": [line for line in combined.splitlines() if "FAILED" in line or "passed" in line][-5:],
+            },
             "summary": [line for line in combined.splitlines() if "FAILED" in line or "passed" in line][-5:],
         }
 

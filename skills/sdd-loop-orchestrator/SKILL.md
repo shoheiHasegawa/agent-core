@@ -47,7 +47,11 @@ description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gat
     ```bash
     uv run python ../agent-core/tools/verify_loop_state.py --phase outer-red --target <test_file_path>
     ```
-*   **判定**: `success: true`（意図通りのアサーション失敗）であれば Phase 3 へ。構文エラーやPASSしてしまった場合は `tdd-red-coder` に修正を再委譲。
+*   **判定 & Proof of Red 証跡記録**: 
+    - `success: true`（意図通りのアサーションまたは未実装エラー）の場合:
+      - レスポンス内の `proof_of_red` メタデータを取得。
+      - `tasks/progress.md` のチェックリストに `- [x] Proof of Red: <target> (<failure_type> at <verified_at>)` を記録して Phase 3 へ。
+    - 構文エラーやPASSしてしまった場合は `tdd-red-coder` に修正を再委譲。
 
 ### Phase 3: Inner Loop & Green (Implementation & Unit Test)
 *   **Action**: `invoke_subagent` を用いて `tdd-green-refactorer` を起動。`spec.md` と `tests/integration/` のテストパスを渡し、実装および `tests/unit/` の単体テスト補強を行わせる。
@@ -65,10 +69,13 @@ description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gat
     ```bash
     uv run python ../agent-core/tools/verify_loop_state.py --phase quality
     ```
-*   **判定 & 自律修復ループ (Max 3 Retries)**: 
+*   **判定 & 自律修復ループ (Max 3 Retries / Prompt Sanitization)**: 
     - `success: true`（カバレッジ >= 90%、Makefile完全性、トレーサビリティ全一致、Linter通過）であれば Phase 5 へ。
     - `success: false` の場合:
-      - エラー詳細を添えて `tdd-green-refactorer` に修正を指示（最大3回までループ）。
+      - **The "God Prompt" 予防（プロンプト・サニタイズ）**: 会話履歴全文を渡さず、以下の3点のみを抽出して `tdd-green-refactorer` に渡す。
+        1. 修正対象ファイルパス一覧
+        2. 最新の `git diff`
+        3. `verify_loop_state.py` が返したエラー末尾50行（`details`）
       - **エスカレーション**: 3回連続で解決できない場合は自律ループを停止し、発生したエラーログと原因分析をユーザーに報告して介入を仰ぐこと。
 
 ### Phase 5: Independent Compliance Review
