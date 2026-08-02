@@ -1,18 +1,12 @@
 # Context
 
 ## Current State (現在地)
-- **Epic 05: Phase 3 (E2E試験運用 - 夜間 Worklog Parser)** の実装と検証が完了した。
-  - `BriefingMarkdownParser` において、`[x]` / `[ ]` の判別、分数（稼働実績）、および「メモ」の抽出に対応（Super-loose Parser）。
-  - `Worklog` および `Task` ドメインに `last_memo` を追加し、DB永続化まで連通。
-- **DDD & Compliance Refactoring** が完了した。
-  - `domain/system/` (Clock, UUIDGenerator) を新設。
-  - `TaskCategory`, `TaskType` を Enum 化して Primitive Obsession を解消。
-  - `SyncWorklogsUseCase` に全て DI コンテナから依存注入するよう改修。
-  - `unittest.mock` を排除し、Fake クラスによるモックフリーな統合テストを実現した（Reviewer評価: パス）。
+- **Epic 01 〜 Epic 05: タスク管理自動化（Action & Reflection Pipeline）の全工程が完了・本番稼働開始**。
+  - **計算エンジン・DDD構造**: `core-service`（9制約スケジューリング、コンテキストアウェア、Super-loose Parser等）がテストカバレッジ90%以上・完全DIで稼働。
+  - **夜と朝の自動パイプライン**: `sync_worklogs.py`（実績回収・Leave No Trace）➡ `generate_daily_briefing.py`（18時境界判定/--date対応・Googleカレンダー同期・Obsidian配信）の自動連携。
+  - **OSレベル自動化**: `launchd`（`com.youinc.dailypipeline`）による毎晩23:00の自動実行エージェントが常駐化。
+  - **対話・トリアージ基盤**: `night-routine`, `inbox-triage`, `priority-planner` 等のスキル群が連動。
 
-## Current Focus (次回の論点・着手領域)
-- **E2E試験運用の継続 (Phase 3)**
-  - 夜のジャーナリング (`night-routine`) のInboxItem検知とフィードバックループの検証。
-  - 朝の配信 (`generate_daily_briefing.py`) による Mobile Vault への同期（既存ファイル退避ロジック含む）の検証。
-- **初期データの棚卸し (Phase 2)**
-  - `inbox-triage` を用いた未完了タスクの仕分け・登録。
+## Next Milestones (次のステップ)
+- **日常運用**: 毎晩の自動バッチ実行および夜のジャーナリング対話を通じた運用の継続。
+- **次のEpic**: `corporate_goal_integration`（会社のABC目標統合）の仕様策定・進行。
