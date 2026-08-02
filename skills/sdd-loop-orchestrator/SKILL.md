@@ -38,21 +38,22 @@ description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gat
 
 ### Phase 1: SDD Spec Design
 *   **Action**: `invoke_subagent` を用いて `sdd-spec-writer` を起動し、対象機能の `spec.md` を作成させる。
-*   **Output**: 確定した `spec.md`（要求ID、I/O型、エッジケース定義）。
+*   **Output**: 確定した `spec.md` のパス（例: `src/application/<domain>/spec.md`）と、定義された要求ID一覧。
 
 ### Phase 2: Outer Red (Acceptance Test)
-*   **Action**: `invoke_subagent` を用いて `tdd-red-coder` を起動し、`tests/integration/<domain>/` 配下に要求IDを紐付けた結合テストを作成させる。
+*   **Action**: `invoke_subagent` を用いて `tdd-red-coder` を起動。`spec.md` を渡し、`tests/integration/<domain>/` 配下に結合テストを作成させる。
+*   **Context Handoff**: `tdd-red-coder` から「作成したテストファイルパス（例: `tests/integration/task_management/test_auto_assign.py`）」を返却値として受け取る。
 *   **Gate Check**:
     ```bash
-    uv run python ../agent-core/tools/verify_loop_state.py --phase outer-red
+    uv run python ../agent-core/tools/verify_loop_state.py --phase outer-red --target <test_file_path>
     ```
-*   **判定**: `success: true`（意図通りのアサーション失敗）であれば Phase 3 へ。構文エラーやPASSしてしまった場合は修正を指示。
+*   **判定**: `success: true`（意図通りのアサーション失敗）であれば Phase 3 へ。構文エラーやPASSしてしまった場合は `tdd-red-coder` に修正を再委譲。
 
 ### Phase 3: Inner Loop & Green (Implementation & Unit Test)
-*   **Action**: `invoke_subagent` を用いて `tdd-green-refactorer` を起動し、結合テストをGreenにしつつ、必要に応じて `tests/unit/` に単体テストを追加して実装・リファクタリングさせる。
+*   **Action**: `invoke_subagent` を用いて `tdd-green-refactorer` を起動。`spec.md` と `tests/integration/` のテストパスを渡し、実装および `tests/unit/` の単体テスト補強を行わせる。
 *   **Gate Check**:
     ```bash
-    uv run python ../agent-core/tools/verify_loop_state.py --phase green
+    uv run python ../agent-core/tools/verify_loop_state.py --phase green --target <test_file_path>
     ```
 *   **判定**: `success: true` であれば Phase 4 へ。
 
@@ -61,9 +62,11 @@ description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gat
     ```bash
     uv run python ../agent-core/tools/verify_loop_state.py --phase quality
     ```
-*   **判定**: 
+*   **判定 & 自律修復ループ (Max 3 Retries)**: 
     - `success: true`（カバレッジ >= 90%、Makefile完全性、トレーサビリティ全一致、Linter通過）であれば Phase 5 へ。
-    - `success: false` の場合、エラー詳細を `send_message` または新規サブエージェントで `tdd-green-refactorer` に渡し、修正を命じる（最大3回）。
+    - `success: false` の場合:
+      - エラー詳細を添えて `tdd-green-refactorer` に修正を指示（最大3回までループ）。
+      - **エスカレーション**: 3回連続で解決できない場合は自律ループを停止し、発生したエラーログと原因分析をユーザーに報告して介入を仰ぐこと。
 
 ### Phase 5: Independent Compliance Review
 *   **Action**: `invoke_subagent` を用いて `compliance-reviewer` を起動し、DDD/SOLID/Context Engineeringの観点で独立レビューを行わせる。
@@ -72,4 +75,4 @@ description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gat
 ### Phase 6: Atomic Commit & Progress Update
 *   **Action**: 
     - `git add` および `git commit` を実行（Pre-commit hook が自動検証）。
-    - ワークスペースの `tasks/progress.md` のチェックリストを更新する。
+    - ワークスペースの `tasks/progress.md` のチェックリストを更新し、完了報告を行う。

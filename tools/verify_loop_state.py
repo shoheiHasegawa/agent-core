@@ -37,10 +37,20 @@ def verify_outer_red(target_test: str | None = None) -> Dict[str, Any]:
     """Outer Red (結合テストが意図通り失敗すること) を検証する。
 
     合格条件:
+    - 指定されたテストファイルが存在すること
     - pytest の終了コードが 1 (テスト失敗)
     - stdout/stderr に FAILED または AssertionError が含まれていること
-    - 構文エラー (SyntaxError) や インポートエラー (ModuleNotFoundError) ではないこと
+    - 構文エラー (SyntaxError), インポートエラー (ModuleNotFoundError), コレクションエラー (ERROR collecting) ではないこと
     """
+    if target_test:
+        test_path = CORE_SERVICE_DIR / target_test
+        if not test_path.exists():
+            return {
+                "success": False,
+                "phase": "outer-red",
+                "error": f"Outer Red Failed: Target test file not found: {target_test}",
+            }
+
     cmd = ["uv", "run", "pytest"]
     if target_test:
         cmd.append(target_test)
@@ -58,14 +68,16 @@ def verify_outer_red(target_test: str | None = None) -> Dict[str, Any]:
             "stdout": stdout,
         }
 
-    # 構文エラーやインポートエラーの検知
-    if "SyntaxError" in combined or "ModuleNotFoundError" in combined or "ImportError" in combined:
-        return {
-            "success": False,
-            "phase": "outer-red",
-            "error": "Outer Red Failed: Test file has syntax or import errors instead of a logical assertion failure.",
-            "details": combined[-1000:],
-        }
+    # 構文エラー、インポートエラー、pytest コレクションエラーの検知
+    fatal_patterns = ["SyntaxError", "ModuleNotFoundError", "ImportError", "ERROR collecting", "NameError", "AttributeError: module"]
+    for pattern in fatal_patterns:
+        if pattern in combined:
+            return {
+                "success": False,
+                "phase": "outer-red",
+                "error": f"Outer Red Failed: Test file has structural/fatal errors ({pattern}) instead of a logical assertion failure.",
+                "details": combined[-1000:],
+            }
 
     if "FAILED" in combined or "AssertionError" in combined:
         return {
@@ -86,8 +98,19 @@ def verify_outer_red(target_test: str | None = None) -> Dict[str, Any]:
 def verify_green(target_test: str | None = None) -> Dict[str, Any]:
     """Green (全テストが成功すること) を検証する。
 
-    合格条件: pytest 終了コードが 0
+    合格条件:
+    - pytest 終了コードが 0
+    - 少なくとも 1 件以上のテストが PASS していること（0 passed による偽陽性を防止）
     """
+    if target_test:
+        test_path = CORE_SERVICE_DIR / target_test
+        if not test_path.exists():
+            return {
+                "success": False,
+                "phase": "green",
+                "error": f"Green Failed: Target test file not found: {target_test}",
+            }
+
     cmd = ["uv", "run", "pytest"]
     if target_test:
         cmd.append(target_test)
@@ -96,6 +119,15 @@ def verify_green(target_test: str | None = None) -> Dict[str, Any]:
     combined = stdout + "\n" + stderr
 
     if retcode == 0:
+        # 偽陽性（0 passed / no tests ran）の防止チェック
+        if "collected 0 items" in combined or "no tests ran" in combined:
+            return {
+                "success": False,
+                "phase": "green",
+                "error": "Green Failed: No tests were collected or executed (0 passed).",
+                "details": combined[-500:],
+            }
+
         return {
             "success": True,
             "phase": "green",
