@@ -41,6 +41,46 @@ Agentとカレンダー間の不整合を防ぐため、Agent向けに「予定�
 
 1. **Single Source of Truth**: 予定の正本は常にDB（Task Registry: `tasks` / `recurring_tasks`）に持ちます。
 2. **操作フロー**: ユーザーから「リスケして」「予定を消して」と依頼された場合、Agentは**DB上のタスクデータを修正**します。
-3. **一括再構築 (Sync)**: その後、同期処理（`DailyPlanningService.plan_day(sync_to_calendar=True)`）を実行します。この処理は、当日のカレンダー上のAgent管理イベントを取得・更新し、最新のDB状態からスケジュールを引き直して同期（INSERT/UPDATE）します。
+3. **一括再構築 (Sync)**: その後、同期処理（`DailyPlanningService.plan_day(sync_to_calendar=True)`）を実行します。この処理は、当日のカレンダー上のAgent管理イベントを取得・更新し、最新のDB状態からスケジュールを引き直して同期（INSERT/UPDATE/DELETE）します。
 
 この設計により、Agentは複雑なイベントIDの管理から解放され、カレンダーとDBの状態は常に冪等（べきとう）に保たれます。
+
+## 5. API Payload & Reconciliation 仕様 (Technical Specification)
+
+### A. イベントのペイロード形式
+Google Calendar APIに登録するイベントは、タスクの開始・終了時刻情報に基づき以下のようにマッピングします。
+
+* **時間指定タスク (`task.start_time` および `task.end_time` が存在する場合)**:
+  ```json
+  {
+    "summary": "[M] 〇〇",
+    "description": "...",
+    "start": { "dateTime": "2026-08-03T07:00:00+09:00", "timeZone": "Asia/Tokyo" },
+    "end": { "dateTime": "2026-08-03T09:00:00+09:00", "timeZone": "Asia/Tokyo" },
+    "colorId": "11",
+    "extendedProperties": {
+      "private": {
+        "source": "you_inc",
+        "taskId": "rt-fixed-01_20260803"
+      }
+    }
+  }
+  ```
+* **終日タスク (`start_time` がない場合)**:
+  * Google Calendarの終日仕様に従い、終了日（`end.date`）は排他（翌日の日付）として指定します。
+  ```json
+  {
+    "start": { "date": "2026-08-03" },
+    "end": { "date": "2026-08-04" }
+  }
+  ```
+
+### B. 完全洗い替え（Reconciliation）ロジック
+同期処理（`sync_daily_briefing`）は、該当日のカレンダーイベントを以下のステップで過不足なく同期します：
+1. **既存イベントの取得**: 該当日の `timeMin`（`00:00:00+09:00`）〜 `timeMax`（`23:59:59+09:00`）のイベントを取得し、`source == "you_inc"` のイベントを抽出。
+2. **余剰イベントの削除 (DELETE)**: 既存の `you_inc` イベントのうち、今回の `scheduled_tasks`（taskId）に含まれないイベントを即座に `delete()` する。
+3. **既存イベントの更新 (UPDATE)**: 今回の `scheduled_tasks` のうち、既にカレンダーに存在する taskId のイベントは最新情報（タイトル、時刻、説明）で `update()` する。
+4. **新規イベントの登録 (INSERT)**: カレンダーにまだ存在しない taskId のイベントは `insert()` する。
+
+この自己修復機構により、過去の重複やゴミデータが自動的に排除され、実行回数に関わらずカレンダー状態の完全性が保証されます。
+
