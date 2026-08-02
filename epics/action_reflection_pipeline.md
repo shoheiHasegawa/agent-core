@@ -19,5 +19,7 @@ tags: [automation, productivity, journaling]
 
 ## 📈 大まかなステータス (Phase Status)
 - [x] Phase 1: 詳細設計（仕様の策定）
-- [ ] Phase 2: 実装・環境構築
-- [ ] Phase 3: 魂の注入と本稼働（E2Eテスト）
+- [x] Phase 2: 実装・環境構築
+- [x] Phase 3: 魂の注入と本稼働（E2E試験運用）
+- [ ] Phase 4: 運用課題・不具合の修正（時刻指定カレンダー同期・定期タスク持ち越し抑止等）
+
