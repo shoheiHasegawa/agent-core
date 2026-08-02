@@ -74,3 +74,28 @@ def main():
 if __name__ == "__main__":
     main()
 ```
+
+## 3. ドキュメンテーションと責務分離の原則 (Documentation & Separation of Concerns)
+
+ツールの仕様や運用情報の肥大化（Fat README）と陳腐化（Drift）を防ぐため、以下の3層で責務を完全分離せよ。
+
+1. **カタログ (`agent-core/tools/README.md`)**:
+   - **責務**: 存在理由と目的（What / Why）のインデックスに徹する。
+   - **記載項目**: 「ツール名」「種別（Read/Write/Audit）」「1行の目的」のみ。
+   - **禁止事項**: 呼び出し元スキルや具体的なJSON呼び出し例を書いてFat化させてはならない。
+2. **仕様の正本 (`tools/*.py` の Docstring / `--help`)**:
+   - **責務**: 具体的なリクエスト/レスポンスJSONスキーマ、引数、エラーコードの自己記述（コード自己記述型SSOT）。
+3. **利用文脈 (`skills/*/SKILL.md`)**:
+   - **責務**: どのライフサイクル・ワークフローでツールを実行するか（How / Context）の記述。
+
+---
+
+## 4. ツールのライフサイクルと自己浄化 (Lifecycle & Garbage Collection)
+
+呼び出し元が存在しないツールは単なる技術的負債であり、システム内に存在してはならない。
+
+1. **呼び出し元（Caller）の必須化**:
+   - 新規ツールを作成する際は、必ずそれを呼び出す主体（いずれかの `SKILL.md`、`jobs/`、または `pre_handoff_verify.sh` / CI）を同時に定義せよ。
+2. **デッドツールの即時削除 (Zero Orphan Tools)**:
+   - どのSKILLやJobからも呼ばれなくなったツールは、直ちに `tools/` から削除（自律破棄）せよ。
+   - この原則は、コミット時のGitフック (`pre-commit`) および `tools/audit_orphan_scripts.py` により物理的に強制・監査される。
