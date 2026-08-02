@@ -40,9 +40,11 @@ CEO（社長）が管理のプレッシャーから解放され、高いパフ�
   - `holidays` ライブラリの導入と Google Calendar の「終日予定」を統合した Context Resolver を実装。
   - 終日予定を「カレンダー上のブロック（壁）」ではなく、「日のコンテキストを切り替えるメタデータ」として扱うアーキテクチャ方針を決定・明文化（SoR分離の徹底）。
 
-## 🚀 次のアクション (Current Status)
-- `[ ]` **Epic 05: 本番移行・試験運用フェーズ (Onboarding & Trial)**
-  - `[x]` **Phase 1: 運用基盤の初期セットアップ**
+- `[x]` **Epic 05: 本番移行・試験運用フェーズ (Onboarding & Trial)** 🏆 COMPLETED
+  - `[x]` **Phase 1: 運用基盤の初期セットアップ** (Google Calendar API, launchd常駐化 `com.youinc.dailypipeline` 稼働確認)
+  - `[x]` **Phase 1.5: 情報の棚卸しとビジョン・計画の再構築** (4大ドメイン再編, johari-profiler)
+  - `[x]` **Phase 2: 初期データの棚卸し（データ移行と仕分け）** (inbox-triage 連携確認)
+  - `[x]` **Phase 3: E2E試験運用 (End-to-End Trial)** (実績回収・DB更新・Leave No Trace・自動ブリーフィング配信の実稼働確認)
     - `[x]` Google Calendar API 認証設定 (完了済)
     - `[x]` 対象カレンダーIDの設定確認 (`.env` 等への登録)
     - `[x]` iOSショートカットの実機設定 (完了済)
