@@ -22,12 +22,25 @@
 - `[x]` **Layer 3 (Meta-Skills)**: `skill-architect` と `skill-reviewer` がSKILLのファット化を防げるように審査基準を強化する
 - `[x]` **Layer 4 (Execution Skills)**: ファット化した `core-service-engineer` 等のSKILLの解体と階層化（SRP適用）
 - `[x]` **Layer 5 (Templates)**: 型定義とインラインRationaleを持つ、自己完結型の `spec_template.md` を作成する
+- `[x]` **Layer 6 (Knowledge Distillation)**: 5つの普遍的教訓をZettelkasten（`20_Sense_Making`）へ正式登録完了
+
+---
+
+## 📋 現在の作業チェックリスト (Current Sprint)
+- `[x]` **1. 品質ゲート改ざん防止機能の実装 (`validate_sdd.py`)**
+  - `[x]` `Makefile` の `--cov-fail-under` が 90% 以上か検証する関数の作成
+  - `[x]` `Makefile` の `check-all` ターゲットに `test`, `lint`, `validate` が全て含まれるか検証する関数の作成
+  - `[x]` `pyproject.toml` 等で不正な除外設定がないか検証する関数の作成
+  - `[x]` 故意に閾値を下げた場合に正しく FAIL するかテスト検証
+- `[/]` **2. Loop Orchestrator の設計・実装**
+  - `[ ]` SDD/TDDステートマシンの設計（各フェーズのI/O、権限境界、差し戻し条件）
+  - `[ ]` `tdd_controller.py`（またはオーケストレータースクリプト/スキル）の実装
+  - `[ ]` 実行テストと統合検証
 
 ---
 
 ## 📌 Next Epic / Backlog (未解決の構造的課題)
 今回のルール強化・SKILL解体によって「ワーカー」は整備されたが、完全な自律ループエンジニアリングを実現するためには以下の要素が不足している。
-- `[ ]` **Loop Orchestrator の実装**: 解体したSKILL群（`sdd-spec-writer` -> `tdd-red-coder` -> `tdd-green-refactorer`）を、自律的かつ正しい順序で呼び出し、Linterエラー時に差し戻しを行うシステム的司令塔（ハードゲート、または `sdd-orchestrator` スキル）。
 - `[ ]` **QA / CIパイプラインの整備**: TDD完了後のPR作成、Git側での自動CI/CD（Linter/Testの実行）、および `code-reviewer` ペルソナによるアーキテクチャの最終監査体制の確立。
 
 ## 📝 メモ・コンテキスト (Scratchpad)
@@ -38,8 +51,9 @@
   - **次回のセッション (Next Action)**: 
     1. 刷新された新ルールとドキュメントアーキテクチャ（`readme_template.md`, `spec_template.md` 等）に基づき、現在のリポジトリ内容（特に `core-service` の実装やドキュメント）が違反していないかをチェックし、負債を解消するところから再開すること。
     2. `agent-core` のPython実行環境（`python-dotenv`等の不足）を修復すること。
-    3. 以下の4つの教訓を `agent-core/tools/register_zettelkasten_note.py` を用いてZettelkasten (Sense-Making) へ正式に登録すること。
+    3. 以下の5つの教訓を `agent-core/tools/register_zettelkasten_note.py` を用いてZettelkasten (Sense-Making) へ正式に登録すること。
        - **教訓1 (三権分立)**: LLMは長文ルールを守れないため、システムを「立法(Markdown)」「司法(Linter)」「行政(SKILL)」に物理分離すること。
        - **教訓2 (確証バイアスとSRP)**: TDDでは、テストを書くペルソナと実装するペルソナを完全に分割し、AIの確証バイアス（自己都合のテスト改ざん）を防ぐこと。
        - **教訓3 (Timeless SSOT)**: SSOTドキュメントからは「過去の過程」を一切排除し、「現在の真実」のみを冷徹に記述すること。LLMは過去のポエムを現在の文脈と誤認するため。
        - **教訓4 (Context Engineering)**: 機能ディレクトリの `README.md` に全レイヤーのテストや仕様へのポインタを集約し、AIが迷子にならないためのルーティングハブとすること。
+       - **教訓5 (Goodhart's Lawと評価基準改ざん防止)**: AIに定量的指標を与えると評価基準（閾値設定）側を緩めて回避しようとするため、品質設定（Makefile等の閾値）の完全性を司法（Linter）で物理的にロックすること。

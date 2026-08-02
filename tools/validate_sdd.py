@@ -3,15 +3,22 @@
 validate_sdd.py
 
 以下のアーキテクチャ制約を自動検証する統合Linter（防波堤）です。
-1. The "Fake ID" & "Test Deletion" Loophole 防御（双方向トレーサビリティ）:
+1. Quality Gate Integrity（Anti-Cheat / Anti-Evasion ガードレール）:
+   - Makefile のテストカバレッジ閾値（>= 90%）および check-all 依存関係（test, lint, validate）の検証。
+   - pyproject.toml / .coveragerc におけるコアコード除外（omit）設定の検証。
+2. The "Fake ID" & "Test Deletion" Loophole 防御（双方向トレーサビリティ）:
    - spec.md の要求ID（マスター）と、Unit/Integration テストの要求IDが完全に一致しているか。
-2. Application層検証: src/application/ 内に README.md, spec.md, *.py が揃っているか。
+3. Application層検証: src/application/ 内に README.md, spec.md, *.py が揃っているか。
+4. Naming Conventions 検証: インターフェースや実装クラスの命名規則。
 """
 
 import ast
+import configparser
 import re
 import sys
+import tomllib
 from pathlib import Path
+from typing import Any
 
 SCENARIO_PATTERN = re.compile(r"\[[A-Z]+(?:-[A-Z]+)*-\d+(?:-\d+)*\]")
 
@@ -234,12 +241,109 @@ def check_naming_conventions(src_dir: Path) -> list[str]:
     return errors
 
 
+def check_quality_gate_integrity(core_service_root: Path) -> list[str]:
+    """
+    AIエージェントによるテストカバレッジ閾値の改ざん・チート（Goodhart's Law / Evasion）を物理的に防ぐガードレール。
+    1. Makefileのカバレッジ閾値 (>= 90%)
+    2. Makefileのcheck-allターゲットの完全性 (test, lint, validate の必須化)
+    3. pyproject.toml / .coveragerc における src/ 除外 (omit) の禁止
+    """
+    errors = []
+
+    # (A) & (B) Makefile Integrity
+    makefile_path = core_service_root / "Makefile"
+    if not makefile_path.exists():
+        errors.append(f"Quality Gate Violation: Makefile not found at {makefile_path}.")
+    else:
+        with open(makefile_path, "r", encoding="utf-8") as f:
+            makefile_content = f.read()
+
+        # (A) Coverage threshold check
+        cov_matches = re.findall(r"--cov-fail-under=(\d+)", makefile_content)
+        if not cov_matches:
+            errors.append("Quality Gate Violation: Coverage threshold in Makefile must be >= 90% (found: none).")
+        else:
+            for match in cov_matches:
+                found = int(match)
+                if found < 90:
+                    errors.append(
+                        f"Quality Gate Violation: Coverage threshold in Makefile must be >= 90% (found: {found}%)."
+                    )
+
+        # (B) check-all integrity check
+        check_all_match = re.search(r"^check-all:\s*(.*)$", makefile_content, re.MULTILINE)
+        if not check_all_match:
+            errors.append(
+                "Quality Gate Violation: Makefile 'check-all' target must include 'test', 'lint', and 'validate'."
+            )
+        else:
+            targets = set(check_all_match.group(1).strip().split())
+            if not {"test", "lint", "validate"}.issubset(targets):
+                errors.append(
+                    "Quality Gate Violation: Makefile 'check-all' target must include 'test', 'lint', and 'validate'."
+                )
+
+    # (C) pyproject.toml / .coveragerc exclusion check
+    pyproject_path = core_service_root / "pyproject.toml"
+    if pyproject_path.exists():
+        try:
+            with open(pyproject_path, "rb") as f:
+                data = tomllib.load(f)
+
+            def scan_omit(obj: Any) -> None:
+                if isinstance(obj, dict):
+                    for k, v in obj.items():
+                        if k == "omit":
+                            if isinstance(v, list):
+                                for item in v:
+                                    if "src" in str(item):
+                                        errors.append(
+                                            f"Quality Gate Violation: Unsafe coverage omit configuration detected in pyproject.toml: '{item}'."
+                                        )
+                            elif isinstance(v, str) and "src" in v:
+                                errors.append(
+                                    f"Quality Gate Violation: Unsafe coverage omit configuration detected in pyproject.toml: '{v}'."
+                                )
+                        else:
+                            scan_omit(v)
+                elif isinstance(obj, list):
+                    for elem in obj:
+                        scan_omit(elem)
+
+            scan_omit(data)
+        except Exception as e:
+            errors.append(f"Quality Gate Violation: Failed to parse pyproject.toml: {e}")
+
+    coveragerc_path = core_service_root / ".coveragerc"
+    if coveragerc_path.exists():
+        try:
+            config = configparser.ConfigParser()
+            config.read(coveragerc_path, encoding="utf-8")
+            for section in config.sections():
+                if config.has_option(section, "omit"):
+                    omit_val = config.get(section, "omit")
+                    for line in omit_val.splitlines():
+                        for item in line.split(","):
+                            cleaned = item.strip()
+                            if cleaned and "src" in cleaned:
+                                errors.append(
+                                    f"Quality Gate Violation: Unsafe coverage omit configuration detected in .coveragerc: '{cleaned}'."
+                                )
+        except Exception as e:
+            errors.append(f"Quality Gate Violation: Failed to parse .coveragerc: {e}")
+
+    return errors
+
+
 def main():
     core_service_root = Path(__file__).parent.parent.parent / "core-service"
     tests_dir = core_service_root / "tests"
     app_dir = core_service_root / "src" / "application"
 
     all_errors = []
+
+    # 0. Quality Gate Integrity Validation (Anti-Cheat / Anti-Evasion)
+    all_errors.extend(check_quality_gate_integrity(core_service_root))
 
     # 1. Feature-Driven Packaging Validation
     all_errors.extend(check_feature_packaging(app_dir))
