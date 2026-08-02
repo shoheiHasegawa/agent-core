@@ -39,10 +39,12 @@
   - `[x]` `register_zettelkasten_note.py` のテスト・検証（単一/複数/全種別）
   - `[x]` `agent-core/templates/Workspace_Progress_Template.md` に `## 💡 Session Insights` 追加
   - `[x]` `agent-core/skills/session-manager/SKILL.md` に Handoff時の知見提案フローを組み込み
-- `[/]` **3. Loop Orchestrator の設計・実装**
-  - `[ ]` SDD/TDDステートマシンの設計（各フェーズのI/O、権限境界、差し戻し条件）
-  - `[ ]` `tdd_controller.py`（またはオーケストレータースクリプト/スキル）の実装
-  - `[ ]` 実行テストと統合検証
+- `[x]` **3. Loop Orchestrator の設計・実装**
+  - `[x]` ダブルループTDD（Outer Red -> Inner TDD -> Quality Gate）の標準フロー明文化（`testing_strategy.md`）
+  - `[x]` 各ワーカーSKILL（`tdd-red-coder`, `tdd-green-refactorer`）のダブルループ対応更新
+  - `[x]` ゲート判定CLIツール（`agent-core/tools/verify_loop_state.py`）の実装
+  - `[x]` オーケストレータースキル（`agent-core/skills/sdd-loop-orchestrator/SKILL.md`）の実装
+  - `[x]` 物理検証とカタログ登録
 
 ---
 

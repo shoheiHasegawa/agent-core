@@ -19,10 +19,12 @@ description: 仕様書（spec.md）を読み込み、それに準拠した「失
 *   **Input**: 対象機能の `spec.md`
 *   **Action**: 全シナリオ（要求ID）と、定義されたI/O型、エッジケースを把握する。
 
-### 2. テストの作成 (Red)
-*   **Action**: `tests/` 配下に対象のテストコード（Integration または Unit）を作成・更新する。
-*   **Constraints**: 必ず各テスト関数の DocString に `[要求ID]` を明記し、トレーサビリティを確保すること。
+### 2. 結合テストの作成 (Outer Red)
+*   **Action**: `tests/integration/<domain>/` 配下に対象の結合テストコード（Integration Test）を作成・更新する。
+*   **Constraints**:
+    - 必ず各テスト関数の DocString に `[要求ID]` を明記し、トレーサビリティを確保すること。
+    - 結合テストではモック（`unittest.mock`, `@patch` 等）を禁止し、テスト用DBや具象コンポーネントを使用すること。
 
-### 3. 失敗の確認とパス
-*   **Action**: `pytest` を実行し、作成したテストが「意図通りに失敗（Red）すること」を確認する。
-*   **Output**: 失敗するテストコード群。完了次第、実装者（`tdd-green-refactorer`）へ引き継ぐ。
+### 3. 失敗の確認とパス (Red Check)
+*   **Action**: 対象テストを実行し、「構文エラーではなく、アサーション失敗等で意図通りに失敗（Red）すること」を確認する。
+*   **Output**: 失敗する結合テストコード群。完了次第、実装者（`tdd-green-refactorer`）へ引き継ぐ。

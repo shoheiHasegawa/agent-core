@@ -1,0 +1,75 @@
+---
+name: sdd-loop-orchestrator
+description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gate -> Review）の自律サイクルを統括・実行するTier 1オーケストレーター。
+---
+
+# Skill: SDD Loop Orchestrator (Tier 1)
+
+## 🎯 目的
+ユーザーからの要求を受け、各専門職ワーカー（サブエージェント）を順序正しく召喚し、機械的な品質ゲート（Exit Code）による物理判定と自律差し戻し（Self-Healing）を行いながら、完全自律で高品質なコードベースを完成させる。
+
+## ⚠️ 絶対遵守ルール
+1. **職務分離（Tier 1の不干渉）**: オーケストレーター自身はプロダクションコード（`src/`）やテストコード（`tests/`）を直接編集してはならない。必ずサブエージェント（`invoke_subagent`）に委譲せよ。
+2. **自己申告の禁止（Exit Code による物理判定）**: ワーカーの「完了しました」という言葉を信じるな。必ず `agent-core/tools/verify_loop_state.py` の物理実行結果で合否を判定せよ。
+3. **自律差し戻し（Self-Healing Loop）**: テスト失敗や品質ゲート違反が発生した場合は、エラーログを添えて直前のワーカーに差し戻せ（最大3回リトライ）。
+
+---
+
+## 🛠️ 実行手順
+
+```
+[Phase 1: Spec Design] -> sdd-spec-writer (spec.md 作成)
+         │
+         ▼
+[Phase 2: Outer Red]   -> tdd-red-coder (tests/integration/ 結合テスト作成)
+         │                └─ verify_loop_state.py --phase outer-red で検証
+         ▼
+[Phase 3: Inner Loop]  -> tdd-green-refactorer (src/ 実装 & tests/unit/ 補強)
+         │                └─ verify_loop_state.py --phase green で検証
+         ▼
+[Phase 4: Quality Gate]-> verify_loop_state.py --phase quality (カバレッジ >= 90%)
+         │                └─ FAIL時は Phase 3 へエラー付きで差し戻し
+         ▼
+[Phase 5: Review]      -> compliance-reviewer (独立司法による合憲性・ルール審査)
+         │                └─ 指摘時は Phase 3 へ修正委譲
+         ▼
+[Phase 6: Commit]      -> Git Commit & progress.md 更新
+```
+
+### Phase 1: SDD Spec Design
+*   **Action**: `invoke_subagent` を用いて `sdd-spec-writer` を起動し、対象機能の `spec.md` を作成させる。
+*   **Output**: 確定した `spec.md`（要求ID、I/O型、エッジケース定義）。
+
+### Phase 2: Outer Red (Acceptance Test)
+*   **Action**: `invoke_subagent` を用いて `tdd-red-coder` を起動し、`tests/integration/<domain>/` 配下に要求IDを紐付けた結合テストを作成させる。
+*   **Gate Check**:
+    ```bash
+    uv run python ../agent-core/tools/verify_loop_state.py --phase outer-red
+    ```
+*   **判定**: `success: true`（意図通りのアサーション失敗）であれば Phase 3 へ。構文エラーやPASSしてしまった場合は修正を指示。
+
+### Phase 3: Inner Loop & Green (Implementation & Unit Test)
+*   **Action**: `invoke_subagent` を用いて `tdd-green-refactorer` を起動し、結合テストをGreenにしつつ、必要に応じて `tests/unit/` に単体テストを追加して実装・リファクタリングさせる。
+*   **Gate Check**:
+    ```bash
+    uv run python ../agent-core/tools/verify_loop_state.py --phase green
+    ```
+*   **判定**: `success: true` であれば Phase 4 へ。
+
+### Phase 4: Quality Gate Verification (司法)
+*   **Gate Check**:
+    ```bash
+    uv run python ../agent-core/tools/verify_loop_state.py --phase quality
+    ```
+*   **判定**: 
+    - `success: true`（カバレッジ >= 90%、Makefile完全性、トレーサビリティ全一致、Linter通過）であれば Phase 5 へ。
+    - `success: false` の場合、エラー詳細を `send_message` または新規サブエージェントで `tdd-green-refactorer` に渡し、修正を命じる（最大3回）。
+
+### Phase 5: Independent Compliance Review
+*   **Action**: `invoke_subagent` を用いて `compliance-reviewer` を起動し、DDD/SOLID/Context Engineeringの観点で独立レビューを行わせる。
+*   **判定**: 指摘事項があれば `tdd-green-refactorer` に修正させ、Passであれば Phase 6 へ。
+
+### Phase 6: Atomic Commit & Progress Update
+*   **Action**: 
+    - `git add` および `git commit` を実行（Pre-commit hook が自動検証）。
+    - ワークスペースの `tasks/progress.md` のチェックリストを更新する。

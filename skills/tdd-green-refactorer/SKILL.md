@@ -15,16 +15,18 @@ description: 失敗するテストをパスさせ（Green）、DDD/SOLID原則�
 
 ## 🛠️ 実行手順
 
-### 1. テストの実行と実装 (Green)
-*   **Input**: `tdd-red-coder` が作成した失敗するテストと `spec.md`
-*   **Action**: テストをパスさせるための最小限の実装（`src/` 配下）を行う。
-*   **Constraints**: `pytest` がすべて通る（Green）までこのフェーズを繰り返す。
+### 1. 最小実装と内側ループ (Inner Loop / Green)
+*   **Input**: `tdd-red-coder` が作成した失敗する結合テスト（Outer Red）と `spec.md`
+*   **Action**: 
+    - 結合テストをパスさせるための最小限の実装（`src/` 配下）を行う。
+    - 複雑なビジネスルールやエッジケース、分岐処理がある場合は、`tests/unit/` 配下に単体テスト（Unit Test）を作成しながら実装を肉付けする（Inner TDD）。
+*   **Constraints**: すべてのテスト（Integration + Unit）が PASS（Green）するまで実装を進める。
 
 ### 2. リファクタリング (Refactor)
 *   **Input**: 全パス状態（Green）のコードベース
-*   **Action**: 対象リポジトリで定義されたアーキテクチャルール（`import-linter`の設定や `docs/rules/` のドキュメント）を遵守し、コードをクリーンにリファクタリングする。
+*   **Action**: 対象リポジトリで定義されたアーキテクチャルール（DDD/SOLID、`docs/rules/` のドキュメント群）を遵守し、コードをクリーンにリファクタリングする。
 *   **Constraints**: リファクタリング中も常にテストを回し続け、Green状態を維持すること。
 
-### 3. 完了チェック
-*   **Action**: `make lint` および `make test` を実行し、Linterエラーゼロ、カバレッジ閾値クリアを確認する。
-*   **Output**: クリーンでテスト済みのプロダクションコード。
+### 3. 品質ゲート検証 (Quality Gate)
+*   **Action**: `make check-all` および `uv run python ../agent-core/tools/validate_sdd.py` を実行し、Linterエラーゼロ、総合カバレッジ 90% 以上クリアを確認する。
+*   **Output**: クリーンでテスト済み（Integration + Unit網羅）のプロダクションコード。
