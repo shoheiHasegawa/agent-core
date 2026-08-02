@@ -10,6 +10,7 @@
 - ドメインの設計ルール: `core-service/docs/rules/`
 - システム全体の構成図・データフロー: `agent-core/docs/architecture/`
 - **プロジェクト（Epic）とワークスペースの運用ルール**: `agent-core/docs/architecture/workspace_management.md`
+- **ツールの設計標準（JSON-First Protocol）**: `agent-core/docs/rules/tool_design_principles.md`
 - 各種テンプレート: `second-brain/90_Meta/Templates/`
 </jit_routing>
 

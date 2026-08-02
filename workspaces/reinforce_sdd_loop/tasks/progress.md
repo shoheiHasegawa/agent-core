@@ -32,7 +32,14 @@
   - `[x]` `Makefile` の `check-all` ターゲットに `test`, `lint`, `validate` が全て含まれるか検証する関数の作成
   - `[x]` `pyproject.toml` 等で不正な除外設定がないか検証する関数の作成
   - `[x]` 故意に閾値を下げた場合に正しく FAIL するかテスト検証
-- `[/]` **2. Loop Orchestrator の設計・実装**
+- `[x]` **2. Tool API化とSession Insights自動ストック・提案の仕組み構築**
+  - `[x]` `agent-core/docs/rules/tool_design_principles.md` の作成（正本仕様）
+  - `[x]` `agent-core/AGENT.md` へのポインタ追加
+  - `[x]` `agent-core/tools/register_zettelkasten_note.py` のJSON API化（全ノート種別・バッチ対応）
+  - `[x]` `register_zettelkasten_note.py` のテスト・検証（単一/複数/全種別）
+  - `[x]` `agent-core/templates/Workspace_Progress_Template.md` に `## 💡 Session Insights` 追加
+  - `[x]` `agent-core/skills/session-manager/SKILL.md` に Handoff時の知見提案フローを組み込み
+- `[/]` **3. Loop Orchestrator の設計・実装**
   - `[ ]` SDD/TDDステートマシンの設計（各フェーズのI/O、権限境界、差し戻し条件）
   - `[ ]` `tdd_controller.py`（またはオーケストレータースクリプト/スキル）の実装
   - `[ ]` 実行テストと統合検証

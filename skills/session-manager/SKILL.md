@@ -32,10 +32,15 @@ Agentic OSにおいて、エージェントがセッションを開始（起動�
 
 ### 3. セッション終了・申し送り (Handoff)
 *   **入力 (Input)**: セッション終了・中断の指示
-*   **アクション (Action)**: セッション終了の準備として、事前検証、コミット、およびEnqueue（申し送りパケット生成）を実行する。
+*   **アクション (Action)**: セッション終了の準備として、知見の蒸留（Session Insights）、事前検証、コミット、およびEnqueue（申し送りパケット生成）を実行する。
 *   **制約事項 (Constraints)**: 以下の手順を必ず厳守すること。
-    1. `context.md` に次回の論点（Current Focus）が書き残されているか確認。
-    2. `bash tools/pre_handoff_verify.sh` を実行。
-    3. パスしたら、作業したリポジトリで `git add . && git commit -m "chore: Handoff - [作業のサマリ]" && git push` を実行。
-    4. コミット完了後、`Handoff_Packet_Template.md` に基づくパケットを生成する。パケットには作業ログを一切書き込まず、単なるポインタのみを記述すること。
-*   **出力 (Output)**: Handoffパケットの生成とGit同期完了
+    1. **【Wisdom Extraction (知見の蒸留提案)】**:
+       - `progress.md` の `## 💡 Session Insights` に未登録（`[ ]`）の教訓・知見があるかスキャンする。
+       - 存在する場合、ユーザーに「本セッションで以下の知見がストックされています。Zettelkasten（`second-brain`）へ登録しますか？」と提示する。
+       - ユーザーの承認が得られたら、`register_zettelkasten_note.py`（JSON API）を実行して登録し、`progress.md` 側を `[x]` に更新する。
+    2. `context.md` に次回の論点（Current Focus）が書き残されているか確認。
+    3. `bash tools/pre_handoff_verify.sh` を実行。
+    4. パスしたら、作業したリポジトリで `git add . && git commit -m "chore: Handoff - [作業のサマリ]" && git push` を実行。
+    5. コミット完了後、`Handoff_Packet_Template.md` に基づくパケットを生成する。パケットには作業ログを一切書き込まず、単なるポインタのみを記述すること。
+*   **出力 (Output)**: 知見のZettelkasten登録、Handoffパケットの生成、およびGit同期完了
+
