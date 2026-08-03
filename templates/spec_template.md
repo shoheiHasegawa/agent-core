@@ -21,8 +21,10 @@
   - `field_1: Type`
   - `warning_flags: List[str]`
 
-### Exceptions (ドメインエラー)
-- **`[DomainExceptionName]`**: [発生条件とハンドリング方針]
+### Exceptions (エラー・例外設計)
+- 原則として Python 標準例外（`ValueError`, `FileNotFoundError`, `FileExistsError` 等）を使用し、独自例外の乱立を避けること（詳細は `docs/rules/error_handling.md` 参照）。
+- **`ValueError`**: [不正入力、未存在リソース、境界値違反、自己依存等の発生条件]
+- **`[OtherStandardException]`**: [発生条件とハンドリング方針]
 
 ---
 
