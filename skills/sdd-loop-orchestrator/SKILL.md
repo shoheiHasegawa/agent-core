@@ -1,12 +1,12 @@
 ---
 name: sdd-loop-orchestrator
-description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gate -> Review）の自律サイクルを統括・実行するTier 1オーケストレーター。
+description: 承認済み仕様書（spec.md）を受け取り、ダブルループTDD（Outer Red -> Inner TDD -> Quality Gate -> Compliance Review）の自律サイクルを統括・完走するTier 1オーケストレーター（Loop 2担当）。
 ---
 
-# Skill: SDD Loop Orchestrator (Tier 1)
+# Skill: SDD Loop Orchestrator (Loop 2: Autonomous TDD Execution)
 
 ## 🎯 目的
-ユーザーからの要求を受け、各専門職ワーカー（サブエージェント）を順序正しく召喚し、機械的な品質ゲート（Exit Code）による物理判定と自律差し戻し（Self-Healing）を行いながら、完全自律で高品質なコードベースを完成させる。
+ユーザー承認済みの仕様書（`spec.md`）を受け取り、各専門職ワーカー（サブエージェント）を順序正しく召喚し、機械的な品質ゲート（Exit Code）による物理判定と自律修復（Self-Healing）を行いながら、完全自律で高品質なコードベースを完成・コミットする。
 
 ## ⚠️ 絶対遵守ルール
 1. **職務分離（Tier 1の不干渉）**: オーケストレーター自身はプロダクションコード（`src/`）やテストコード（`tests/`）を直接編集してはならない。必ずサブエージェント（`invoke_subagent`）に委譲せよ。
@@ -17,72 +17,54 @@ description: SDDとダブルループTDD（Outer Red -> Inner TDD -> Quality Gat
 
 ## 🛠️ 実行手順
 
-```
-[Phase 1: Spec Design] -> sdd-spec-writer (spec.md 作成)
-         │
-         ▼
-[Phase 2: Outer Red]   -> tdd-red-coder (tests/integration/ 結合テスト作成)
-         │                └─ verify_loop_state.py --phase outer-red で検証
-         ▼
-[Phase 3: Inner Loop]  -> tdd-green-refactorer (src/ 実装 & tests/unit/ 補強)
-         │                └─ verify_loop_state.py --phase green で検証
-         ▼
-[Phase 4: Quality Gate]-> verify_loop_state.py --phase quality (カバレッジ >= 90%)
-         │                └─ FAIL時は Phase 3 へエラー付きで差し戻し
-         ▼
-[Phase 5: Review]      -> compliance-reviewer (独立司法による合憲性・ルール審査)
-         │                └─ 指摘時は Phase 3 へ修正委譲
-         ▼
-[Phase 6: Commit]      -> Git Commit & progress.md 更新
+```mermaid
+graph TD
+    P1[Phase 1: Outer Red] --> P2[Phase 2: Inner Loop Green]
+    P1 -- Stub/Signature Error --> S1[Phase 1 回帰: spec.md/スタブ修正]
+    P2 -- Green Verified --> P3[Phase 3: Quality Gate make check-all]
+    P3 -- Quality Fail Max 3 --> P2
+    P3 -- Quality Pass --> P4[Phase 4: Compliance Review]
+    P4 -- Review Reject --> P2
+    P4 -- Review Pass --> P5[Phase 5: Atomic Commit & Handoff]
 ```
 
-### Phase 1: SDD Spec Design
-*   **Action**: `invoke_subagent` を用いて `sdd-spec-writer` を起動し、対象機能の `spec.md` を作成させる。
-*   **Output**: 確定した `spec.md` のパス（例: `src/application/<domain>/spec.md`）と、定義された要求ID一覧。
-
-### Phase 2: Outer Red (Acceptance Test)
-*   **Action**: `invoke_subagent` を用いて `tdd-red-coder` を起動。`spec.md` を渡し、`tests/integration/<domain>/` 配下に結合テストを作成させる。
-*   **Context Handoff**: `tdd-red-coder` から「作成したテストファイルパス（例: `tests/integration/task_management/test_auto_assign.py`）」を返却値として受け取る。
-*   **Gate Check**:
+### Phase 1: Outer Red (Acceptance Test Creation)
+*   **入力 (Input)**: ユーザー承認済みの `spec.md`
+*   **アクション (Action)**: `invoke_subagent` を用いて `tdd-red-coder` を起動。`spec.md` を渡し、`tests/integration/<domain>/` 配下に結合テストを作成させる（バグ修正時はバグ再現テスト）。
+*   **検証 (Gate Check)**:
     ```bash
     uv run python ../agent-core/tools/verify_loop_state.py --phase outer-red --target <test_file_path>
     ```
-*   **判定 & Proof of Red 証跡記録**: 
-    - `success: true`（意図通りのアサーションまたは未実装エラー）の場合:
-      - レスポンス内の `proof_of_red` メタデータを取得。
-      - `tasks/progress.md` のチェックリストに `- [x] Proof of Red: <target> (<failure_type> at <verified_at>)` を記録して Phase 3 へ。
-    - 構文エラーやPASSしてしまった場合は `tdd-red-coder` に修正を再委譲。
+*   **判定 & ルーティング**:
+    - `success: true`（意図通りのアサーションまたは未実装エラー）: `tasks/progress.md` に Proof of Red を記録して Phase 2 へ。
+    - **スタブ起因の致命的エラー（`AttributeError` / `TypeError` in `src/`）の場合**: `tdd-red-coder` ではなく、スタブ作成元へ差し戻して型シグネチャを修正。
 
-### Phase 3: Inner Loop & Green (Implementation & Unit Test)
-*   **Action**: `invoke_subagent` を用いて `tdd-green-refactorer` を起動。`spec.md` と `tests/integration/` のテストパスを渡し、実装および `tests/unit/` の単体テスト補強を行わせる。
-*   **Gate Check**:
+### Phase 2: Inner Loop & Green (Implementation & Unit Test)
+*   **入力 (Input)**: `spec.md` と `tests/integration/` のテストパス
+*   **アクション (Action)**: `invoke_subagent` を用いて `tdd-green-refactorer` を起動。実装および `tests/unit/` の単体テスト補強を行わせる。
+*   **検証 (Gate Check)**:
     ```bash
-    # 1. 新規テストのパス確認
-    uv run python ../agent-core/tools/verify_loop_state.py --phase green --target <test_file_path>
-    # 2. 全体テストのパス（リグレッション・デグレがないことの検証）
     uv run python ../agent-core/tools/verify_loop_state.py --phase green
     ```
-*   **判定**: 両方が `success: true` であれば Phase 4 へ。失敗時はエラーログを添えて `tdd-green-refactorer` に修正を指示。
+*   **判定**: `success: true` であれば Phase 3 へ。失敗時はエラーログを添えて `tdd-green-refactorer` に再委譲。
 
-### Phase 4: Quality Gate Verification (司法)
-*   **Gate Check**:
+### Phase 3: Quality Gate Verification ( make check-all )
+*   **アクション (Action)**:
     ```bash
-    uv run python ../agent-core/tools/verify_loop_state.py --phase quality
+    make check-all
     ```
-*   **判定 & 自律修復ループ (Max 3 Retries / Prompt Sanitization)**: 
-    - `success: true`（カバレッジ >= 90%、Makefile完全性、トレーサビリティ全一致、Linter通過）であれば Phase 5 へ。
-    - `success: false` の場合:
-      - **The "God Prompt" 予防（プロンプト・サニタイズ）**: 会話履歴全文を渡さず、以下の3点のみを抽出して `tdd-green-refactorer` に渡す。
-        1. 修正対象ファイルパス一覧
-        2. 最新の `git diff`
-        3. `verify_loop_state.py` が返したエラー末尾50行（`details`）
-      - **エスカレーション**: 3回連続で解決できない場合は自律ループを停止し、発生したエラーログと原因分析をユーザーに報告して介入を仰ぐこと。
+*   **制約事項 (Constraints)**: カバレッジ >= 90%、Ruff lint/format、AST双方向トレーサビリティ検証がすべて Exit 0 であること。
+*   **自律修復 (Prompt Sanitization & Max 3 Retries)**:
+    - 失敗時は「①対象ファイルパス ②git diff ③エラー末尾50行」のみを抽出して `tdd-green-refactorer` に渡す。3回連続で失敗した場合は人間にエスカレーションする。
 
-### Phase 5: Independent Compliance Review
-*   **Action**: `invoke_subagent` を用いて `compliance-reviewer` を起動し、DDD/SOLID/Context Engineeringの観点で独立レビューを行わせる。
-*   **判定**: 指摘事項があれば `tdd-green-refactorer` に修正させ、Passであれば Phase 6 へ。
+### Phase 4: Independent Compliance Review
+*   **アクション (Action)**: `invoke_subagent` を用いて `compliance-reviewer` を起動し、合憲性・ルール審査を行わせる。
+*   **制約事項 (Constraints)**: 
+    - レビューで指摘・Reject された場合は、指摘事項をサニタイズして Phase 2 (`tdd-green-refactorer`) へ差し戻す。
+    - **【完全ループバック原則】**: 修正後は必ず **Phase 2 (Green) ➔ Phase 3 (Quality Gate) ➔ Phase 4 (Review)** を再走し、デグレがないことを再検証すること。
 
-### Phase 6: Atomic Commit & Progress Update
-*   **Action**: 
-    - `git add` および `git commit` を実行（Pre-commit hook が自動検証）。
+### Phase 5: Atomic Commit & Progress Update
+*   **アクション (Action)**:
+    - `git add` および `git commit` を実行。
     - ワークスペースの `tasks/progress.md` のチェックリストを更新し、完了報告を行う。
+*   **出力 (Output)**: 完全検証済みのコミットハッシュおよび進捗完了レポート。

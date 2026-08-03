@@ -22,9 +22,11 @@ Agentic OSにおいて、エージェントがセッションを開始（起動�
 ### 1. 起動シーケンス (Boot Sequence)
 *   **入力 (Input)**: セッション開始時の `agent-core/queue/` の状態
 *   **アクション (Action)**: 現在の状態に応じたルーティング（状態遷移）を行う。
-    - **State A (Resume)**: `handoff_*.md` が存在する場合、ポインタ先の `progress.md` と `context.md` を読み込み進捗を把握した後、元のパケットを破棄し、タスク再開を提案する。
+    - **State A (Resume)**: `handoff_*.md` が存在する場合、ポインタ先の `progress.md` と `context.md` を読み込み進捗を把握した後、元のパケットを破棄する。
+      - `progress.md` の現在地が「Loop 1: 仕様策定中（未承認）」の場合 ➔ `sdd-spec-writer` による壁打ち・仕様合意を再開。
+      - `progress.md` の現在地が「Loop 2: 自律TDD実装中」の場合 ➔ `sdd-loop-orchestrator` によるTDDサイクルを再開。
     - **State B (New Task)**: キューが空の場合、バックログをスキャンし、次に着手すべきEpic候補を提案する。
-*   **出力 (Output)**: ユーザーへの着手提案
+*   **出力 (Output)**: ユーザーへの着手提案（現在地に応じた適切なスキルの起動）
 
 ### 2. セッション中の自律更新
 *   **入力 (Input)**: セッション中の対話や議論の結論

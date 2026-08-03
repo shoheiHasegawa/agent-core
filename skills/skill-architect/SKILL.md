@@ -39,5 +39,11 @@ Agentic OSのエージェントが使用する「Skill」を設計・生成す�
 *   **アクション (Action)**: `agent-core/skills/<skill_name>/SKILL.md` を作成する。
 *   **制約事項 (Constraints)**: YAMLフロントマター（`name`, `description`）を必ず記述し、実行手順にはグローバル・スキーマ（Input/Action/Constraints/Output）を厳守すること。
 
-### 4. レビュー依頼
-*   **アクション (Action)**: 作成後、ユーザーに対して「`skill-reviewer` スキルを使って品質チェックを行ってください」と提案する。
+### 4. 自律レビューと合憲性検証 (Auto Review & Gate)
+*   **アクション (Action)**: 
+    - `invoke_subagent` を呼び出し、`skill-reviewer` サブエージェントに対象スキルの審査を依頼する。
+    - また、ターミナルで `python tools/audit_skills.py` を実行し、機械的な構文・規約エラーがないか検証する。
+*   **制約事項 (Constraints)**:
+    - `skill-reviewer` から 【Pass（承認）】 を獲得し、かつ `audit_skills.py` がエラー 0 件で通過するまで、タスクを完了してはならない。
+    - 違反・修正要求（Reject）を受けた場合は、指摘事項を即座にリファクタリングして再審査を受けること。
+*   **出力 (Output)**: Reviewer の承認ログおよび検証完了済みの `SKILL.md`。親エージェントまたはユーザーへ完了を報告する。

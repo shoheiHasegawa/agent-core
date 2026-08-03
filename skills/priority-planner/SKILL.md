@@ -17,7 +17,7 @@ description: タスクの優先度見直しや明日の計画に特化し、DB�
 ## 🛡️ 防衛プロトコル (Safety & Validation)
 タスクの更新は、安全のため必ず専用のCLIツールを経由すること。
 直接DBファイルを編集したりSQLを発行することは禁止する。
-実行コマンド: `cd core-service && PYTHONPATH=src uv run python3 ../agent-core/tools/update_task.py --task_id <ID> [--category <CATEGORY>] [--estimated_minutes <MINUTES>] [--status <STATUS>]`
+実行コマンド: `cd core-service && PYTHONPATH=src uv run python3 ../agent-core/tools/update_task.py --task_id <ID> [--title <TITLE>] [--category <CATEGORY>] [--estimated_minutes <MINUTES>] [--status <STATUS>] [--deadline <YYYY-MM-DD>] [--memo <MEMO>]`
 （※エラーが出た場合は、引数を確認して再実行すること）
 
 ## 🛠️ 実行手順

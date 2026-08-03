@@ -16,7 +16,21 @@ secrets-decrypt:
 	@sops --decrypt --in-place .env || echo "Failed to decrypt. Check if you have the correct PGP/AGE keys."
 
 # ---------------------------------------------------------
-# Task Execution
+# Quality Gate & Architecture Validation
 # ---------------------------------------------------------
-# 将来的に agent-core のオーケストレーション処理を呼び出すための
-# エントリーポイント等もここに定義します。
+
+validate-skills:
+	@echo "Auditing skills..."
+	@uv run python tools/audit_skills.py
+
+validate-sdd:
+	@echo "Validating SDD and architecture..."
+	@uv run python tools/validate_sdd.py
+
+validate-orphans:
+	@echo "Auditing orphan scripts..."
+	@uv run python tools/audit_orphan_scripts.py
+
+check-all: validate-skills validate-sdd validate-orphans
+	@echo "✅ All agent-core Quality Gates passed!"
+

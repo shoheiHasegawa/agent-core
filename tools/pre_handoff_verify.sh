@@ -15,10 +15,10 @@ cd "$ROOT_DIR/core-service"
 make check-all
 echo "✅ core-service verified successfully."
 
-# agent-core の検証 (孤立ツールの監査等)
-echo "=> Verifying agent-core (Orphan Scripts Audit)..."
+# agent-core の検証 (スキル監査・SDD検証・孤立ツールの監査等)
+echo "=> Verifying agent-core (Quality Gates)..."
 cd "$ROOT_DIR/agent-core"
-python3 tools/audit_orphan_scripts.py
+make check-all
 echo "✅ agent-core verified successfully."
 echo "======================================"
 echo "🎉 All verifications passed! Ready to commit."
