@@ -1,9 +1,7 @@
-# Current Context (RAM)
+# Context & Working Memory (Task Operations Refactoring)
 
-- 現在地: Loop 1（Discovery: 協働仕様策定）
-- 対象: `core-service/src/application/task_operations/`
-- 主な論点:
-  1. `RefineTaskUseCase` でどのようなパラメータ（title, estimated_minutes, category, deadline, is_deep_work, memo, description等）の更新を許可するか。
-  2. `RegisterTaskUseCase` の `uuid.uuid4()` 直書き解消と `UuidGenerator` DI。
-  3. `Task` エンティティにおける `description` / `last_memo` / `area_id` の整合性。
-  4. 6大観点テストシナリオの定義。
+## 状態
+本タスクは完了し、すべての検証・コミットが正常に終了しました。
+- `make check-all` (core-service: 128 passed, 92.99% coverage)
+- `make check-all` (agent-core: all passed)
+- Compliance Review: PASS

@@ -1,9 +1,11 @@
-# Epic Workspace: task_operations_refactoring
+# Workspace: Task Operations Refactoring
 
-## 📌 概要
-`core-service` におけるタスク基本操作パッケージ（`src/application/task_operations/`）の技術的負債解消と6大観点SDD/TDDリファクタリング。
-
-## 🧭 エントリーポイント & 読み順
-1. [`tasks/progress.md`](file:///Users/shoheihasegawa/you_inc/agent-core/workspaces/task_operations_refactoring/tasks/progress.md) : プロジェクトの現在地とチェックリスト
-2. [`tasks/context.md`](file:///Users/shoheihasegawa/you_inc/agent-core/workspaces/task_operations_refactoring/tasks/context.md) : 直近の作業コンテキスト（RAM）
-3. [`src/application/task_operations/spec.md`](file:///Users/shoheihasegawa/you_inc/core-service/src/application/task_operations/spec.md) : 仕様書（Timeless SSOT）
+- **ステータス**: `COMPLETED`
+- **目的**: `TaskOperationsService` および `RefineTaskUseCase` / `RegisterTaskUseCase` の空洞化解消、6大観点SDD/TDD適用、CLI拡張、エラーハンドリング統一。
+- **完了日**: 2026-08-03
+- **成果物**:
+  - `core-service/src/application/task_operations/spec.md` (6大観点 SSOT)
+  - `core-service/src/application/task_operations/` (UseCase 実装・DI 化)
+  - `core-service/tests/integration/task_operations/test_integration.py` (実DB 6大観点テスト)
+  - `agent-core/tools/update_task.py` (CLI 引数拡張)
+  - `core-service/docs/rules/error_handling.md` (例外設計正本)
