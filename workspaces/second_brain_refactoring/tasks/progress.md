@@ -3,8 +3,8 @@
 **【メタデータ】**
 - Epic: `second_brain_refactoring`
 - 種別: `[機能改修]`
-- 現在地: `[Tier 1A: 協働仕様策定中]`
-- 次回アクション: `sdd-spec-writer` による 6大観点仕様（`src/application/second_brain/spec.md`）の策定・壁打ちと Human Gate 承認
+- 現在地: `[完了]`
+- 次回アクション: なし（Epic 完遂・全ゲート通過済み）
 
 ---
 
