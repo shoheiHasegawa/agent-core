@@ -29,6 +29,10 @@ def main():
         root_md_path = AGENT_CORE_DIR / root_md
         if root_md_path.exists():
             md_files_to_search.append(root_md_path)
+            
+    tools_readme = TOOLS_DIR / "README.md"
+    if tools_readme.exists():
+        md_files_to_search.append(tools_readme)
 
     reference_text = ""
     for md_file in md_files_to_search:

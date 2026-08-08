@@ -11,9 +11,9 @@ You_Inc エコシステムにおける、主要な情報の流れ（データフ
 sequenceDiagram
     actor User as 社長 (人間)
     participant Mobile as Mobile Vault
-    participant Queue as Event Bus as agent-core/events/
+    participant EventBus as agent-core/events/
     participant Inbox as second-brain/00_Inbox
-    participant Epic as agent-core/epics
+    participant Backlog as agent-core/backlog
     participant Workspace as agent-core/workspaces
     participant SenseMaking as second-brain/20_Sense_Making
     participant PermNotes as second-brain/40_Permanent_Notes
@@ -24,10 +24,10 @@ sequenceDiagram
     Mobile->>Inbox: フォーマットして格納（バックログ化）
     
     %% フェーズ2: プロジェクト実行
-    note over User,Inbox: 人間がトリガーとなりEpic化
-    User->>Epic: Inboxからアイデアを吸い上げPJ立ち上げ
-    Epic->>Workspace: フラットな作業場を展開しPJ実行
-    note over Workspace,Queue: 作業中、Agent間でEvent Busを通じたシステム非同期エラー通知
+    note over User,Inbox: 人間がトリガーとなりBacklog化
+    User->>Backlog: Inboxからアイデアを吸い上げPJ立ち上げ
+    Backlog->>Workspace: フラットな作業場を展開しPJ実行
+    note over Workspace,EventBus: 作業中、Agent間でEvent Busを通じたシステム非同期エラー通知
     
     %% フェーズ3: 学びと改善の抽出 (Continuous Harvesting)
     Workspace->>SenseMaking: 実行により得た普遍的な学びや運用改善案を直接投函
@@ -105,5 +105,5 @@ Event Bus（`agent-core/events/`）はセッション引き継ぎではなくシ
 
 ### ⚠️ イベント駆動型エラーハンドリング (Event Bus 思想)
 Agentic OSにおいて、システムエラーは単なる「死蔵されるログ（記録）」ではなく、**「AIエージェントに対する自律修復要求アクション（イベント）」** として扱われます。
-- ログ専用ディレクトリ（例: `logs/` や `queue/errors/`）へ静的にエラーを出力することは禁止します。
-- エラーが発生した場合、必ず `SystemEventGateway` を介して、フラットな「処理待ちエラーパケット（例: `error_generate_daily_briefing_20260721_123456.md`）」として `queue/` 直下に投函（Publish）しなければなりません。これにより、エラーがAIの認知（Inbox Triage 等）に入り、自律的な修復タスクへとシームレスに繋がります。
+- ログ専用ディレクトリ（例: `logs/` や `events/errors/`）へ静的にエラーを出力することは禁止します。
+- エラーが発生した場合、必ず `SystemEventGateway` を介して、フラットな「処理待ちエラーパケット（例: `error_generate_daily_briefing_20260721_123456.md`）」として `events/` 直下に投函（Publish）しなければなりません。これにより、エラーがAIの認知（Inbox Triage 等）に入り、自律的な修復タスクへとシームレスに繋がります。

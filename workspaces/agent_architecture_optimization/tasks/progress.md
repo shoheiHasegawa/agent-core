@@ -3,8 +3,8 @@
 **【メタデータ】**
 - Epic: `agent_architecture_optimization`
 - 種別: `[アーキテクチャ最適化・リファクタリング]`
-- 現在地: `[Phase 3: 実装中]` ➔ `[PR 2: クリーンネス自動検証ハーネスの構築]`
-- 次回アクション: PR 2 サブエージェントの実装委譲
+- 現在地: `[Phase 3: 実装中]` ➔ `[PR 3: サブエージェント契約テンプレートの作成]`
+- 次回アクション: PR 3 サブエージェントの実装委譲
 
 ---
 
@@ -29,9 +29,9 @@
   - [x] `core-service/src/di/config.py`, `container.py` のDI注入先更新
   - [x] `core-service/src/infrastructure/local_file/queue_system_event_gateway.py` の投函先を `events/` に是正
   - [x] `agent-core/docs/architecture/data_flow.md` の更新
-- [ ] **PR 2: クリーンネス自動検証ハーネスの構築**
-  - [ ] `agent-core/tools/verify_cleanliness.py` の実装（50行制限、ゴミ検知、パス構造検証）
-  - [ ] `agent-core/scripts/pre_handoff_verify.sh` への統合
+- [x] **PR 2: クリーンネス自動検証ハーネスの構築**
+  - [x] `agent-core/tools/verify_cleanliness.py` の実装（50行制限、ゴミ検知、パス構造検証）
+  - [x] `agent-core/scripts/pre_handoff_verify.sh` & `Makefile` & `AGENT.md` への統合
 - [ ] **PR 3: サブエージェント契約テンプレートの作成**
   - [ ] `agent-core/templates/Subagent_Prompt_Template.md` の作成（契約型Few-Shot）
 - [ ] **PR 4: 全18スキルのリファクタリング (高付加価値化 & ルール純度向上)**
@@ -41,7 +41,7 @@
   - [ ] Category D (オーケストレーター3スキル): `session-manager`, `sdd-loop-orchestrator`, `zk-distillation-orchestrator`
 - [ ] **PR 5: ドキュメント整理・レガシー移行**
   - [ ] 空スタブファイル削除 (`core-service/docs/rules/api_gateway.md` 等)
-  - [ ] 既存ワークスペース（`ai_study_sessions` 等）の `tasks/` 構造への移行
+  - [ ] 既存ワークスペース（`ai_study_sessions`, `systematic_trading` 等）の `tasks/` 構造への移行
   - [ ] 旧 `agent-core/queue/` の完全削除
 - [ ] **PR 6: 全体品質検証とコミット**
   - [ ] `pre_handoff_verify.sh` & `make check-all` パス検証

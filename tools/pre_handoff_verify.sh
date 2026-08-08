@@ -18,6 +18,7 @@ echo "✅ core-service verified successfully."
 # agent-core の検証 (スキル監査・SDD検証・孤立ツールの監査等)
 echo "=> Verifying agent-core (Quality Gates)..."
 cd "$ROOT_DIR/agent-core"
+uv run python tools/verify_cleanliness.py
 make check-all
 echo "✅ agent-core verified successfully."
 echo "======================================"

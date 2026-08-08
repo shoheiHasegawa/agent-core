@@ -17,6 +17,7 @@
 | [`verify_loop_state.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/verify_loop_state.py) | Audit | SDD/TDDループの各フェーズ（Outer Red, Green, Quality）の機械的判定 |
 | [`audit_orphan_scripts.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/audit_orphan_scripts.py) | Audit | どこからも参照されていない孤立スクリプトの監査検知 |
 | [`pre_handoff_verify.sh`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/pre_handoff_verify.sh) | Audit | コミット前の総合検証（テスト・Lint・SDD・孤立監査）の一括実行 |
+| [`verify_cleanliness.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/verify_cleanliness.py) | Audit | Agent OS の物理的クリーンネス（Leave No Trace, 行数制限）の機械的検証 |
 
 > [!NOTE]
 > 各ツールの詳細な引数やJSONスキーマ仕様は、各スクリプトの先頭 Docstring または `--help` 引数を参照せよ。

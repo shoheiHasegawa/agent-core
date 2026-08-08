@@ -31,6 +31,10 @@ validate-orphans:
 	@echo "Auditing orphan scripts..."
 	@uv run python tools/audit_orphan_scripts.py
 
-check-all: validate-skills validate-sdd validate-orphans
+validate-cleanliness:
+	@echo "Validating cleanliness..."
+	@uv run python tools/verify_cleanliness.py
+
+check-all: validate-skills validate-sdd validate-orphans validate-cleanliness
 	@echo "✅ All agent-core Quality Gates passed!"
 

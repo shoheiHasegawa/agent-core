@@ -7,15 +7,15 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus)
-- **PR 1 (Event Bus 移行 & DI整合)**: 完了・テスト全通過・コミット完了。
-- **PR 2: クリーンネス自動検証ハーネス (`verify_cleanliness.py`) の構築** に着手。
+- **PR 1 & PR 2**: 完了・テスト/クリーンネス全通過・コミット完了。
+- **PR 3: サブエージェント契約テンプレート (`templates/Subagent_Prompt_Template.md`) の作成** に着手。
 
-## 📌 次の実行内容 (PR 2)
-- `agent-core/tools/verify_cleanliness.py` の実装
-  - 50行制限検証（`context.md` ≤ 50 lines）
-  - 孤立ゴミ検知（`scratch/` 以外の不要ファイル等）
-  - パス構造検証（`_index.md`, `tasks/progress.md`, `tasks/context.md`）
-- `agent-core/scripts/pre_handoff_verify.sh` への統合と動作検証
+## 📌 次の実行内容 (PR 3)
+- `agent-core/templates/Subagent_Prompt_Template.md` の新規作成
+  - 【呼び出し契約 (Invocation Contract)】: 職務定義、明確なゴール、入力パラメータ（JITポインタ）、明示的制約
+  - 【報告契約 (Reporting Contract)】: 担当タスク、変更/生成ファイル、検証ステータス (PASS/FAIL)、テスト/コマンド実行結果、要約
+  - Flash ワーカーと Pro ワーカーの使い分け基準・Few-Shot 例を収録
+- `audit_orphan_scripts.py` および `templates/README.md` 等での参照登録
 
 ## ❓ なぜ今ここにいるのか (Why we are here)
-- 次のスキル改修（PR 4）やワークスペース移行（PR 5）を機械的に監視・保証する物理的ハーネスを先に構築するため。
+- PR 4 の全18スキル改修において、オーケストレーターからサブエージェントへの呼び出し品質を契約型で保証するため。
