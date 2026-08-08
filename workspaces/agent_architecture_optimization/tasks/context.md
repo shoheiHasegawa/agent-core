@@ -7,15 +7,16 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus)
-- **PR 1 & PR 2**: 完了・テスト/クリーンネス全通過・コミット完了。
-- **PR 3: サブエージェント契約テンプレート (`templates/Subagent_Prompt_Template.md`) の作成** に着手。
+- **PR 1, PR 2, PR 3**: 完了・テスト/クリーンネス/孤立監査全通過・コミット完了。
+- **PR 4: 全18スキルのリファクタリング (高付加価値化 & ルール純度向上)** に着手。
 
-## 📌 次の実行内容 (PR 3)
-- `agent-core/templates/Subagent_Prompt_Template.md` の新規作成
-  - 【呼び出し契約 (Invocation Contract)】: 職務定義、明確なゴール、入力パラメータ（JITポインタ）、明示的制約
-  - 【報告契約 (Reporting Contract)】: 担当タスク、変更/生成ファイル、検証ステータス (PASS/FAIL)、テスト/コマンド実行結果、要約
-  - Flash ワーカーと Pro ワーカーの使い分け基準・Few-Shot 例を収録
-- `audit_orphan_scripts.py` および `templates/README.md` 等での参照登録
+## 📌 次の実行内容 (PR 4)
+- `docs/04_Skill_Refactoring_Matrix_and_High_Value_Specs.md` の仕様に従い、4つのカテゴリ別にスキルを順次リファクタリング:
+  1. **Category A (対話7スキル)**: `night-routine`, `inbox-triage`, `journaling-counselor`, `priority-planner`, `johari-profiler`, `socratic-interviewer`, `sdd-spec-writer`
+  2. **Category B (重ワーカー4スキル)**: `tdd-green-refactorer`, `tool-architect`, `skill-architect`, `skill-reviewer`
+  3. **Category C (軽ワーカー4スキル)**: `tdd-red-coder`, `compliance-reviewer`, `zk-formatter-qa`, `workspace-architect`
+  4. **Category D (オーケストレーター3スキル)**: `session-manager`, `sdd-loop-orchestrator`, `zk-distillation-orchestrator`
+- 各カテゴリごとに `audit_skills.py` および `./tools/pre_handoff_verify.sh` で検証。
 
 ## ❓ なぜ今ここにいるのか (Why we are here)
-- PR 4 の全18スキル改修において、オーケストレーターからサブエージェントへの呼び出し品質を契約型で保証するため。
+- ハーネス（PR 2）と契約テンプレート（PR 3）が完成したため、全スキルのプロンプト純度向上と知能注入（Few-Shot / ヒューリスティクス）を安全に実行できる状態になった。

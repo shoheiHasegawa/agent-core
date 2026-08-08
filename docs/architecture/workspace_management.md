@@ -37,6 +37,7 @@ workspaces/<Epic名>/
         *   `progress.md`: 具体的な進捗状況やアトミックなTODOの管理（タスク完了時の低頻度更新）。新規作成時は `agent-core/templates/Workspace_Progress_Template.md` を使用すること。
         *   `context.md`: 現在の焦点や最新の合意事項を50行以内で要約するワーキングメモリ（議論ごとの高頻度更新）。新規作成時は `agent-core/templates/Workspace_Context_Template.md` を使用すること。
     *   **`scratch/`**: 一時的なスクリプトや、Agent同士のレビューレポート、エラーログなどを置く。**この中のファイルはフェーズ完了時に破棄すること。**
+*   **機械的検証 (Quality Gate)**: ワークスペースの必須ディレクトリ構造（`_index.md`, `docs/`, `tasks/`, `scratch/`）および `tasks/context.md` の50行制限は、`tools/verify_cleanliness.py` によって機械的に検証されます。
 *   **終了時の扱い**: プロジェクト（Epic）が完了した際、このワークスペース内に残された `docs/` などの有益な「普遍的ルール」や「アーキテクチャ図」は `agent-core/docs/` 等に昇格・移動させます。その後、このワークスペース自体はクリーンアップ（削除）可能となります。
 
 ## 2. Epicの終了とクリーンアップ (Standard Close Operation)

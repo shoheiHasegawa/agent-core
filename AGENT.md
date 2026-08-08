@@ -35,7 +35,7 @@
 - 【未検証コードの抑止】Agentは未検証のコードや未コミットの変更を残してセッションを終了してはならない。
 - セッション終了（Handoff）およびタスク完了報告の絶対条件（Definition of Done）として、以下の **全Quality Gateの完全通過（Exit Code 0）** を要求する。
   1. `core-service` における `make check-all`（pytest >= 90%, Ruff lint/format, SDD双方向トレーサビリティ）の合格。
-  2. `agent-core` における `make check-all`（全SKILL静的監査 `audit_skills.py`, SDD整合性検証）の合格。
+  2. `agent-core` における `make check-all`（全SKILL静的監査 `audit_skills.py`, クリーンネス検証 `tools/verify_cleanliness.py`, SDD整合性検証）の合格。
 </handoff_verification>
 </execution_flow>
 
