@@ -7,12 +7,15 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus)
-- 洗い出した全課題の記録が完了。
-- 局所最適化を避けるため、課題を3つの根本原因クラスターに統合し、最優先の「Cluster 1: 状態管理・起動・引き継ぎの根本整理」から議論を開始。
+- **PR 1 (Event Bus 移行 & DI整合)**: 完了・テスト全通過・コミット完了。
+- **PR 2: クリーンネス自動検証ハーネス (`verify_cleanliness.py`) の構築** に着手。
 
-## 📌 最終合意事項 (Conclusions)
-- `queue/` 完全撤廃を含むすべての洗い出し課題を `docs/00_Identified_Issues_and_Challenges.md` に記録完了。
-- 課題を個別に弄るのではなく、根本原因ごとにまとめて全体最適設計を行う。
+## 📌 次の実行内容 (PR 2)
+- `agent-core/tools/verify_cleanliness.py` の実装
+  - 50行制限検証（`context.md` ≤ 50 lines）
+  - 孤立ゴミ検知（`scratch/` 以外の不要ファイル等）
+  - パス構造検証（`_index.md`, `tasks/progress.md`, `tasks/context.md`）
+- `agent-core/scripts/pre_handoff_verify.sh` への統合と動作検証
 
 ## ❓ なぜ今ここにいるのか (Why we are here)
-- セッションのライフサイクル（起動・進行・引き継ぎ・検証）の土台を固め、後続のモデル最適化やプロンプトスリム化の基盤とするため。
+- 次のスキル改修（PR 4）やワークスペース移行（PR 5）を機械的に監視・保証する物理的ハーネスを先に構築するため。

@@ -38,7 +38,7 @@ def get_core_service_container(session: Session = None) -> CoreServiceContainer:
         mobile_inbox_dir=os.environ.get("ICLOUD_MOBILE_INBOX", "/tmp/mobile_inbox"),
         mobile_dashboard_dir=os.environ.get("ICLOUD_MOBILE_DASHBOARD", "/tmp/mobile_dashboard"),
         mobile_attachments_dir=os.environ.get("ICLOUD_MOBILE_ATTACHMENTS", "/tmp/mobile_attachments"),
-        agent_queue_dir=os.environ.get("AGENT_QUEUE_DIR", str(agent_core_dir / "queue")),
+        agent_events_dir=os.environ.get("AGENT_EVENTS_DIR", str(agent_core_dir / "events")),
         google_calendar_id=os.environ.get("TARGET_CALENDAR_ID", "primary"),
         google_credentials_path=os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ""),
         

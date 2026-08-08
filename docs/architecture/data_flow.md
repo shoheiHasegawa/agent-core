@@ -11,7 +11,7 @@ You_Inc エコシステムにおける、主要な情報の流れ（データフ
 sequenceDiagram
     actor User as 社長 (人間)
     participant Mobile as Mobile Vault
-    participant Queue as agent-core/queue
+    participant Queue as Event Bus as agent-core/events/
     participant Inbox as second-brain/00_Inbox
     participant Epic as agent-core/epics
     participant Workspace as agent-core/workspaces
@@ -27,7 +27,7 @@ sequenceDiagram
     note over User,Inbox: 人間がトリガーとなりEpic化
     User->>Epic: Inboxからアイデアを吸い上げPJ立ち上げ
     Epic->>Workspace: フラットな作業場を展開しPJ実行
-    note over Workspace,Queue: 作業中、Agent間でQueueを通じた通信
+    note over Workspace,Queue: 作業中、Agent間でEvent Busを通じたシステム非同期エラー通知
     
     %% フェーズ3: 学びと改善の抽出 (Continuous Harvesting)
     Workspace->>SenseMaking: 実行により得た普遍的な学びや運用改善案を直接投函
@@ -97,10 +97,10 @@ sequenceDiagram
 
 ## 4. アーキテクチャ運用ルール
 
-### ⚠️ Queueの処理粒度ルール (Context Engineering)
-Queue（`agent-core/queue/`）は厳密な一次元の処理待ちキューとして機能しなければなりません。
-- **処理粒度の原則**: Queue直下に配置されるアイテムは、ファイル（例: `handoff_*.md`）であれディレクトリ（例: `packet_xyz/`）であれ、必ず「1つの独立した処理単位（処理粒度）」でなければなりません。
-- **分類用ディレクトリの禁止**: 複数の処理単位を格納するための「分類用フォルダ」や「カテゴリ用ディレクトリ」をQueue内に作成することはアーキテクチャ違反として固く禁じます。
+### ⚠️ Event Busの処理粒度ルール (System Async Events)
+Event Bus（`agent-core/events/`）はセッション引き継ぎではなくシステム非同期エラー通知等のためのイベントバスとして機能しなければなりません。
+- **処理粒度の原則**: Event Bus直下に配置されるアイテムは、ファイル（例: `error_*.md`）であれディレクトリであれ、必ず「1つの独立した処理単位（処理粒度）」でなければなりません。
+- **分類用ディレクトリの禁止**: 複数の処理単位を格納するための「分類用フォルダ」や「カテゴリ用ディレクトリ」をEvent Bus内に作成することはアーキテクチャ違反として固く禁じます。
 - **命名規則**: 処理単位としてディレクトリ（バンドル）を作成する場合、それが処理パケットであることが名称から明白になるよう `packet_*` などの接頭辞を強制します。
 
 ### ⚠️ イベント駆動型エラーハンドリング (Event Bus 思想)
