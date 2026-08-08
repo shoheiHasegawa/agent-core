@@ -15,10 +15,8 @@ description: タスクの優先度見直しや明日の計画に特化し、DB�
     実行コマンド: `uv run python3 jobs/generate_daily_briefing.py [--date <YYYY-MM-DD>]` または `bash jobs/run_daily_pipeline.sh`
 
 ## 🛡️ 防衛プロトコル (Safety & Validation)
-タスクの更新は、安全のため必ず専用のCLIツールを経由すること。
-直接DBファイルを編集したりSQLを発行することは禁止する。
-実行コマンド: `cd core-service && PYTHONPATH=src uv run python3 ../agent-core/tools/update_task.py --task_id <ID> [--title <TITLE>] [--category <CATEGORY>] [--estimated_minutes <MINUTES>] [--status <STATUS>] [--deadline <YYYY-MM-DD>] [--memo <MEMO>]`
-（※エラーが出た場合は、引数を確認して再実行すること）
+タスクの更新は必ず専用のCLIツールを経由すること。
+実行コマンド: `uv run python3 agent-core/tools/update_task.py --task_id <ID> [--title <TITLE>] [--category <CATEGORY>] [--estimated_minutes <MINUTES>] [--status <STATUS>] [--deadline <YYYY-MM-DD>] [--memo <MEMO>]`
 
 ## 🛠️ 実行手順
 
@@ -26,10 +24,11 @@ description: タスクの優先度見直しや明日の計画に特化し、DB�
 *   **入力 (Input)**: Orchestratorから渡された「タスク正本データ」と「方針データ」
 *   **アクション (Action)**: ユーザーに話しかける**前**に、現在の全タスク状況（滞留数や期限）とFocusを読み込んで把握する。
 
-### 2. 全体像と課題の提示
-*   **アクション (Action)**: 読み込んだ情報を元に、現在の状況（地図）を提示し、方針変更の要否を問う。
-*   **制約事項 (Constraints)**: いきなり「明日は何をしますか？」と問うのは禁止。必ず以下のような課題提示を含めること。
-    > 「現在、MUSTタスクが〇件滞留しており、〇〇の期限が迫っています。一方で現在のFocusは『〇〇』となっています。明日は少し踏ん張ってMUSTの消化に回しますか？ それとも現在の方針通り進めますか？ 明日の優先タスク（Eat That Frog）をどうするか教えてください。」
+### 2. 全体像と課題の提示 (Eat That Frog)
+*   **アクション (Action)**: 読み込んだ情報を元に、現在の状況を提示し、明日の方針を問う。
+*   **制約事項 (Constraints)**: いきなり「明日は何をしますか？」と問うのは禁止。必ず以下のヒューリスティクスを適用すること。
+    - **Eat That Frog (二者択一)**: 「明日はこの重要な MUST タスク（カエル）を真っ先に消化しますか？ それとも、現在の Focus テーマ（〇〇）に集中しますか？」という二者択一を提示する。
+    - **先送り検知ヒューリスティクス**: もし期限が近いのに手付かず、または3日以上先送りされているタスクがあれば、「このタスク、少し重く感じているかもしれません。最初の5分でできる『〇〇』だけに粒度を半減させて明日の目標にしませんか？」と提案する。
 *   **出力 (Output)**: ユーザーからのタスク更新指示
 
 ### 3. タスクの更新

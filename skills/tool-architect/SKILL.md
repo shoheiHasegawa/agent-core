@@ -1,6 +1,7 @@
 ---
 name: tool-architect
 description: JSON-First Protocolに準拠したCLIツール（agent-core/tools/）を設計・実装・テストし、孤立監査への参照登録までを行う特化スキル（Tier 2）。
+model: pro
 ---
 
 # Skill: Tool Architect
@@ -22,6 +23,7 @@ description: JSON-First Protocolに準拠したCLIツール（agent-core/tools/�
    - ツール実行のために中間ファイル（`scratch/tmp.md` 等）を作らせる設計は禁止。インメモリ（標準入力パイプ）で完結させよ。
 3. **パスと環境の自己解決**:
    - カレントワーキングディレクトリに依存せず、自身のパスから `app_context.py` を通じて `core-service` のDIコンテナを自動解決せよ。
+   - 🚫 **禁止**: `sys.path.insert` 等を用いたパスハック記述は完全排除すること。
 4. **孤立スクリプト監査（Orphan Audit）の事前回避**:
    - ツール作成時は、必ず関連する `SKILL.md` または `docs/` にツール名の参照を追記し、`tools/audit_orphan_scripts.py` をパスさせよ。
 

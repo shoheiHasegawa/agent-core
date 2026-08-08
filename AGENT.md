@@ -12,6 +12,7 @@
 - **プロジェクト（Epic）とワークスペースの運用ルール**: `agent-core/docs/architecture/workspace_management.md`
 - **ツールの設計標準（JSON-First Protocol）**: `agent-core/docs/rules/tool_design_principles.md`
 - 各種テンプレート: `second-brain/90_Meta/Templates/`
+- **サブエージェント契約テンプレート**: `agent-core/templates/Subagent_Prompt_Template.md`
 </jit_routing>
 
 ## <workspace_awareness>

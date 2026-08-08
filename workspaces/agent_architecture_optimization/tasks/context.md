@@ -7,16 +7,15 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus)
-- **PR 1, PR 2, PR 3**: 完了・テスト/クリーンネス/孤立監査全通過・コミット完了。
-- **PR 4: 全18スキルのリファクタリング (高付加価値化 & ルール純度向上)** に着手。
+- **PR 1 〜 PR 4**: 完了・全18スキル刷新完了・Quality Gate全通過・コミット完了。
+- **PR 5: ドキュメント整理・レガシー移行** に着手。
 
-## 📌 次の実行内容 (PR 4)
-- `docs/04_Skill_Refactoring_Matrix_and_High_Value_Specs.md` の仕様に従い、4つのカテゴリ別にスキルを順次リファクタリング:
-  1. **Category A (対話7スキル)**: `night-routine`, `inbox-triage`, `journaling-counselor`, `priority-planner`, `johari-profiler`, `socratic-interviewer`, `sdd-spec-writer`
-  2. **Category B (重ワーカー4スキル)**: `tdd-green-refactorer`, `tool-architect`, `skill-architect`, `skill-reviewer`
-  3. **Category C (軽ワーカー4スキル)**: `tdd-red-coder`, `compliance-reviewer`, `zk-formatter-qa`, `workspace-architect`
-  4. **Category D (オーケストレーター3スキル)**: `session-manager`, `sdd-loop-orchestrator`, `zk-distillation-orchestrator`
-- 各カテゴリごとに `audit_skills.py` および `./tools/pre_handoff_verify.sh` で検証。
+## 📌 次の実行内容 (PR 5)
+- 空スタブファイルの削除 (`core-service/docs/rules/api_gateway.md` 等)
+- 既存ワークスペースの `tasks/` 構造移行 (`ai_study_sessions`, `systematic_trading`)
+  - `_index.md`, `tasks/progress.md`, `tasks/context.md` の配置
+- 旧 `agent-core/queue/` ディレクトリの完全削除（Zero-Queue 完成）
+- `verify_cleanliness.py` で警告（Warning）がゼロになることを検証
 
 ## ❓ なぜ今ここにいるのか (Why we are here)
-- ハーネス（PR 2）と契約テンプレート（PR 3）が完成したため、全スキルのプロンプト純度向上と知能注入（Few-Shot / ヒューリスティクス）を安全に実行できる状態になった。
+- 全18スキルの新契約が整備されたため、物理的な残骸・レガシー構造を解消してシステム全体のクリーンネスを100%にする。

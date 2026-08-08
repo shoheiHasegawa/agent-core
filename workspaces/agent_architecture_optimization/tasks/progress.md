@@ -3,8 +3,8 @@
 **【メタデータ】**
 - Epic: `agent_architecture_optimization`
 - 種別: `[アーキテクチャ最適化・リファクタリング]`
-- 現在地: `[Phase 3: 実装中]` ➔ `[PR 4: 全18スキルのリファクタリング]`
-- 次回アクション: PR 4 スキル改修の順次委譲（Category A 〜 D）
+- 現在地: `[Phase 3: 実装中]` ➔ `[PR 5: ドキュメント整理・レガシー移行]`
+- 次回アクション: PR 5 レガシー移行と空スタブ清掃の委譲
 
 ---
 
@@ -35,11 +35,11 @@
 - [x] **PR 3: サブエージェント契約テンプレートの作成**
   - [x] `agent-core/templates/Subagent_Prompt_Template.md` の作成（契約型Few-Shot）
   - [x] `templates/README.md` & `AGENT.md` & `workspace_management.md` への参照登録
-- [ ] **PR 4: 全18スキルのリファクタリング (高付加価値化 & ルール純度向上)**
-  - [ ] Category A (対話7スキル): `night-routine`, `inbox-triage`, `journaling-counselor`, `priority-planner`, `johari-profiler`, `socratic-interviewer`, `sdd-spec-writer`
-  - [ ] Category B (重ワーカー4スキル): `tdd-green-refactorer`, `tool-architect`, `skill-architect`, `skill-reviewer`
-  - [ ] Category C (軽ワーカー4スキル): `tdd-red-coder`, `compliance-reviewer`, `zk-formatter-qa`, `workspace-architect`
-  - [ ] Category D (オーケストレーター3スキル): `session-manager`, `sdd-loop-orchestrator`, `zk-distillation-orchestrator`
+- [x] **PR 4: 全18スキルのリファクタリング (高付加価値化 & ルール純度向上)**
+  - [x] Category A (対話7スキル): `night-routine`, `inbox-triage`, `journaling-counselor`, `priority-planner`, `johari-profiler`, `socratic-interviewer`, `sdd-spec-writer`
+  - [x] Category B (重ワーカー4スキル): `tdd-green-refactorer`, `tool-architect`, `skill-architect`, `skill-reviewer`
+  - [x] Category C (軽ワーカー4スキル): `tdd-red-coder`, `compliance-reviewer`, `zk-formatter-qa`, `workspace-architect`
+  - [x] Category D (オーケストレーター3スキル): `session-manager`, `sdd-loop-orchestrator`, `zk-distillation-orchestrator`
 - [ ] **PR 5: ドキュメント整理・レガシー移行**
   - [ ] 空スタブファイル削除 (`core-service/docs/rules/api_gateway.md` 等)
   - [ ] 既存ワークスペース（`ai_study_sessions`, `systematic_trading` 等）の `tasks/` 構造への移行

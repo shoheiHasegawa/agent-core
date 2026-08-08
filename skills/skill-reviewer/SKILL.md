@@ -1,6 +1,7 @@
 ---
 name: skill-reviewer
 description: 既存または新規作成されたスキルの品質を、SOLID原則とAgentic OSアーキテクチャに基づいてレビューするメタスキル。
+model: pro
 ---
 
 # Skill: Skill Reviewer
@@ -15,17 +16,19 @@ description: 既存または新規作成されたスキルの品質を、SOLID�
    - **参照元**: `/Users/shoheihasegawa/you_inc/GEMINI.md`
    - **チェック内容**: Leave No Trace や 事前コミットなどの「システムの大原則・Philosophy」に違反する設計をしていないか。
 
-2. **【設計・実装方針チェック (Design Guidelines)】**
-   - **参照元**:
-     - `agent-core/docs/skill_design_principles.md`
-     - `agent-core/docs/architecture/document_architecture_principles.md`
-   - **チェック内容**: 以下のアンチパターンに該当していないか。
-     1. **Document Architecture 違反 (God Promptの禁止)**: SKILLは純粋な「実行手順」のみを記述する場所である。抽象論や特定の設計制約（How）がハードコードされ、Fat化（God Prompt化）していないか？（制約はLinterや外部ルールに移譲すべき）
-     2. **単一責任の違反**: プロンプト内で「Aをして、次にBをして、さらにCをする」といった長大な手順が含まれていないか？（→責務ごとに分割すべき）
-     3. **実行モデルの誤り (Role Switching vs Subagent)**: 「ユーザーとの対話」が主目的であるにも関わらず `invoke_subagent` を使って伝言ゲームを起こそうとしていないか？
-     4. **暗黙の依存**: `second-brain` などの外部リポジトリのパスや、特定のドメイン知識がプロンプトにハードコードされていないか？
-     5. **立法と司法の分離の違反**: スキルプロンプト内に特定のルールや制約（DDD, DIなど）がハードコードされていないか？
-     6. **フォーマット**: YAMLフロントマター（`name`, `description`）が正しく設定されているか？実行手順が `Input`, `Action`, `Constraints`, `Output` の標準タグに厳密に従っているか？
+2. **【多面的スキル品質ゲート (Multi-faceted Quality Gate)】**
+   以下の4つの観点でスキルの品質を多面的に審査し、合否判定（Pass/Fail）を行うこと。
+   1. **プロンプト純度 (Prompt Purity)**:
+      - 抽象論や長大なルール説明、特定の設計制約（How）がハードコードされ、Fat化（God Prompt化）していないか？
+      - ドメインルールは外部ドキュメントに追い出し、スキルは純粋な推論・実行手順のみを記述しているか？
+   2. **職務分離 (Separation of Duties / SRP)**:
+      - 複数の異なる作業を1つのプロンプトに混ぜ込んでいないか？
+      - 適切な実行モデル（対話が必要なら Role Switching、バックグラウンド処理なら Subagent）が選択されているか？
+   3. **Few-Shotの具体性**:
+      - 単なる抽象的な禁止事項ではなく、「Bad/Good」の対比など、認知負荷を下げる具体的なFew-Shot（ヒューリスティクス）が注入されているか？
+   4. **契約遵守 (Contract Compliance)**:
+      - YAMLフロントマター（`name`, `description`, `model`）が正しく設定されているか？
+      - 実行手順が `Input`, `Action`, `Constraints`, `Output` の標準タグに厳密に従っているか？
 
 ## 🛠️ 実行手順
 
