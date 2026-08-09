@@ -29,10 +29,12 @@ Agentic OS におけるプロジェクト管理の根幹である「ワークス
 *   **Constraints**:
     - 直下に落ちているファイルや一時的なゴミを発見した場合、直ちに `scratch/` へ移動（隔離）させる。
 
-### Case 3: Epicの完了 (Handoff & Cleanup)
-*   **Action**: `docs/` 内の有益な設計書やルール（恒久的なSSOT）を抽出し、上位の保管庫（`agent-core/docs/` 等）への退避を提案・実行する。
+### Case 3: Epicの完了と教訓抽出 (Handoff & Sense-Making)
+*   **Action**: 
+    - `docs/` 内の有益な設計書やルール（恒久的なSSOT）を抽出し、上位の保管庫（`agent-core/docs/` 等）への退避を提案・実行する。
+    - **メタ認知 (Whyの抽出)**: 単にファイルを消して終わるのではなく、「今回のEpicを通じて、将来のプロジェクトにも活かせる普遍的な教訓やアンチパターン（Why）は得られなかったか？」をユーザーに問いかけ、Zettelkasten（`second-brain/20_Sense_Making` 等）への蒸留を促すこと。
 *   **Constraints**:
-    - 退避完了後、Epicファイル（`epics/<Epic名>.md`）のステータスを `completed` に更新し、Gitコミットする。
+    - 退避・蒸留完了後、Epicファイル（`epics/<Epic名>.md`）のステータスを `completed` に更新し、Gitコミットする。
     - ワークスペースディレクトリ全体とEpicファイル本体を削除し、再度Gitコミットしてステートレスな状態に戻す。
 
 ### 報告 (Reporting)
