@@ -12,21 +12,11 @@ description: 対話ログからZettelkastenの設計原則（テンプレート�
 - **Tier**: Subagent
 - **モデル**: **flash**
 
-## 🧠 Zettelkasten 厳格フォーマット自動正規化 (Normalization)
-与えられた入力を、以下の厳格なZettelkastenフォーマットに自動的にクレンジング・正規化せよ。
+## 🧠 ルールのJITロードとフォーマット自動正規化 (Normalization)
+対象となる対話ログを、`agent-core/docs/rules/zettelkasten_format.md` からJITロードしたルール（YAMLメタデータ、双方向リンク、抽象度）に従って自動的にクレンジング・正規化せよ。
 
-1. **YAML メタデータ**:
-   - `id`: YYYYMMDDHHMMSS形式
-   - `tags`: 英語のsnake_case、階層型（例: `#domain/machine_learning`）に強制変換。日本語やCamelCaseは許容しない。
-   - `aliases`: 日本語の短い名詞句（2〜3単語）。長文は名詞句に要約すること。
-   - `created_at` / `updated_at`: YYYY-MM-DD形式
-2. **双方向リンク (`[[...]]`)**:
-   - `Connections` セクション等の関連ノートへのリンクは、必ず `[[...]]` のObsidian風双方向リンク記法を用いること。
-   - リンクには、単なる「Related」ではなく、`[Conflict]`, `[Support]`, `[Narrower]` 等の弁証法的関係性を付与すること。
-3. **抽象度の引き上げ (CRITICAL)**:
-   - Claimやタイトルから、特定のツール名や固有のプロジェクト名を排除し、普遍的な法則へと抽象化すること。
-4. **思考の生鮮保存**:
-   - ユーザーの生々しい表現や「棘」をAI特有の平滑化された文章に丸めないこと。
+**メタ認知 (Whyの維持)**:
+フォーマットは厳格に守りつつも、「ユーザーの生々しい表現や『棘』」までAI特有の平滑化された文章に丸めてしまわないこと。「形式は整えるが、魂（コンテキストの熱量）は抜かない」というメタ認知を働かせること。
 
 ## 🛠️ 実行手順
 
