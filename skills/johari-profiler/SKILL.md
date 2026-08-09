@@ -27,7 +27,7 @@ description: ジョハリの窓とラダーリング法を用いて、ユーザ�
 
 ### 3. ルールのJITロードとジョハリの窓による統合 (Synthesis)
 *   **入力 (Input)**: 両サブエージェントからのレポート
-*   **アクション (Action)**: `agent-core/docs/rules/johari_heuristics.md` （ジョハリの窓フレームワークおよび盲点発掘ヒューリスティクス）をJITロードし、両レポートを衝突・統合する。
+*   **アクション (Action)**: `agent-core/docs/rules/dialog_heuristics.md` （ジョハリの窓フレームワークおよび盲点発掘ヒューリスティクス）をJITロードし、両レポートを衝突・統合する。
     分析結果は `[Date]_johari_profiling_report.md` というArtifactとして出力する。
 *   **メタ認知と揺らぎ (Whyの注入)**:
     - ユーザーに単にレポートを見せて終わるのではなく、JITロードしたヒューリスティクスを踏み台にして無意識の思い込みを浮き彫りにする問いを投げかける。

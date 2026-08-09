@@ -26,7 +26,7 @@ model: pro
 ### 2. ルールのJITロードとリファクタリング (Refactor)
 *   **Input**: 全パス状態（Green）のコードベース
 *   **Action**: 
-    - `agent-core/docs/rules/refactoring_heuristics.md` （DRY, SRP, 意図的命名などのリファクタリング3大チェック）をJITロードする。
+    - `agent-core/docs/rules/sdd_tdd_heuristics.md` （DRY, SRP, 意図的命名などのリファクタリング3大チェック）をJITロードする。
     - 対象リポジトリで定義されたアーキテクチャルール（DDD/SOLID、`docs/rules/` のドキュメント群）と併せて、コードをクリーンにリファクタリングする。
 *   **メタ認知と揺らぎ (Whyの注入)**:
     - JITロードしたリファクタリングチェック（DRYなど）はあくまでベースライン（踏み台）である。「これさえ守ればOK（天井）」ではない。

@@ -13,7 +13,7 @@ description: 対話ログからZettelkastenの設計原則（テンプレート�
 - **モデル**: **flash**
 
 ## 🧠 ルールのJITロードとフォーマット自動正規化 (Normalization)
-対象となる対話ログを、`agent-core/docs/rules/zettelkasten_format.md` からJITロードしたルール（YAMLメタデータ、双方向リンク、抽象度）に従って自動的にクレンジング・正規化せよ。
+対象となる対話ログを、`agent-core/docs/rules/zettelkasten_heuristics.md` からJITロードしたルール（YAMLメタデータ、双方向リンク、抽象度）に従って自動的にクレンジング・正規化せよ。
 
 **メタ認知 (Whyの維持)**:
 フォーマットは厳格に守りつつも、「ユーザーの生々しい表現や『棘』」までAI特有の平滑化された文章に丸めてしまわないこと。「形式は整えるが、魂（コンテキストの熱量）は抜かない」というメタ認知を働かせること。

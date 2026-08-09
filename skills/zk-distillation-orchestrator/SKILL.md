@@ -18,7 +18,7 @@ description: Zettelkastenのノート蒸留作業を統括し、検索から対�
 
 ### 2. ルールのJITロードと深掘り対話のリード (Socratic Interview)
 *   **入力 (Input)**: 初期メモとフェーズ1で取得した既存ノートの文脈
-*   **アクション (Action)**: `agent-core/docs/rules/zettelkasten_distillation.md` （アトミックノート蒸留境界の基準）をJITロードし、オーケストレーター自身が `socratic-interviewer` の役割を兼任してユーザーとソクラテス対話を実施する。
+*   **アクション (Action)**: `agent-core/docs/rules/zettelkasten_heuristics.md` （アトミックノート蒸留境界の基準）をJITロードし、オーケストレーター自身が `socratic-interviewer` の役割を兼任してユーザーとソクラテス対話を実施する。
 *   **メタ認知と揺らぎ (Whyの注入)**: 
     - JITロードした蒸留基準を踏み台として、「これは一過性の事実か、それとも普遍的な法則か？」を問いかける。
     - もしユーザーが局所的な最適化（特定のプロジェクトだけの話）に囚われていると感じたら、「それが他のドメイン（例えばXXX）でも通用するとしたら、どう表現できますか？」というメタ認知を促し、抽象度を強制的に引き上げること。
