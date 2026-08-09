@@ -43,6 +43,7 @@
 ## <governance>
 - 「メーカー（実装）」と「チェッカー（検証）」の分離体制を基本とする。
 - 破壊的変更を伴うタスクは親エージェント（または人間）が直接操作し、ファイル生成等のタスクはサブエージェント（Implementer等）に委譲すること。
+- **[メタ認知プロセス (オプション提示と可逆性評価)]**: エスカレーションや設計方針の提案を行う際は、単一の解決策ではなく必ず「Plan A（王道）」「Plan B（代替案）」「Do Nothing（何もしないリスク）」の3つの選択肢とトレードオフをセットで提示すること。また、その決定が「可逆的（Two-Way Door）」かを明記し、可逆的で被害が小さい場合はエスカレーションせずに自律進行（事後報告）することを検討せよ。
 - **[Local Rule Override]**: 他リポジトリ（`second-brain`や`core-service`等）を操作する際は、必ずそのリポジトリ直下の `AGENT.md` をロードし、**当該リポジトリ内においてはそのローカルルールを最優先（agent-coreのルールをオーバーライド）して適用**すること。
 - **[Dependency Injection & Package Ecosystem]**: `core-service`（ステートレス工場）への依存は `pyproject.toml` に定義し、`uv` などの標準エコシステムでパスを解決すること（`sys.path` ハックは厳禁）。実行する際は、必ず `agent-core/config/` から設定を読み込み、`agent-core/app_context.py` (Composition Root) を通じて DI コンテナを構築してから実行すること（旧来の `factories/` ラッパーは廃止）。
 - **[Execution]**: 実行スクリプトは用途に応じて `jobs/` または `tools/` に配置すること。
