@@ -3,7 +3,7 @@ name: sdd-loop-orchestrator
 description: 承認済み仕様書（spec.md）を受け取り、ダブルループTDD（Outer Red -> Inner TDD -> Quality Gate -> Compliance Review）の自律サイクルを統括・完走するTier 1オーケストレーター（Loop 2担当）。
 ---
 
-# Skill: SDD Loop Orchestrator (Loop 2: Autonomous TDD Execution)
+# Skill: SDD Loop Orchestrator (Loop 2: Autonomous TDD Execution / Model: 親 Orchestrator / Pro)
 
 ## 🎯 目的
 ユーザー承認済みの仕様書（`spec.md`）を受け取り、各専門職ワーカー（サブエージェント）を順序正しく召喚し、機械的な品質ゲート（Exit Code）による物理判定と自律修復（Self-Healing）を行いながら、完全自律で高品質なコードベースを完成・コミットする。
@@ -55,7 +55,8 @@ graph TD
     ```
 *   **制約事項 (Constraints)**: カバレッジ >= 90%、Ruff lint/format、AST双方向トレーサビリティ検証がすべて Exit 0 であること。
 *   **自律修復 (Prompt Sanitization & Max 3 Retries)**:
-    - 失敗時は「①対象ファイルパス ②git diff ③エラー末尾50行」のみを抽出して `tdd-green-refactorer` に渡す。3回連続で失敗した場合は人間にエスカレーションする。
+    - **リトライ状態の追跡**: ループ実行時は `tasks/progress.md` に `[Retry Count: N/3]` を物理記録し、リトライ回数をトラッキングする。
+    - 失敗時は「①対象ファイルパス ②git diff ③エラー末尾50行」のみを抽出して `tdd-green-refactorer` に渡す。3回失敗時は自律修復を中断し、人間へのエスカレーション境界として処理を停止する。
 
 ### Phase 4: Independent Compliance Review
 *   **アクション (Action)**: `invoke_subagent` を用いて `compliance-reviewer` を起動し、合憲性・ルール審査を行わせる。

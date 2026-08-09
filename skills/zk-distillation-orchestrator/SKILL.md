@@ -1,12 +1,12 @@
 ---
 name: zk-distillation-orchestrator
-description: Zettelkastenのノート蒸留作業を統括し、検索からワーカーの呼び出しまでをオーケストレーションするTier 1スキル。
+description: Zettelkastenのノート蒸留作業を統括し、検索から対話のリード、ワーカーの呼び出しまでをオーケストレーションするTier 1スキル。
 ---
 
-# Skill: Zettelkasten Distillation Orchestrator
+# Skill: Zettelkasten Distillation Orchestrator (Model: 親 Orchestrator / Pro)
 
 ## 🎯 目的
-このスキルはTier 1（Orchestrator）です。自身で深い考察やファイル編集を行わず、全体の手順を管理し、適切なツールとTier 2サブエージェントを呼び出してPermanent Noteを完成させます。
+このスキルはTier 1（Orchestrator）です。アトミックノート蒸留境界（一過性のメモから普遍的法則 Permanent Note を抽出するフィルタリング基準）を管理し、自身がソクラテス対話をリードしつつ、QAやフォーマットは適切なTier 2サブエージェントに委譲してノートを完成させます。
 
 ## 🛠️ 実行手順
 
@@ -16,10 +16,11 @@ description: Zettelkastenのノート蒸留作業を統括し、検索からワ�
 *   **制約事項 (Constraints)**: 既存ノートを発見した場合、フォーマットと抽象度を監査し、要件を満たさない場合は既存ノート自体の再構築（上書き・リネーム）を行う計画を立てること。
 *   **出力 (Output)**: 検索で得られた「既存ノートの文脈（矛盾や関連性）」を次のフェーズ（Socratic Interviewer）の初期プロンプトへ引き継ぐ。
 
-### 2. 深掘り対話の委譲 (Socratic Interview)
+### 2. 深掘り対話のリード (Socratic Interview / Role Switching)
 *   **入力 (Input)**: 初期メモとフェーズ1で取得した既存ノートの文脈
-*   **アクション (Action)**: `define_subagent` および `invoke_subagent` を使い、「`socratic-interviewer`」スキルを持たせたサブエージェントを起動し、「この文脈でユーザーと壁打ちをして洞察を深めてください」と指示する。
-*   **出力 (Output)**: ユーザーとの深い対話ログ
+*   **アクション (Action)**: オーケストレーター自身が `socratic-interviewer` の役割を兼任（Role Switching）し、ユーザーとソクラテス対話を実施して洞察を深める。
+*   **アトミックノート蒸留境界**: この対話の中で「一過性のメモ・単なる事実」をフィルタリングし、「複数のコンテキストで再利用可能な普遍的法則（Permanent Note）」を抽出・特定すること。
+*   **出力 (Output)**: ユーザーとの深い対話ログ、および抽出された普遍的法則のドラフト
 
 ### 3. 品質管理とフォーマット化の委譲 (QA & Formatting)
 *   **入力 (Input)**: 完了した対話ログ

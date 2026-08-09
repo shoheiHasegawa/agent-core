@@ -1,32 +1,33 @@
 ---
 name: session-manager
-description: Agentic OSのセッション開始時（起動シーケンス）および終了時（ハンドオフ）のキュー・進捗管理とルーティングを行うスキル。
+description: Agentic OSのセッション開始時（起動シーケンス）および終了時（ハンドオフ）の進捗管理とルーティングを行うスキル。
 ---
 
-# Skill: Session Manager
+# Skill: Session Manager (Model: 親 Orchestrator / Pro)
 
 ## 🎯 目的
 Agentic OSにおいて、エージェントがセッションを開始（起動）した際の初期行動と、セッションを終了（ハンドオフ）する際の申し送り手順を標準化し、正本（SSOT）の原則に基づく強固な進捗管理とルーティングを提供する。
 
 ## ⚠️ 絶対遵守ルール（SSOTの原則と自律更新）
-1. **正本（状態の真実）**: `workspaces/<epic_name>/progress.md` が静的な進捗の正本であり、`workspaces/<epic_name>/context.md` が動的な議論（現在地）の正本である。
-2. **Queue（ルーティング）**: `agent-core/queue/handoff_*.md` は進捗状態を一切持たず、「次にどのWorkspaceを見るべきか」という**軽量なルーティング情報（チケット）**のみを保持する。
+1. **正本（状態の真実）**: `tasks/progress.md` が静的な進捗の正本であり、`tasks/context.md` が動的な議論（現在地）の正本である。
+2. **Zero-Queue**: 旧パス構造の `queue/` は廃止された。すべてのセッションは `tasks/context.md` から直接再開される。
 3. **【自律的な状態管理の強制 (Zero-Prompt Update)】**: エージェントは、ユーザーから「進捗を更新して」と指示されるのを待ってはならない。以下の粒度に従い、ユーザーに返答する前に**自律的にツールを呼び出して状態を更新すること**。これを怠ることは重大な職務怠慢である。
-   - **`context.md` (RAM) ＝ 【高頻度】**: 議論に結論が出た時や話題が変わった時。細かい変化を逃さず最新の現在地を要約上書きする（最大50行）。
+   - **`context.md` (RAM) ＝ 【高頻度】**: 議論に結論が出た時や話題が変わった時。細かい変化を逃さず最新の現在地を要約上書きする（最大50行制限）。
    - **`progress.md` (HDD) ＝ 【低頻度】**: タスクが完全に終了した時、または新規追加された時のみ。マイルストーンの区切りでのみ更新する。
 
 ## 🛠️ 実行手順
 
 本スキルは状態（State）やライフサイクルイベントに応じた振る舞いを行う。
 
-### 1. 起動シーケンス (Boot Sequence)
-*   **入力 (Input)**: セッション開始時の `agent-core/queue/` の状態
-*   **アクション (Action)**: 現在の状態に応じたルーティング（状態遷移）を行う。
-    - **State A (Resume)**: `handoff_*.md` が存在する場合、ポインタ先の `progress.md` と `context.md` を読み込み進捗を把握した後、元のパケットを破棄する。
-      - `progress.md` の現在地が「Loop 1: 仕様策定中（未承認）」の場合 ➔ `sdd-spec-writer` による壁打ち・仕様合意を再開。
-      - `progress.md` の現在地が「Loop 2: 自律TDD実装中」の場合 ➔ `sdd-loop-orchestrator` によるTDDサイクルを再開。
-    - **State B (New Task)**: キューが空の場合、バックログをスキャンし、次に着手すべきEpic候補を提案する。
-*   **出力 (Output)**: ユーザーへの着手提案（現在地に応じた適切なスキルの起動）
+### 1. 起動シーケンス (3-Step Lazy Bootstrapping)
+*   **入力 (Input)**: 対象ワークスペースの `tasks/context.md` と `tasks/progress.md`
+*   **アクション (Action)**: 以下の3ステップによる最速起動（Zero-Queue）を行う。
+    1. **Context Load**: `tasks/context.md` (≤50行) を読み込み、前回の文脈と直近のFocusを把握する。
+    2. **Progress Check**: `tasks/progress.md` を読み込み、現在のEpicにおける進捗（Loop状態）を確認する。
+    3. **Routing**: 状態に応じた適切なスキルの起動、またはユーザーへの提案を行う。
+       - `progress.md` の現在地が「Loop 1: 仕様策定中」の場合 ➔ `sdd-spec-writer` 等による再開。
+       - `progress.md` の現在地が「Loop 2: 自律TDD実装中」の場合 ➔ `sdd-loop-orchestrator` による再開。
+*   **出力 (Output)**: ユーザーへの着手提案、または自律的なスキルチェーンの再開。
 
 ### 2. セッション中の自律更新
 *   **入力 (Input)**: セッション中の対話や議論の結論
@@ -41,8 +42,7 @@ Agentic OSにおいて、エージェントがセッションを開始（起動�
        - 存在する場合、ユーザーに「本セッションで以下の知見がストックされています。Zettelkasten（`second-brain`）へ登録しますか？」と提示する。
        - ユーザーの承認が得られたら、`register_zettelkasten_note.py`（JSON API）を実行して登録し、`progress.md` 側を `[x]` に更新する。
     2. `context.md` に次回の論点（Current Focus）が書き残されているか確認。
-    3. `bash tools/pre_handoff_verify.sh` を実行。
+    3. **【Handoffクリーンネスの物理保証】**: `bash tools/pre_handoff_verify.sh` を実行し、検証に合格することを確認する。
     4. パスしたら、作業したリポジトリで `git add . && git commit -m "chore: Handoff - [作業のサマリ]" && git push` を実行。
-    5. コミット完了後、`Handoff_Packet_Template.md` に基づくパケットを生成する。パケットには作業ログを一切書き込まず、単なるポインタのみを記述すること。
-*   **出力 (Output)**: 知見のZettelkasten登録、Handoffパケットの生成、およびGit同期完了
+*   **出力 (Output)**: 知見のZettelkasten登録、およびGit同期完了
 

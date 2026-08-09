@@ -6,33 +6,35 @@ description: 対話ログからZettelkastenの設計原則（テンプレート�
 # Skill: Zettelkasten Formatter QA
 
 ## 🎯 目的
-このスキルはTier 2（Worker）です。純粋な編集者および品質管理者として振る舞い、渡された深い思考ログを**ユーザー自身の言葉を歪めることなく**、指定のテンプレート構造に落とし込みます。
+対話ログから、Zettelkastenの設計原則に従ったPermanent Noteを生成・正規化する。
 
-## ⚠️ 遵守ルール (QA Rules)
+## 🏛️ アーキテクチャ (Tier & Execution Model)
+- **Tier**: Subagent
+- **モデル**: **flash**
 
-1. **テンプレートの厳守**: `second-brain/90_Meta/Templates/Permanent_Note.md` の構造（YAMLタグ、Claim、Context、Connections）を完全に再現すること。
-2. **抽象度の厳格な担保 (CRITICAL)**: タイトル（ファイル名）および `Claim` には、特定のツール名（例: RAG, node_modules等）やプロジェクト固有の「具象」を含めてはなりません。時代やツールが変わっても通用する「普遍的な法則・アーキテクチャ」へと抽象度を引き上げること。
-3. **必須YAMLタグ**: `id` (YYYYMMDDHHMMSS形式), `tags`, `aliases`, `created_at` (YYYY-MM-DD), `updated_at` (YYYY-MM-DD) を必ず埋めること。
-4. **言語・フォーマット制約 (CRITICAL)**:
-   - `tags`: 必ず **英語の snake_case** かつ階層型（例: `#domain/machine_learning`, `#concept/architecture`）で記述すること。絶対に日本語やCamelCaseを含めないこと。
-   - `aliases`: 必ず **日本語** の短い名詞句（2〜3単語程度）で記述すること。絶対に長文（文節以上の長さ）にしないこと。（例: `機械学習のアーキテクチャ`）
-5. **リンクの制約**: `Connections` セクションからのリンクは、必ず他の `40_Permanent_Notes` へのリンクのみとし、単に「Related」で済ますのではなく、探索結果に基づく `[Conflict]` (対立・矛盾), `[Support]` (根拠・支持), `[Narrower]` (具体論) 等の弁証法的な関係性を必ず明記すること。
-6. **思考の保存（AIの自己解釈禁止）**: ユーザーの言葉や表現の「棘」や「生々しさ」をAI特有の平滑化された文章（"〇〇と言えます" 等）に丸めないこと。
+## 🧠 Zettelkasten 厳格フォーマット自動正規化 (Normalization)
+与えられた入力を、以下の厳格なZettelkastenフォーマットに自動的にクレンジング・正規化せよ。
+
+1. **YAML メタデータ**:
+   - `id`: YYYYMMDDHHMMSS形式
+   - `tags`: 英語のsnake_case、階層型（例: `#domain/machine_learning`）に強制変換。日本語やCamelCaseは許容しない。
+   - `aliases`: 日本語の短い名詞句（2〜3単語）。長文は名詞句に要約すること。
+   - `created_at` / `updated_at`: YYYY-MM-DD形式
+2. **双方向リンク (`[[...]]`)**:
+   - `Connections` セクション等の関連ノートへのリンクは、必ず `[[...]]` のObsidian風双方向リンク記法を用いること。
+   - リンクには、単なる「Related」ではなく、`[Conflict]`, `[Support]`, `[Narrower]` 等の弁証法的関係性を付与すること。
+3. **抽象度の引き上げ (CRITICAL)**:
+   - Claimやタイトルから、特定のツール名や固有のプロジェクト名を排除し、普遍的な法則へと抽象化すること。
+4. **思考の生鮮保存**:
+   - ユーザーの生々しい表現や「棘」をAI特有の平滑化された文章に丸めないこと。
 
 ## 🛠️ 実行手順
 
-### 1. 原稿の生成
-*   **入力 (Input)**: オーケストレーターから渡された対話ログ
-*   **アクション (Action)**: 対話ログを元に、Permanent Noteのテンプレートに従ってMarkdown原稿を生成する。
+### Step 1: 正規化・原稿生成 (Normalization)
+*   **Action**: 対話ログを読み込み、上記ルールに従ってMarkdown原稿を生成・正規化する。
 
-### 2. 自己QAチェック
-*   **アクション (Action)**: 生成した原稿がCI基準や遵守ルールを満たしているか自己検証する。
-*   **制約事項 (Constraints)**: 以下の点を必ず確認すること。
-    - YAMLタグの漏れはないか？
-    - リンクの方向性（`40_Permanent_Notes` への弁証法的なリンクのみか）に違反はないか？
-    - 結論（Claim）は1〜2行で鋭くまとまっているか？
+### Step 2: 自己QAチェック (Quality Assurance)
+*   **Constraints**: YAMLタグの漏れ、双方向リンクの書式、抽象度が保たれているかを確認する。
 
-### 3. 納品
-*   **アクション (Action)**: 完成したMarkdown原稿のテキストをそのままオーケストレーター（またはユーザー）に返却する。
-*   **制約事項 (Constraints)**: ファイルへの保存自体はオーケストレーターに任せ、直接ファイルシステムに書き込んではならない。
-*   **出力 (Output)**: フォーマット済みのMarkdown原稿テキスト
+### Step 3: 納品と報告 (Reporting)
+*   **Action**: 完成したMarkdownテキストを出力とし、標準ワーカー報告フォーマットで親エージェントに完了を報告する。自身でファイルシステムへの書き込みは行わないこと。
