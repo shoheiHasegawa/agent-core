@@ -61,7 +61,8 @@ graph TD
 ### Phase 4: Independent Compliance Review
 *   **アクション (Action)**: `invoke_subagent` を用いて `compliance-reviewer` を起動し、合憲性・ルール審査を行わせる。
 *   **制約事項 (Constraints)**: 
-    - レビューで指摘・Reject された場合は、指摘事項をサニタイズして Phase 2 (`tdd-green-refactorer`) へ差し戻す。
+    - **【仕様の自己修復（セマンティック・レビュー）】**: 変更された実装コードの振る舞いと、`spec.md` の自然言語の記述（該当ID部分）に意味的な矛盾（陳腐化）が生じていないか必ず検証させること。矛盾がある場合は、`spec.md` の記述を修正するよう指示を出して差し戻すこと。
+    - レビューで指摘・Reject された場合は、指摘事項をサニタイズして Phase 2 (`tdd-green-refactorer` などの適切なワーカー) へ差し戻す。
     - **【完全ループバック原則】**: 修正後は必ず **Phase 2 (Green) ➔ Phase 3 (Quality Gate) ➔ Phase 4 (Review)** を再走し、デグレがないことを再検証すること。
 
 ### Phase 5: Atomic Commit & Progress Update
