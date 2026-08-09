@@ -54,9 +54,10 @@ graph TD
     make check-all
     ```
 *   **制約事項 (Constraints)**: カバレッジ >= 90%、Ruff lint/format、AST双方向トレーサビリティ検証がすべて Exit 0 であること。
-*   **自律修復 (Prompt Sanitization & Max 3 Retries)**:
+*   **自律修復とエラー・リフレクション (Meta-Cognition & Self-Healing)**:
     - **リトライ状態の追跡**: ループ実行時は `tasks/progress.md` に `[Retry Count: N/3]` を物理記録し、リトライ回数をトラッキングする。
-    - 失敗時は「①対象ファイルパス ②git diff ③エラー末尾50行」のみを抽出して `tdd-green-refactorer` に渡す。3回失敗時は自律修復を中断し、人間へのエスカレーション境界として処理を停止する。
+    - **エラー・リフレクション**: 失敗時は闇雲にリトライ（ブルートフォース）するのではなく、「なぜこの品質ゲート（あるいはテスト）に落ちたのか？」という原因の仮説を言語化（エラー・リフレクション）した上で、対象ファイルパス・diff・エラーログと共に `tdd-green-refactorer` に差し戻すこと。
+    - 3回失敗時は自律修復を中断し、人間へのエスカレーション境界（Plan A/B提示）として処理を停止する。
 
 ### Phase 4: Independent Compliance Review
 *   **アクション (Action)**: `invoke_subagent` を用いて `compliance-reviewer` を起動し、合憲性・ルール審査を行わせる。
