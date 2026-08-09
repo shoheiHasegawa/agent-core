@@ -3,8 +3,8 @@
 **【メタデータ】**
 - Epic: `agent_architecture_optimization`
 - 種別: `[アーキテクチャ最適化・リファクタリング]`
-- 現在地: `[Phase 3: 実装中]` ➔ `[PR 5: ドキュメント整理・レガシー移行]`
-- 次回アクション: PR 5 レガシー移行と空スタブ清掃の委譲
+- 現在地: `[完了 (Completed)]`
+- 次回アクション: (なし) 全てのPRが統合され、Epicは完了しました。
 
 ---
 
@@ -25,33 +25,25 @@
 
 ### Phase 3: 対策の実装と検証 (Implementation & Verification - Atomic PR Cycles)
 - [x] **PR 1: Event Bus 移行 & DI/設定層の整合**
-  - [x] `agent-core/app_context.py` & `config/conf.env` のイベントパス設定化
-  - [x] `core-service/src/di/config.py`, `container.py` のDI注入先更新
-  - [x] `core-service/src/infrastructure/local_file/queue_system_event_gateway.py` の投函先を `events/` に是正
-  - [x] `agent-core/docs/architecture/data_flow.md` の更新
 - [x] **PR 2: クリーンネス自動検証ハーネスの構築**
-  - [x] `agent-core/tools/verify_cleanliness.py` の実装（50行制限、ゴミ検知、パス構造検証）
-  - [x] `agent-core/scripts/pre_handoff_verify.sh` & `Makefile` & `AGENT.md` への統合
 - [x] **PR 3: サブエージェント契約テンプレートの作成**
-  - [x] `agent-core/templates/Subagent_Prompt_Template.md` の作成（契約型Few-Shot）
-  - [x] `templates/README.md` & `AGENT.md` & `workspace_management.md` への参照登録
 - [x] **PR 4: 全18スキルのリファクタリング (高付加価値化 & ルール純度向上)**
-  - [x] Category A (対話7スキル): `night-routine`, `inbox-triage`, `journaling-counselor`, `priority-planner`, `johari-profiler`, `socratic-interviewer`, `sdd-spec-writer`
-  - [x] Category B (重ワーカー4スキル): `tdd-green-refactorer`, `tool-architect`, `skill-architect`, `skill-reviewer`
-  - [x] Category C (軽ワーカー4スキル): `tdd-red-coder`, `compliance-reviewer`, `zk-formatter-qa`, `workspace-architect`
-  - [x] Category D (オーケストレーター3スキル): `session-manager`, `sdd-loop-orchestrator`, `zk-distillation-orchestrator`
-- [ ] **PR 5: ドキュメント整理・レガシー移行**
-  - [ ] 空スタブファイル削除 (`core-service/docs/rules/api_gateway.md` 等)
-  - [ ] 既存ワークスペース（`ai_study_sessions`, `systematic_trading` 等）の `tasks/` 構造への移行
-  - [ ] 旧 `agent-core/queue/` の完全削除
-- [ ] **PR 6: 全体品質検証とコミット**
-  - [ ] `pre_handoff_verify.sh` & `make check-all` パス検証
-  - [ ] Git commit & push
+  - [x] Category A (対話7スキル)
+  - [x] Category B (重ワーカー4スキル)
+  - [x] Category C (軽ワーカー4スキル)
+  - [x] Category D (オーケストレーター3スキル)
+- [x] **PR 5: ドキュメント整理・レガシー移行**
+  - [x] 空スタブファイル削除 (`core-service/docs/rules/api_gateway.md` 等)
+  - [x] 既存ワークスペースの `tasks/` 構造への移行と `Handoff_Packet_Template.md` 等のレガシー削除
+  - [x] 旧 `agent-core/queue/` の完全削除
+- [x] **PR 6: 全体品質検証とコミット**
+  - [x] `pre_handoff_verify.sh` & `make check-all` パス検証
+  - [x] Git commit (PR 1~5 のアトミックコミット完了)
 
 ---
 
 ## 💡 Session Insights (未登録の教訓・知見)
-- `[ ]` **Zero-Queue & Backlog-Workspace Separation**: 企画（`backlog/`）と作業現場（`workspaces/`）をライフサイクルで明確に分離し、中間のキューを排除することで、コンテキストの純度と探索速度が劇的に向上する。
-- `[ ]` **Event Bus vs Task Handoff**: セッション引き継ぎとシステム非同期エラー通知は別物。引き継ぎはRAM/HDDで完結させ、システムエラー通知のみを極小のEvent Bus（`events/`）に分離する。
-- `[ ]` **Contract-Driven Flash Subagents**: Flash モデルは呼び出し契約（入力・制約）と報告契約（出力型）を固定することで、Pro 相当の精度と Flash の爆速・低コストを両立できる。
-- `[ ]` **Rule Leanization & High-Value Prompts**: 機械的ルールをLinterに任せ、プロンプトには思考ヒューリスティクス、Few-Shot実例、エスカレーション境界を注入する。
+- `[x]` **Zero-Queue & Backlog-Workspace Separation**: 企画（`backlog/`）と作業現場（`workspaces/`）をライフサイクルで明確に分離し、中間のキューを排除することで、コンテキストの純度と探索速度が劇的に向上する。
+- `[x]` **Event Bus vs Task Handoff**: セッション引き継ぎとシステム非同期エラー通知は別物。引き継ぎはRAM/HDDで完結させ、システムエラー通知のみを極小のEvent Bus（`events/`）に分離する。
+- `[x]` **Contract-Driven Flash Subagents**: Flash モデルは呼び出し契約（入力・制約）と報告契約（出力型）を固定することで、Pro 相当の精度と Flash の爆速・低コストを両立できる。
+- `[x]` **Rule Leanization & High-Value Prompts**: 機械的ルールをLinterに任せ、プロンプトには思考ヒューリスティクス、Few-Shot実例、エスカレーション境界を注入する。
