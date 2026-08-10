@@ -1,6 +1,8 @@
 ---
 name: sdd-spec-writer
 description: ユーザーとの対話・壁打ち（Discovery）を通じて要求を具体化し、6大観点ストレステストを経て厳密な仕様書（spec.md）を共創・合意する特化スキル（Loop 1担当）。
+type: Worker
+model: pro
 ---
 
 # Skill: SDD Spec Writer (Loop 1: Co-Creation Discovery)

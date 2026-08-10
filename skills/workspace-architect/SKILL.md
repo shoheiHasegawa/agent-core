@@ -1,6 +1,8 @@
 ---
 name: workspace-architect
 description: プロジェクト（Epic）のワークスペースが公式ルールに準拠しているかを監視・強制し、構築から完了時のクリーンアップまでを管理するシステム・オーケストレーター。
+type: Worker
+model: flash
 ---
 
 # Skill: Workspace Architect
@@ -10,7 +12,6 @@ Agentic OS におけるプロジェクト管理の根幹である「ワークス
 
 ## 🏛️ アーキテクチャ (Tier & Execution Model)
 - **Tier**: Orchestrator (Tier 1) -> Subagent (Role Switching 廃止、標準化)
-- **モデル**: **flash**
 
 ## 🧠 自己完結型ワークスペース構築 (Self-Contained Workspace)
 ワークスペース（`workspaces/<Epic名>/`）は、それ自体が完全に自己記述的でなければならない。

@@ -1,6 +1,8 @@
 ---
 name: johari-profiler
 description: ジョハリの窓とラダーリング法を用いて、ユーザーの顕在意識と潜在意識を隔離分析し、真のIdentityを抽出・言語化するプロファイリング・スキル。
+type: Orchestrator
+model: pro
 ---
 
 # Johari Profiler (深層プロファイリング・スキル)

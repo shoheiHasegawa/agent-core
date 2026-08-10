@@ -1,6 +1,8 @@
 ---
 name: session-manager
 description: Agentic OSのセッション開始時（起動シーケンス）および終了時（ハンドオフ）の進捗管理とルーティングを行うスキル。
+type: Orchestrator
+model: pro
 ---
 
 # Skill: Session Manager (Model: 親 Orchestrator / Pro)

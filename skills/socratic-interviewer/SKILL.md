@@ -1,6 +1,8 @@
 ---
 name: socratic-interviewer
 description: ユーザーと壁打ちを行い、既存の文脈との矛盾や抽象的な繋がりを見出して思考を深めるTier 2スキル。
+type: Worker
+model: pro
 ---
 
 # Skill: Socratic Interviewer

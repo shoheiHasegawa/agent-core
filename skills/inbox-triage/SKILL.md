@@ -1,6 +1,8 @@
 ---
 name: inbox-triage
 description: Mobile Inboxから未処理InboxItemをPeekし、ユーザーと壁打ちを行ってTask Registryやアイデアノートに振り分け・回収するスキル。
+type: Worker
+model: pro
 ---
 
 # Skill: Inbox Triage (Worker)
@@ -19,8 +21,8 @@ description: Mobile Inboxから未処理InboxItemをPeekし、ユーザーと壁
 *   **出力 (Output)**: 未処理InboxItemのリスト（※InboxItemがない場合は「本日の未処理メモはありません」とユーザーに伝えて終了する）
 
 ### 2. ルールのJITロードと対話（メタ認知プロトコル）
-*   **入力 (Input)**: 取得した未処理InboxItem
-*   **アクション (Action)**: `agent-core/docs/rules/inbox_triage_rules.md` （トリアージ基準やTask/Ideaの定義）をJITロードし、それを「踏み台」としてユーザーとの対話を行う。
+*   **Input**: 対象のメモ1件
+*   **Action**: `agent-core/docs/rules/dialog_heuristics.md` （ジョハリの窓などのヒューリスティクス）をJITロードし、それを踏み台としてユーザーと対話する。を行う。
 *   **メタ認知と揺らぎ (Whyの注入)**: 
     - メモを機械的に分類するのではなく、「ユーザーはなぜこのメモを残したのか？」を推論し、曖昧な場合は「TaskかIdeaか」の二択に縛られず、「これは〇〇という背景による『未定義のモヤモヤ』ではありませんか？」など、一段上のレイヤーから問いかけを行うこと。
     - ルール（例: 2分ルール）はあくまでベースラインであり、ユーザーのコンテキスト（疲労度や緊急度）に応じて柔軟に提案を変えること。

@@ -2,6 +2,7 @@
 name: tdd-green-refactorer
 description: 失敗するテストをパスさせ（Green）、DDD/SOLID原則に従ってリファクタリングする実装特化スキル。
 model: pro
+type: Worker
 ---
 
 # Skill: TDD Green Refactorer (Implementer)
@@ -28,9 +29,8 @@ model: pro
 *   **Action**: 
     - `agent-core/docs/rules/sdd_tdd_heuristics.md` （DRY, SRP, 意図的命名などのリファクタリング3大チェック）をJITロードする。
     - 対象リポジトリで定義されたアーキテクチャルール（DDD/SOLID、`docs/rules/` のドキュメント群）と併せて、コードをクリーンにリファクタリングする。
-*   **メタ認知と揺らぎ (Whyの注入)**:
-    - JITロードしたリファクタリングチェック（DRYなど）はあくまでベースライン（踏み台）である。「これさえ守ればOK（天井）」ではない。
-    - これらを担保した上で、「このドメインモデルの表現力（ビジネスの意図）はコード上で最大化されているか？」「過剰な共通化（DRYの誤用）によって結合度が上がっていないか？」を自問（メタ認知）しながらリファクタリングを完遂すること。
+*   **Worker制約**:
+    - 本スキルはWorkerであるため、The Trampoline（過剰な推論やメタ認知）は無効化される。ルールに従って機械的にコードを最適化すること。
 *   **Constraints**: リファクタリング中も常にテストを回し続け、Green状態を維持すること。
 
 ### 💡 ヒューリスティクス & Few-Shot
@@ -40,5 +40,15 @@ model: pro
 - ⭕ *Good*: ドメイン層に `IEventRepository` などのインターフェースを定義し、コンストラクタ経由で注入（DI）して依存を逆転させる。
 
 ### 3. 品質ゲート検証 (Quality Gate)
-*   **Action**: `make check-all` および `uv run python ../agent-core/tools/validate_sdd.py` を実行し、Linterエラーゼロ、総合カバレッジ 90% 以上クリアを確認する。
-*   **Output**: クリーンでテスト済み（Integration + Unit網羅）のプロダクションコード。
+*   **Action**: `make check-all` を実行し、Linterエラーゼロ、テスト網羅を確認する。
+*   **Output**: クリーンでテスト済みのプロダクションコード。
+
+## 🤝 出力契約 (Output Contract)
+作業完了後は、必ず以下のフォーマットのみで親エージェント（Orchestrator）へ報告すること。余計な考察や推論を含めてはならない。
+
+```markdown
+【Green Refactorer 完了報告】
+- 実装・修正したファイル: [ファイルパスのリスト]
+- `make check-all` の結果: [PASS] (失敗時は差し戻しとなるため、必ずPASSしてから報告すること)
+- 特記事項: (アーキテクチャルールによる制約で回避した実装があれば簡潔に記載)
+```

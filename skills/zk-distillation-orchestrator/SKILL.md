@@ -1,6 +1,8 @@
 ---
 name: zk-distillation-orchestrator
 description: Zettelkastenのノート蒸留作業を統括し、検索から対話のリード、ワーカーの呼び出しまでをオーケストレーションするTier 1スキル。
+type: Orchestrator
+model: pro
 ---
 
 # Skill: Zettelkasten Distillation Orchestrator (Model: 親 Orchestrator / Pro)

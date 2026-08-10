@@ -1,6 +1,8 @@
 ---
 name: zk-formatter-qa
 description: 対話ログからZettelkastenの設計原則（テンプレート・リンク規則）に従ったMarkdown原稿を生成するTier 2スキル。
+type: Worker
+model: flash
 ---
 
 # Skill: Zettelkasten Formatter QA
@@ -10,13 +12,11 @@ description: 対話ログからZettelkastenの設計原則（テンプレート�
 
 ## 🏛️ アーキテクチャ (Tier & Execution Model)
 - **Tier**: Subagent
-- **モデル**: **flash**
 
 ## 🧠 ルールのJITロードとフォーマット自動正規化 (Normalization)
 対象となる対話ログを、`agent-core/docs/rules/zettelkasten_heuristics.md` からJITロードしたルール（YAMLメタデータ、双方向リンク、抽象度）に従って自動的にクレンジング・正規化せよ。
 
-**メタ認知 (Whyの維持)**:
-フォーマットは厳格に守りつつも、「ユーザーの生々しい表現や『棘』」までAI特有の平滑化された文章に丸めてしまわないこと。「形式は整えるが、魂（コンテキストの熱量）は抜かない」というメタ認知を働かせること。
+*   **Worker制約**: 本スキルはWorkerであるため、The Trampoline（過剰な推論やメタ認知）は無効化される。指定されたルールに従い、機械的かつフェイルファストにフォーマットを正規化すること。ただし「生々しい表現や熱量」を維持するというThe Floorのルールには従うこと。
 
 ## 🛠️ 実行手順
 
@@ -27,4 +27,15 @@ description: 対話ログからZettelkastenの設計原則（テンプレート�
 *   **Constraints**: YAMLタグの漏れ、双方向リンクの書式、抽象度が保たれているかを確認する。
 
 ### Step 3: 納品と報告 (Reporting)
-*   **Action**: 完成したMarkdownテキストを出力とし、標準ワーカー報告フォーマットで親エージェントに完了を報告する。自身でファイルシステムへの書き込みは行わないこと。
+*   **Action**: 完成したMarkdownテキストを出力とし、以下の出力契約フォーマットで親エージェントに完了を報告する。自身でファイルシステムへの書き込みは行わないこと。
+
+## 🤝 出力契約 (Output Contract)
+作業完了後は、必ず以下のフォーマットのみで親エージェント（Orchestrator）へ報告すること。余計な考察や推論を含めてはならない。
+
+```markdown
+【ZK Formatter QA 完了報告】
+- 生成したノートのタイトル候補: [タイトル]
+- 正規化チェック: [PASS / ERROR]
+- 最終Markdown原稿:
+  (ここに生成したMarkdownテキストをコードブロックとしてそのまま貼り付ける)
+```

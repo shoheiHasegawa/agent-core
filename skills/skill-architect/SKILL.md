@@ -2,6 +2,7 @@
 name: skill-architect
 description: ユーザーの要求に基づいて新しいスキル（Agentの振る舞い）を設計・実装するメタスキル。
 model: pro
+type: Orchestrator
 ---
 
 # Skill: Skill Architect

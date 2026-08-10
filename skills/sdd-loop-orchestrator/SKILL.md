@@ -1,6 +1,8 @@
 ---
 name: sdd-loop-orchestrator
 description: 承認済み仕様書（spec.md）を受け取り、ダブルループTDD（Outer Red -> Inner TDD -> Quality Gate -> Compliance Review）の自律サイクルを統括・完走するTier 1オーケストレーター（Loop 2担当）。
+type: Orchestrator
+model: pro
 ---
 
 # Skill: SDD Loop Orchestrator (Loop 2: Autonomous TDD Execution / Model: 親 Orchestrator / Pro)

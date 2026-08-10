@@ -2,6 +2,7 @@
 name: skill-reviewer
 description: 既存または新規作成されたスキルの品質を、SOLID原則とAgentic OSアーキテクチャに基づいてレビューするメタスキル。
 model: pro
+type: Worker
 ---
 
 # Skill: Skill Reviewer

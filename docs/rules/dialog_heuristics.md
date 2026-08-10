@@ -1,7 +1,4 @@
----
-# JITロード精度向上のためのメタタグ
-triggers: ["ユーザーとの壁打ち", "タスクの優先度付け", "潜在意識のプロファイリング", "矛盾する情報の止揚", "Socratic Interview"]
----
+
 
 # Dialog & Profiling Heuristics (対話とプロファイリングの踏み台)
 

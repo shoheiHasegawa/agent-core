@@ -2,6 +2,7 @@
 name: tool-architect
 description: JSON-First Protocolに準拠したCLIツール（agent-core/tools/）を設計・実装・テストし、孤立監査への参照登録までを行う特化スキル（Tier 2）。
 model: pro
+type: Worker
 ---
 
 # Skill: Tool Architect

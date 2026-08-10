@@ -1,6 +1,8 @@
 ---
 name: night-routine
 description: 1日の終わりに行う内省と明日への準備を統括するOrchestrator（Tier 1）スキル。各フェーズのスキルを順次読み込み、Role Switchingによって対話を進行する。
+type: Orchestrator
+model: pro
 ---
 
 # Skill: Night Routine (Orchestrator)

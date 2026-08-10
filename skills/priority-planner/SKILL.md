@@ -1,6 +1,8 @@
 ---
 name: priority-planner
 description: タスクの優先度見直しや明日の計画に特化し、DB（SQLAlchemy）内のタスク状態更新と安全検証を行うスキル（Tier 2）。
+type: Worker
+model: pro
 ---
 
 # Skill: Priority Planner (Worker)
