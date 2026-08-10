@@ -1,6 +1,5 @@
 ---
 type: epic
-status: active
 tags: [wellness, architecture]
 ---
 

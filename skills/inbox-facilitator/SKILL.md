@@ -18,5 +18,6 @@ model: pro
 1. `python3 agent-core/tools/peek_inbox.py` を実行し、未処理のInboxItem一覧と内容を取得する。（InboxItemがない場合は「本日の未処理メモはありません」とユーザーに伝えて終了する）
 2. `agent-core/docs/rules/dialog_heuristics.md` をJITロードする。
 3. 取得したメモ1件について、JITロードしたヒューリスティクスを踏み台にして、ユーザーと対話し分類と次アクションの合意を得る。（「ユーザーはなぜこのメモを残したのか？」を推論し、曖昧な場合はメタ認知を促す問いを行う。モバイル側に残すと判断された場合はスキップする。）
+    - ※もしアイデアが大きく、新規プロジェクト（Epic）として起票すべきと判断された場合は、必ず `agent-core/docs/templates/Backlog_Item_Template.md` の型枠（静的DI）に準拠して `backlog/` に起票すること。
 4. ユーザーから合意が得られた分類内容に基づき、`agent-core/tools/process_inbox_item.py` を用いて一気に処理を実行する。（Ideaの場合は `--action idea`、Taskの場合は `--action task`、削除の場合は `--action delete` を指定。スキップの場合は実行しない。）
 5. すべての処理が終わったら、標準ワーカー報告フォーマットで完了報告を行う。
