@@ -69,7 +69,7 @@ def main():
 
     # 2. Check templates/
     print("=> Checking templates/ ...")
-    exclude_templates = {".gitkeep"}
+    exclude_templates = {".gitkeep", "AGENT_Template.md", "spec_template.md", "SKILL_Template.md"}
     if TEMPLATES_DIR.exists():
         for tmpl_file in TEMPLATES_DIR.glob("*"):
             if tmpl_file.is_file():

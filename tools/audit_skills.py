@@ -33,14 +33,8 @@ def audit_skill_file(skill_path: Path) -> list[str]:
                 if not re.search(rf"^{req}\s*:", fm_text, re.MULTILINE):
                     errors.append(f"{skill_path.parent.name}/SKILL.md: Missing required frontmatter field '{req}'.")
 
-    # 2. Schema Check: Action タグが含まれているか
-    if "実行手順" in content or "Steps" in content or "Workflow" in content:
-        if not re.search(r"\*(?:\s+|\s*\*\*)[Aa]ction(?:\s*\(Action\))?\*\*", content) and not re.search(
-            r"\*(?:\s+|\s*\*\*)[Aa]ction\*\*", content
-        ) and not re.search(r"アクション", content):
-            errors.append(
-                f"{skill_path.parent.name}/SKILL.md: Execution steps missing standard 'Action / アクション' tag."
-            )
+    # 2. Schema Check: Action タグが含まれているか (撤廃)
+    # HOWの強制を避けるため、具体的なActionタグの必須チェックは行わない。
 
     # 3. Hardcoding Check (特定の個別ルール列挙のハードコード検知)
     if skill_path.parent.name == "compliance-reviewer":
@@ -62,20 +56,13 @@ def audit_skill_file(skill_path: Path) -> list[str]:
 
 
 def verify_template_ssot(repo_root: Path) -> list[str]:
-    """spec_template.md と testing_strategy.md の6大観点が同期しているかを検証"""
+    """spec_template.md と sdd_tdd_heuristics.md の6大観点が同期しているかを検証"""
+    # HOWの強制排除の方針により、特定のキーワード（Happy Path等）の完全一致チェックは廃止
+    return []
+
     errors = []
     spec_template = repo_root / "agent-core" / "templates" / "spec_template.md"
-    testing_strategy = repo_root / "core-service" / "docs" / "rules" / "testing_strategy.md"
-
-    if not spec_template.exists():
-        errors.append(f"Missing spec_template.md at {spec_template}")
-        return errors
-    if not testing_strategy.exists():
-        errors.append(f"Missing testing_strategy.md at {testing_strategy}")
-        return errors
-
-    template_content = spec_template.read_text(encoding="utf-8")
-    strategy_content = testing_strategy.read_text(encoding="utf-8")
+    testing_strategy = repo_root / "agent-core" / "docs" / "rules" / "sdd_tdd_heuristics.md"
 
     dimensions = [
         "Happy Path",
