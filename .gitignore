@@ -5,9 +5,9 @@ config/credentials.json
 # 2. Runtime Data & Queues
 data/*
 !data/.gitkeep
-queue/*
-!queue/.gitkeep
-!queue/handoff_*.md
+events/*
+!events/.gitkeep
+!events/handoff_*.md
 
 # 3. Agent Sandbox (唯一の公式作業領域)
 scratch/

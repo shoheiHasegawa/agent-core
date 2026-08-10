@@ -7,10 +7,10 @@
 - `docs/`: 構成図やアーキテクチャ・ルール類
   - `architecture/`: You_Inc 全体エコシステムの構成図
   - `rules/`: agent-core側の運用・オーケストレーションルール
-- `epics/`: エピック（大規模なプロジェクトやゴール）の管理
+- `backlog/`: 未着手のエピック（大規模プロジェクトの企画書）の管理
 - app_context.py: core-service の依存性を注入する組み立て工場 (Composition Root)
-- `queue/`: Agent間の非同期通信バッファ（1タスク＝1パケット単位で処理対象とメタデータを格納）
+- `events/`: エラーパケットやAgent間の非同期通知などのイベントストア（旧queue）
 - `skills/`: エージェントの拡張スキル定義
-- `templates/`: 各種テンプレート
+- `docs/templates/`: 各種テンプレート
 - `tools/`: Agentが手動/適宜使用するステートレスなCLIツール群。（一覧・詳細は [`tools/README.md`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/README.md) を参照）
 - `workspaces/`: 各プロジェクトやエピックのフラットな作業スペース（階層化せず、完了後に削除・破棄する）

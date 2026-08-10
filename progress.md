@@ -24,7 +24,7 @@
 ### 🛠️ 完了した作業 (Implementation)
 - **`agent-core/GEMINI.md`**: 第4条を修正し、「フェイルセーフと委譲のトレードオフ (Handoff Protocol & Error Reflection)」として原則を統合・復元。
 - **JITルールのクリーンアップ**: `sdd_tdd_heuristics.md`, `zettelkasten_heuristics.md`, `dialog_heuristics.md` から Worker依存の Warning セクションを全削除。
-- **Worker SKILLのプロンプト適正化**: `compliance-reviewer`, `tdd-red-coder`, `tdd-green-refactorer`, `zk-formatter-qa` の4つのSKILLにおいて、「推論の無効化」を撤回し「メタ認知を『深さ』の追求に限定する」制約へ書き換え。
+- **Worker SKILLのプロンプト適正化**: `compliance-reviewer`, `tdd-red-builder`, `tdd-green-refactorer`, `zk-format-reviewer` の4つのSKILLにおいて、「推論の無効化」を撤回し「メタ認知を『深さ』の追求に限定する」制約へ書き換え。
 - **Linterの強化**: `agent-core/tools/audit_skills.py` に、SKILLファイルから `docs/rules/` へのパス指定がリンク切れしていないかを検証するロジックを追加し、全18 SKILLの依存関係を検証。
 
 ### 🚀 次のアクション (Next Steps)

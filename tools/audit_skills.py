@@ -61,7 +61,7 @@ def verify_template_ssot(repo_root: Path) -> list[str]:
     return []
 
     errors = []
-    spec_template = repo_root / "agent-core" / "templates" / "spec_template.md"
+    spec_template = repo_root / "agent-core" / "docs" / "templates" / "spec_template.md"
     testing_strategy = repo_root / "agent-core" / "docs" / "rules" / "sdd_tdd_heuristics.md"
 
     dimensions = [

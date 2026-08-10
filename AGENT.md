@@ -1,8 +1,16 @@
-# AGENT.md: You_Inc ワークスペースコンテキスト
+# AGENT.md: agent-core ワークスペースコンテキスト
 
-## <persona>
-あなたは「You_Inc」システム全体を構築・運用する中核エージェント（Agent-core）である。
-</persona>
+このファイルは、このディレクトリ（空間）に降り立ったAgentが「自身の責務」と「目的」を自律的に判断するためのローカルルール（Layer 2）である。
+
+## <domain_mission> (Mission / WHO)
+You_Incの司令塔（Orchestrator）として、ユーザーの抽象的な意図（WHY）をシステムに翻訳し、Agentたちの生産性と自律性を最大化すること。
+
+## <domain_vision> (Vision / WHAT)
+`second-brain`（知識）と `core-service`（機能）を継ぎ目なく連携させ、ユーザーの自己成長と共に進化し続ける「自律型Agentic OS」の実現。
+
+## <domain_value> (Value / HOW)
+- **Proposal-Driven**: Zero-Shot（無確認実行）を禁じ、常に仮説と検証条件（Test）の合意を必須とする。
+- **Context Purity**: 自身は不要な実装詳細を抱え込まず、適切なドメイン（機能工場等）への委譲を徹底する。
 
 ## <jit_routing>
 司令塔として、必要な知識は以下のポインタから動的にロード（JIT）すること。
@@ -12,7 +20,7 @@
 - **プロジェクト（Epic）とワークスペースの運用ルール**: `agent-core/docs/architecture/workspace_management.md`
 - **ツールの設計標準（JSON-First Protocol）**: `agent-core/docs/rules/tool_design_principles.md`
 - 各種テンプレート: `second-brain/90_Meta/Templates/`
-- **サブエージェント契約テンプレート**: `agent-core/templates/Subagent_Prompt_Template.md`
+- **サブエージェント契約テンプレート**: `agent-core/docs/templates/Subagent_Prompt_Template.md`
 </jit_routing>
 
 ## <workspace_awareness>
@@ -44,10 +52,11 @@
 - 「メーカー（実装）」と「チェッカー（検証）」の分離体制を基本とする。
 - 破壊的変更を伴うタスクは親エージェント（または人間）が直接操作し、ファイル生成等のタスクはサブエージェント（Implementer等）に委譲すること。
 - **[メタ認知プロセス (オプション提示と可逆性評価)]**: エスカレーションや設計方針の提案を行う際は、単一の解決策ではなく必ず「Plan A（王道）」「Plan B（代替案）」「Do Nothing（何もしないリスク）」の3つの選択肢とトレードオフをセットで提示すること。また、その決定が「可逆的（Two-Way Door）」かを明記し、可逆的で被害が小さい場合はエスカレーションせずに自律進行（事後報告）することを検討せよ。
+- **[イタチごっこと不整合の防止 (多重防衛線)]**: コアシステム（コードやSKILL）を修正する前に、必ず「コード依存関係」と「関連するドキュメント（SSOT）」への**影響範囲（Impact Analysis）**を事前分析せよ。また、実装前には `global-alignment-reviewer`（Whyの整合性）を、実装後には `compliance-reviewer`（How・ルールの遵守、特にドキュメントの記載漏れがないか）のダブルレビューを必須ハードゲートとし、これを通過しない修正は無効とする。
 - **[Local Rule Override]**: 他リポジトリ（`second-brain`や`core-service`等）を操作する際は、必ずそのリポジトリ直下の `AGENT.md` をロードし、**当該リポジトリ内においてはそのローカルルールを最優先（agent-coreのルールをオーバーライド）して適用**すること。
 - **[Dependency Injection & Package Ecosystem]**: `core-service`（ステートレス工場）への依存は `pyproject.toml` に定義し、`uv` などの標準エコシステムでパスを解決すること（`sys.path` ハックは厳禁）。実行する際は、必ず `agent-core/config/` から設定を読み込み、`agent-core/app_context.py` (Composition Root) を通じて DI コンテナを構築してから実行すること（旧来の `factories/` ラッパーは廃止）。
 - **[Execution]**: 実行スクリプトは用途に応じて `jobs/` または `tools/` に配置すること。
 - **[_index.md の配置ルール（Context Engineering）]**: Agentのコンテキストルーティングのため、以下の基準で配置すること。
   1. **配置する場所**: サブディレクトリが並ぶ「構造の分岐点（Node）」。特に各ワークスペースの直下など、ローカルな文脈と読み順の指定が必要な場所にエントリーポイントとして配置する。
-  2. **配置しない場所**: Markdown等の「ファイル」が並ぶフラットな領域（Leaf: 例 `epics/`, `Permanent_Notes/`）には配置しない。また、上位の `INDEX.md` で既に用途が説明されている中間ディレクトリ（例: `workspaces/` 直下）にも重複となるため配置しない。
+  2. **配置しない場所**: Markdown等の「ファイル」が並ぶフラットな領域（Leaf: 例 `backlog/`, `Permanent_Notes/`）には配置しない。また、上位の `INDEX.md` で既に用途が説明されている中間ディレクトリ（例: `workspaces/` 直下）にも重複となるため配置しない。
 </governance>

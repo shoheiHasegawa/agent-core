@@ -55,9 +55,9 @@ sequenceDiagram
 
     %% 🌙 Night Phase: 対話と棚卸し
     rect rgb(220, 200, 240)
-        Note over CEO, GCal: 🌙 Night Phase (Journaling & Inventory: night-routine)
+        Note over CEO, GCal: 🌙 Night Phase (Journaling & Inventory: night-routine-orchestrator)
         CEO->>MV: 日中の雑多なメモをInboxに投下
-        CEO->>Sec: チャットで1日の振り返り（night-routine 開始）
+        CEO->>Sec: チャットで1日の振り返り（night-routine-orchestrator 開始）
         Sec->>MV: InboxのメモをPeek (覗き見) して一覧取得
         Sec->>CEO: Triage Planを提示し壁打ち（回収・残留の合意）
         CEO->>Sec: プラン承認

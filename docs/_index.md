@@ -23,7 +23,7 @@ Agentがタスク実行時に**JITロードする対象**。単なる手順（Ho
 *   [system_heuristics.md](./rules/system_heuristics.md): セッション管理、Zero-Queue状態管理、アーキテクチャ境界検知の踏み台。
 *   [tool_design_principles.md](./rules/tool_design_principles.md): ツール実装時のJSON-Firstやエラーハンドリングの制約。
 *   [orchestration.md](./rules/orchestration.md): Agent間通信とタスク委譲のプロトコル。
-*   [skill_design_principles.md](./skill_design_principles.md): SKILL自体の設計に関するメタ・ルール。
+*   [skill_design_principles.md](./architecture/skill_design_principles.md): SKILL自体の設計に関するメタ・ルール。
 
 ### バックエンド機能実装系 (`core-service/docs/rules/`)
 *   `ddd_guidelines.md`: DDDの実装制約とエンティティの純粋性。

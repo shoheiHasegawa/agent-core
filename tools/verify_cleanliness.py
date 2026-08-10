@@ -75,6 +75,15 @@ def main():
                     "message": f"Invalid temporary file found: {file}"
                 })
 
+    # 4. Enforce abolition of epics/ directory (Cluster 1 transition)
+    epics_dir = AGENT_CORE_DIR / "epics"
+    if epics_dir.exists():
+        results["violations"].append({
+            "type": "legacy_epics_dir",
+            "file": "epics/",
+            "message": "The epics/ directory is deprecated. Use backlog/ or workspaces/ instead."
+        })
+
     if results["violations"]:
         results["status"] = "failure"
 

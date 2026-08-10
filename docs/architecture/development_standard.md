@@ -9,7 +9,7 @@ You_Inc におけるすべてのソフトウェア開発行為（新規機能開
 ```
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║  【Tier 0: プロジェクト・現在地管理層 (Epic Workspace / progress.md)】       ║
-║   ・管理場所: workspaces/epics/<epic_name>/tasks/progress.md               ║
+║   ・管理場所: workspaces/<epic_name>/tasks/progress.md                   ║
 ║   ・責務: 全体進捗の可視化、セッション中断・再開時の現在地復元、マイルストーン管理║
 ║   ・オーケストレーター: session-manager / workspace-architect              ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
@@ -20,7 +20,7 @@ You_Inc におけるすべてのソフトウェア開発行為（新規機能開
 ║ 【Tier 1A: 協働仕様策定ループ】║ ──(Human Gate)─>║ 【Tier 1B: 自律TDDループ】    ║
 ║ (Co-Creation Discovery Loop)  ║               ║ (Autonomous Double-Loop TDD)  ║
 ║                               ║               ║                               ║
-║ ・スキル: sdd-spec-writer     ║               ║ ・スキル: sdd-loop-orchestrator║
+║ ・スキル: sdd-spec-builder     ║               ║ ・スキル: sdd-loop-orchestrator║
 ║ ・参加者: ユーザー ✕ AI       ║               ║ ・参加者: AIワーカー群 (自律) ║
 ║ ・出力: 確定した spec.md      ║               ║ ・出力: 完全テスト済コード    ║
 ╚═══════════════════════════════╝               ╚═══════════════════════════════╝
@@ -31,7 +31,7 @@ You_Inc におけるすべてのソフトウェア開発行為（新規機能開
 ## 2. 2大ループと2大関所
 
 ### 🗣️ Loop 1: 協働仕様策定ループ (Co-Creation Discovery Loop)
-- **担当**: `sdd-spec-writer` (Role Switching による対話型)
+- **担当**: `sdd-spec-builder` (Role Switching による対話型)
 - **目的**: What to Build の具体化と「仕様の穴」の実装前炙り出し。
 - **実行手順**:
   1. **Socratic Discovery**: 要求のヒアリングと業務シナリオの言語化。
@@ -49,8 +49,10 @@ You_Inc におけるすべてのソフトウェア開発行為（新規機能開
   1. **Outer Red**: `tests/integration/` に失敗する結合テストを作成（バグ修正時はバグ再現テスト）。`verify_loop_state.py --phase outer-red` で物理検証。
   2. **Inner Green**: `tdd-green-refactorer` が最小限の実装を行い、`tests/unit/` を補強（Green確認）。
   3. **Quality Gate**: `make check-all`（カバレッジ >= 90%, Ruff lint/format, AST双方向トレーサビリティ）の物理合格。
-- **🚪【関所 2: Compliance Gate (司法承認)】**:
-  - `compliance-reviewer` サブエージェントが独立して合憲性・ルール審査を行い、Pass を獲得する。
+- **🚪【関所 2: Compliance Gate (司法承認と多重防衛線)】**:
+  - 実装前に「どのコードとドキュメント（SSOT）に影響が及ぶか」を事前分析（**Impact Analysis**）させる。
+  - `global-alignment-reviewer` サブエージェントが「Why（大局の方針）との整合性」を独立審査する。
+  - `compliance-reviewer` サブエージェントが「How（法律）の遵守」と、特に**「コードと関連ドキュメントの同時更新（Atomic Update）」**が行われているかを独立審査する。
 - **Commit & Handoff**: 全自動検証合格後のアトミックコミットと `progress.md` 完了記録。
 
 ---
@@ -67,11 +69,6 @@ You_Inc におけるすべてのソフトウェア開発行為（新規機能開
 
 ## 4. エラーハンドリング・例外設計規約 (Error Handling Principles)
 
-システム全体におけるエラーハンドリングは、以下の設計原則に従う。詳細は正本 [`core-service/docs/rules/error_handling.md`](file:///Users/shoheihasegawa/you_inc/core-service/docs/rules/error_handling.md) を参照。
+システム全体におけるエラーハンドリング（標準例外の活用、Fail-Fastの原則、独自例外の定義基準など）に関する具体的な実装制約は、以下の「法律（Rules）」インデックスを参照してJITロードすること。
 
-1. **Pythonic & YAGNI (標準例外の最大活用)**:
-   - 不要な独自例外クラスの乱立を禁止し、Python標準例外（`ValueError`, `FileNotFoundError`, `FileExistsError` 等）を活用する。
-2. **Fail-Fast の原則**:
-   - 不正入力、未存在リソースへの更新、不変条件違反はサイレント失敗（`None` 返却）させず、即座に例外を送出して処理を停止する。
-3. **独自例外定義の3大厳格条件**:
-   - 独自例外クラスを作成できるのは「呼び出し元で自律的リカバリが必要」「標準例外では識別不能」「Web APIステータス等への機械的マッピングが必要」の3条件を全て満たす場合に限る。
+- 👉 **[`core-service/docs/rules/_index.md`](file:///Users/shoheihasegawa/you_inc/core-service/docs/rules/_index.md)** (Error Handling セクション)

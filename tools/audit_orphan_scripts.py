@@ -7,7 +7,7 @@ from pathlib import Path
 AGENT_CORE_DIR = Path(__file__).resolve().parent.parent
 TOOLS_DIR = AGENT_CORE_DIR / "tools"
 JOBS_DIR = AGENT_CORE_DIR / "jobs"
-TEMPLATES_DIR = AGENT_CORE_DIR / "templates"
+TEMPLATES_DIR = AGENT_CORE_DIR / "docs" / "templates"
 CONFIG_DIR = AGENT_CORE_DIR / "config"
 
 SKILLS_DIR = AGENT_CORE_DIR / "skills"

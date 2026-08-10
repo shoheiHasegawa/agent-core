@@ -58,7 +58,7 @@ graph TD
 ## 各コンポーネントの責務
 
 1. **agent-core (本社・作業場・Jobs)**
-   - 自律エージェントの頭脳であり司令塔。対話スキル（`night-routine` 等）、日次パイプライン（`jobs/run_daily_pipeline.sh`）、Epic実行環境（workspaces）を提供する。
+   - 自律エージェントの頭脳であり司令塔。対話スキル（`night-routine-orchestrator` 等）、日次パイプライン（`jobs/run_daily_pipeline.sh`）、Epic実行環境（workspaces）を提供する。
 2. **second-brain (図書館)**
    - 情報と知識の永続化レイヤー。実行状態（State）を持たず、Agentが整形済みの種（Inbox）、会社のルール（Areas）、普遍的知識（Permanent Notes / Sense Making）を保管する。
 3. **core-service (工場・計算エンジン SDK)**
