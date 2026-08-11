@@ -19,7 +19,7 @@ model: pro
 ## 🛠️ 実行手順 (HOW)
 
 ### 1. 文脈の取得 (Context Retrieval)
-1. `agent-core/tools/search_zettelkasten.py` 等で `40_Permanent_Notes` を検索する。
+1. 汎用的な探索ツール（grep_search等）を用いて `40_Permanent_Notes` を検索し、関連するノートを特定する。
 2. 既存ノートが発見された場合は、既存ノートの再構築（上書き・リネーム）計画を立て、抽出した文脈を次のフェーズへ引き継ぐ。
 
 ### 2. 対話のリード (Socratic Interview)

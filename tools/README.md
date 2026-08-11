@@ -10,7 +10,6 @@
 | [`register_zettelkasten_note.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/register_zettelkasten_note.py) | Write | Zettelkasten（Inbox / Sense-Making / Permanent）へのノート登録（JSON-First） |
 | [`peek_inbox.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/peek_inbox.py) | Read | Mobile Vault の未処理 Inbox アイテム取得 |
 | [`process_inbox_item.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/process_inbox_item.py) | Write | Inbox アイテムのタスク化・アイデア化・削除処理 |
-| [`search_zettelkasten.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/search_zettelkasten.py) | Read | Second Brain 内のノート検索（キーワード・タグ・エイリアス） |
 | [`check_zettelkasten.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/check_zettelkasten.py) | Audit | Zettelkasten のリンク・フォーマット整合性検証 |
 | [`update_task.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/update_task.py) | Write | Task Registry 内のタスク状態（Status, Priority等）の更新 |
 | [`validate_sdd.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/validate_sdd.py) | Audit | SDD要件トレーサビリティおよび品質ゲート完全性検証 |
