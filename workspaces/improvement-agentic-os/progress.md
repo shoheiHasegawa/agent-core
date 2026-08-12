@@ -15,7 +15,8 @@
 - **TDD Implementation (Phase 5)**:
   - `docs/spec/agent_task_system.md` の6大観点マトリクスのシナリオに基づくテスト (`test_agent_task.py`) を実装。
   - ユースケースの実装 (`add_task_usecase.py`, `checkout_task_usecase.py`, `complete_task_usecase.py`, `fail_task_usecase.py`) を完成。
-  - `SqliteAgentTaskRepository` を実装し、テストをオールグリーンで通過。
+  - **アーキテクチャ是正**: 当初 `sqlite3` の生実装で作成したためシステム全体のDI・SQLAlchemyのエコシステムと矛盾（排他ロック競合）が発生。その後、正しく `infrastructure/sqlalchemy/agent_task_repository.py` へと再実装・移行し、CAS排他制御の統合検証を完了。
+  - 全ての検証ゲートウェイ (`validate_sdd.py`, `make check-all`) をオールグリーンで通過。
 
 ## ユーザーとの合意事項（最重要）
 - **DBの物理配置**: まったく新しいDBファイルを作成するのではなく、**既存の `you_inc_ops.db` に新しいテーブル (`agent_tasks`) を追加** することで実装する。テーブル名（論理層）で完全に独立させる。
