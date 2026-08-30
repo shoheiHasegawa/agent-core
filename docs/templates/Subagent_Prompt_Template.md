@@ -24,27 +24,13 @@
 - 2. Mock禁止: 実際のファイルシステムと通信して動作確認すること。
 - 3. [その他、50行制限や特定のアーキテクチャルールなど]
 【Reporting Format】
-標準ワーカー報告フォーマット (Reporting Contract) で結果を通知せよ。
+`agent-core/docs/templates/Reporting_Contract_Template.md` (Reporting Contract) の型に従って結果を通知せよ。
 ```
 
-## 2. 報告契約 (Reporting Contract - Standard Format)
+## 2. 報告契約 (Reporting Contract)
 
-サブエージェントは、タスク完了時に以下のフォーマットで親エージェントに報告してください。
-
-```markdown
-## 🎯 実行完了レポート
-- **担当タスク**: `[スキル・役割名]`
-- **変更/生成ファイル**: `[NEW / MOD / DEL] [ファイルパス]`
-- **検証ステータス**: `[PASS / FAIL / RED_VERIFIED]`
-- **テスト/コマンド実行結果**: `[Exit Code 0 / 失敗理由のサマリ]`
-
-### 📝 主な実施内容
-1. [実施内容の要約 1]
-2. [実施内容の要約 2]
-
-### ⚠️ エスカレーション要否
-- `[なし / あり: 仕様変更が必要な理由や、ブロッカーとなっている問題点]`
-```
+サブエージェントは、親への報告時に独自のフォーマットを使ってはなりません。
+必ず `agent-core/docs/templates/Reporting_Contract_Template.md` をJITロードし、そこに定義された Markdown フォーマット（Status, Modified Files, Executed Gates, Blockers 等）に厳密に従って報告を行ってください。
 
 ## 3. Few-Shot 実例
 
@@ -65,14 +51,14 @@
 - 1. Leave No Trace
 - 2. 内容は変更せず、インデントと空行のみ修正すること。
 【Reporting Format】
-標準ワーカー報告フォーマットで結果を通知せよ。
+`agent-core/docs/templates/Reporting_Contract_Template.md` に従って結果を通知せよ。
 ```
 
 ### 例2: Pro 向け重作業 (アーキテクチャリファクタリングなど)
 
 **呼び出し:**
 ```markdown
-【Role】あなたは pro 階層の tdd-green-refactorer です。
+【Role】あなたは pro 階層の tdd-green-worker です。
 【WHY (目的と背景)】
 - なぜこのタスクが必要か: 保守性向上のためのクリーンアーキテクチャへの移行
 - 目指す状態: `tools/pre_handoff_verify.sh` の責務が分離され、リファクタリングが完了していること
@@ -85,5 +71,5 @@
 - 1. Leave No Trace
 - 2. Mock禁止、必ずローカル実行してテストを通過させること。
 【Reporting Format】
-標準ワーカー報告フォーマットで結果を通知せよ。
+`agent-core/docs/templates/Reporting_Contract_Template.md` に従って結果を通知せよ。
 ```

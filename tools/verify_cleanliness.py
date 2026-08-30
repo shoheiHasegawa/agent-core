@@ -61,7 +61,7 @@ def main():
                     })
 
     # 3. Leave No Trace verification (no .tmp or .bak files outside scratch/)
-    exclude_dirs = {".venv", ".git", "scratch", "__pycache__", ".pytest_cache"}
+    exclude_dirs = {".venv", ".git", "__pycache__", ".pytest_cache"}
     for root, dirs, files in os.walk(AGENT_CORE_DIR):
         # Exclude directories
         dirs[:] = [d for d in dirs if d not in exclude_dirs]

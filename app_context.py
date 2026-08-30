@@ -22,8 +22,6 @@ if not _db_path_env:
 _db_path: str = _db_path_env
 
 _engine = create_engine(_db_path, echo=False)
-with _engine.begin() as conn:
-    Base.metadata.create_all(bind=conn)
 SessionLocal = sessionmaker(bind=_engine)
 
 from di.config import CoreServiceConfig

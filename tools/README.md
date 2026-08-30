@@ -11,6 +11,8 @@
 | [`peek_inbox.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/peek_inbox.py) | Read | Mobile Vault の未処理 Inbox アイテム取得 |
 | [`process_inbox_item.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/process_inbox_item.py) | Write | Inbox アイテムのタスク化・アイデア化・削除処理 |
 | [`check_zettelkasten.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/check_zettelkasten.py) | Audit | Zettelkasten のリンク・フォーマット整合性検証 |
+| [`init_db.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/init_db.py) | Write | 物理DBのスキーマ初期化 (マイグレーション) |
+| [`manage_agent_task.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/manage_agent_task.py) | Write/Read | Agent Task の追加・取得・完了・失敗状態の管理 (CRUD) |
 | [`update_task.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/update_task.py) | Write | Task Registry 内のタスク状態（Status, Priority等）の更新 |
 | [`validate_sdd.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/validate_sdd.py) | Audit | SDD要件トレーサビリティおよび品質ゲート完全性検証 |
 | [`verify_loop_state.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/verify_loop_state.py) | Audit | SDD/TDDループの各フェーズ（Outer Red, Green, Quality）の機械的判定 |

@@ -1,38 +1,43 @@
 ---
 name: session-manager
-description: Agentic OSのセッション開始時（起動シーケンス）および終了時（ハンドオフ）の進捗管理とルーティングを行うスキル。
+description: Agentic OSのルーター兼オーケストレーター。状態管理(progress.mdの専任更新)、品質Gateの機械的検証、子ワーカーへの分離ルーティング、非常ベル、メタ認知（自己進化）を統括する。
 type: Orchestrator
 model: pro
 ---
 
-# SKILL: Session Manager
+# SKILL: Session Manager (Agentic OS Orchestrator)
 
 このファイルは、特定のタスクを実行するための具体的な手法（Layer 3）を定義する。
 
 ## 🎯 目的 (ミクロな WHY)
-セッション開始時のコンテキスト復元と終了時の状態保存を標準化し、エージェントがスムーズに作業を再開・引き継ぎできるようにするため。
+- ワーカーから進行管理や状態保存の責務を剥がし、コンテキストの圧迫を防ぐため。
+- 情報隔離（ハーネス）、契約（型）、フェイルセーフを強制し、安全な自律ループエンジニアリングを実現するため。
 
 ## 📥 入力と出力 (ミクロな WHAT)
-- **Input**: ワークスペース内の `tasks/context.md`、`tasks/progress.md`、またはセッション終了・中断の指示
-- **Output**: 適切なスキルの起動、状態ファイルの更新、またはGitコミットによる終了状態の保存
+- **Input**: ワークスペース内の `tasks/progress.md`、`spec.md`、ワーカーからの `Reporting Contract`。
+- **Output**: 適切なワーカーの起動、`progress.md` の更新、人間への Check-out（エスカレーション）、教訓の抽出。
 
 ## 🛠️ 実行手順 (HOW)
 
-### 1. 起動シーケンス (Bootstrapping)
-1. 対象のリポジトリや直近の会話から、現在アクティブなプロジェクト（Epic）または作業中のタスクが存在するかを検証する。
-2. 対象ワークスペースの `tasks/context.md` を読み込み、前回の文脈と直近のFocusを把握する。
-3. `tasks/progress.md` を読み込み、現在の進捗（Loop状態）を確認する。
-4. `progress.md` の現在地に応じた適切なスキルをルーティング（起動）する。
-   - 「Loop 1: 仕様策定中」の場合 ➔ `sdd-spec-builder` を起動
-   - 「Loop 2: 自律TDD実装中」の場合 ➔ `sdd-loop-orchestrator` を起動
+### 1. 起動と状態復元 (Check-in)
+1. 対象ワークスペースの `tasks/progress.md` を読み込み、現在の進捗とループ周回数を復元する。
+2. もし新規の実装ループに入る前であれば、**「仕様書の品質Gate」**として `spec.md` を読み込み、論理破綻がないか検証する。破綻があれば実装を開始せず、人間に壁打ち（Check-out）を求める。
 
-### 2. セッション中の状態維持
-1. セッション中の対話や議論の結論に基づき、自律的に `tasks/progress.md` と `tasks/context.md` を更新する。
+### 2. ワーカーのルーティングと隔離 (Harness)
+1. 現在のフェーズやタスクの性質に応じて、物理的に分離されたワーカーを `invoke_subagent` で起動する。
+   - **Phase: Research (調査)** ➔ `research-worker` を起動。実装はさせず、仮説に基づく概要〜詳細へのドリルダウン調査のみを委譲する。
+   - **Phase: Red (テスト作成)** ➔ `tdd-red-worker` を起動。`spec.md` とルールだけを渡し、実装コンテキストは見せない。
+   - **Phase: Green (実装)** ➔ `tdd-green-worker` を起動。テストコードと設計ルールだけを渡す。
+2. 起動時、必ず `docs/templates/Reporting_Contract_Template.md` を参照し、その型で報告するようワーカーに義務付ける。
 
-### 3. セッション終了・申し送り (Handoff)
-1. `tasks/progress.md` の `## 💡 Session Insights` に未登録（`[ ]`）の知見があるかスキャンする。
-2. 存在する場合、ユーザーにZettelkastenへの登録を提案する。承認されたら `register_zettelkasten_note.py` を実行し、`progress.md` 側を `[x]` に更新する。
-3. `tasks/context.md` に次回の論点（Current Focus）を書き残す。
-4. `bash tools/pre_handoff_verify.sh` を実行し、検証に合格することを確認する。
-5. 成功後、`git add . && git commit -m "chore: Handoff - [作業のサマリ]" && git push` を実行する。
-6. [完了条件 / Exit Criteria]: Gitの同期が完了し、ユーザーへハンドオフが完了したことを通知する。
+### 3. 機械的検証と状態更新 (Gate & State)
+1. ワーカーから `Reporting Contract` が返ってきたら、親である自分が機械的に検証（ファイルツリーの確認、`make test` 等の実行）を行う。
+2. 検証結果に基づき、**自身が専任で** `tasks/progress.md` のステータスやエラー履歴（ループ周回数）を更新する。
+
+### 4. 非常ベルとフェイルセーフ (Exit Criteria)
+1. ワーカーへの差し戻しが発生した場合、ループ回数をカウントする。
+2. **「3周以上同じエラー・指摘が解消されない場合」**または「未決事項が発生した場合」は、自律ループを即座に停止し、人間にエスカレーション（Check-out）する。
+
+### 5. メタ認知と教訓の抽出 (Self-Evolution)
+1. ループ完走時、あるいは非常ベル発動時に、今回のループで起きた問題（ルールの穴、型の漏れ、プロンプトの不備）をメタ認知する。
+2. 抽出した改善案を `tasks/lessons_learned.md` （または指定のZettelkastenノート）に自動投函し、段階的な検証プロセスに回す。

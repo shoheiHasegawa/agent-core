@@ -31,32 +31,17 @@ You_Incの司令塔（Orchestrator）として、ユーザーの抽象的な意�
 - **【セッション管理（起動・終了）】**: セッション開始時、またはセッションを終了（中断）する際は、必ず `agent-core/skills/session-manager/SKILL.md` をロードし、記載された「イベント駆動ルーティング」および「Handoffプロトコル」に従って行動すること。
 - **【プロジェクト運用】**: 新しいプロジェクト（Epic）を開始する際、およびワークスペースを運用する際は、必ず `agent-core/docs/architecture/workspace_management.md` のルール（`_index.md`, `docs/`, `tasks/`, `scratch/` の構造化）に従うこと。
 
-## <progress_tracking>
-- 【記憶喪失の防止】LLMはコンテキストウィンドウに限界があるため、タスクに着手する際、および完了・中断する際は、必ず自身が作業しているディレクトリ（ワークスペース等）内にある `progress.md` （または `task.md`）のチェックボックスを更新すること。
-  - 常に「今どこまで終わっていて、次は何をするのか」を外部ファイルに書き出すことで、Agentが再起動しても一瞬で現在地に復帰できるようにせよ。
-</progress_tracking>
-
-## <continuous_documentation>
-- 【陳腐化の防止】タスク完了時（Harvest Report作成時）は、必ず今回変更した実装と「アーキテクチャ図群」「各リポジトリのREADME/INDEX」に乖離がないかをクロスチェックし、差分があれば自動同期・修正してからセッションを終了すること。
-</continuous_documentation>
-
-## <handoff_verification>
-- 【未検証コードの抑止】Agentは未検証のコードや未コミットの変更を残してセッションを終了してはならない。
-- セッション終了（Handoff）およびタスク完了報告の絶対条件（Definition of Done）として、以下の **全Quality Gateの完全通過（Exit Code 0）** を要求する。
-  1. `core-service` における `make check-all`（pytest >= 90%, Ruff lint/format, SDD双方向トレーサビリティ）の合格。
-  2. `agent-core` における `make check-all`（全SKILL静的監査 `audit_skills.py`, クリーンネス検証 `tools/verify_cleanliness.py`, SDD整合性検証）の合格。
-</handoff_verification>
-</execution_flow>
+## <progress_and_playbook>
+- 【状態管理とコンテキスト・ハーネス】ワークスペースの進行管理は、マクロな手順書（Playbook）に基づいて行われる。
+- **絶対の掟**: `tasks/progress.md` のチェックボックス（状態）を更新する権限は、親であるオーケストレーター（Session Manager）の専権事項である。**実働ワーカー（Worker）が自身の進行状況を判断して直接 progress.md を書き換えることは固く禁ずる**。
+- ワーカーは目の前のタスク（spec.md等）のみを読み、結果は必ず「報告の型（Reporting Contract）」を用いて親へ返却せよ。
+</progress_and_playbook>
 
 ## <governance>
 - 「メーカー（実装）」と「チェッカー（検証）」の分離体制を基本とする。
-- 破壊的変更を伴うタスクは親エージェント（または人間）が直接操作し、ファイル生成等のタスクはサブエージェント（Implementer等）に委譲すること。
-- **[メタ認知プロセス (オプション提示と可逆性評価)]**: エスカレーションや設計方針の提案を行う際は、単一の解決策ではなく必ず「Plan A（王道）」「Plan B（代替案）」「Do Nothing（何もしないリスク）」の3つの選択肢とトレードオフをセットで提示すること。また、その決定が「可逆的（Two-Way Door）」かを明記し、可逆的で被害が小さい場合はエスカレーションせずに自律進行（事後報告）することを検討せよ。
-- **[イタチごっこと不整合の防止 (多重防衛線)]**: コアシステム（コードやSKILL）を修正する前に、必ず「コード依存関係」と「関連するドキュメント（SSOT）」への**影響範囲（Impact Analysis）**を事前分析せよ。また、実装前には `global-alignment-reviewer`（Whyの整合性）を、実装後には `compliance-reviewer`（How・ルールの遵守、特にドキュメントの記載漏れがないか）のダブルレビューを必須ハードゲートとし、これを通過しない修正は無効とする。
+- 破壊的変更を伴うタスクは親エージェント（または人間）が直接操作し、ファイル生成等のタスクはサブエージェント（Worker等）に委譲すること。
+- **[メタ認知プロセス (オプション提示と可逆性評価)]**: エスカレーションや設計方針の提案を行う際は、単一の解決策ではなく必ず「Plan A（王道）」「Plan B（代替案）」「Do Nothing（何もしないリスク）」の3つの選択肢とトレードオフをセットで提示すること。
+- **[イタチごっこと不整合の防止 (多重防衛線)]**: コアシステム（コードやSKILL）を修正する前に、必ず「コード依存関係」と「関連するドキュメント（SSOT）」への**影響範囲（Impact Analysis）**を事前分析せよ。
 - **[Local Rule Override]**: 他リポジトリ（`second-brain`や`core-service`等）を操作する際は、必ずそのリポジトリ直下の `AGENT.md` をロードし、**当該リポジトリ内においてはそのローカルルールを最優先（agent-coreのルールをオーバーライド）して適用**すること。
-- **[Dependency Injection & Package Ecosystem]**: `core-service`（ステートレス工場）への依存は `pyproject.toml` に定義し、`uv` などの標準エコシステムでパスを解決すること（`sys.path` ハックは厳禁）。実行する際は、必ず `agent-core/config/` から設定を読み込み、`agent-core/app_context.py` (Composition Root) を通じて DI コンテナを構築してから実行すること（旧来の `factories/` ラッパーは廃止）。
-- **[Execution]**: 実行スクリプトは用途に応じて `jobs/` または `tools/` に配置すること。
-- **[_index.md の配置ルール（Context Engineering）]**: Agentのコンテキストルーティングのため、以下の基準で配置すること。
-  1. **配置する場所**: サブディレクトリが並ぶ「構造の分岐点（Node）」。特に各ワークスペースの直下など、ローカルな文脈と読み順の指定が必要な場所にエントリーポイントとして配置する。
-  2. **配置しない場所**: Markdown等の「ファイル」が並ぶフラットな領域（Leaf: 例 `backlog/`, `Permanent_Notes/`）には配置しない。また、上位の `INDEX.md` で既に用途が説明されている中間ディレクトリ（例: `workspaces/` 直下）にも重複となるため配置しない。
+- ※ 具体的な実装制約（Dependency Injectionの作法や _index.md の配置ルールなど）は、`docs/rules/` および `docs/architecture/` 配下を参照すること。
 </governance>

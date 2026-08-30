@@ -4,25 +4,24 @@ You_Inc におけるすべてのソフトウェア開発行為（新規機能開
 
 ---
 
-## 1. 3層構造 (3-Tier Architecture)
+## 1. 開発フローと分離アーキテクチャ (Playbook & Harness)
 
 ```
 ╔═════════════════════════════════════════════════════════════════════════════╗
-║  【Tier 0: プロジェクト・現在地管理層 (Epic Workspace / progress.md)】       ║
+║  【Tier 0: プロジェクト・現在地管理層 (Playbook & Tracker)】                  ║
 ║   ・管理場所: workspaces/<epic_name>/tasks/progress.md                   ║
-║   ・責務: 全体進捗の可視化、セッション中断・再開時の現在地復元、マイルストーン管理║
-║   ・オーケストレーター: session-manager / workspace-architect              ║
+║   ・責務: 全体進捗の可視化、セッション中断・再開時の現在地復元、ループの表現       ║
+║   ・オーケストレーター: session-manager (専任で書き込み、子は読めない)            ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
                                   │
           ┌───────────────────────┴───────────────────────┐
           ▼                                               ▼
 ╔═══════════════════════════════╗               ╔═══════════════════════════════╗
-║ 【Tier 1A: 協働仕様策定ループ】║ ──(Human Gate)─>║ 【Tier 1B: 自律TDDループ】    ║
-║ (Co-Creation Discovery Loop)  ║               ║ (Autonomous Double-Loop TDD)  ║
+║ 【Tier 1A: 協働仕様策定フェーズ】║ ──(Human Gate)─>║ 【Tier 1B: 自律TDD実装フェーズ】 ║
+║ (Co-Creation Discovery)       ║               ║ (Double-Loop TDD Harness)     ║
 ║                               ║               ║                               ║
-║ ・スキル: sdd-spec-builder     ║               ║ ・スキル: sdd-loop-orchestrator║
-║ ・参加者: ユーザー ✕ AI       ║               ║ ・参加者: AIワーカー群 (自律) ║
-║ ・出力: 確定した spec.md      ║               ║ ・出力: 完全テスト済コード    ║
+║ ・担当: 人間 ＋ /grill-me     ║               ║ ・統括: session-manager        ║
+║ ・出力: 確定した spec.md      ║               ║ ・実働: 隔離されたワーカー群   ║
 ╚═══════════════════════════════╝               ╚═══════════════════════════════╝
 ```
 
@@ -30,30 +29,30 @@ You_Inc におけるすべてのソフトウェア開発行為（新規機能開
 
 ## 2. 2大ループと2大関所
 
-### 🗣️ Loop 1: 協働仕様策定ループ (Co-Creation Discovery Loop)
-- **担当**: `sdd-spec-builder` (Role Switching による対話型)
+### 🗣️ Loop 1: 協働仕様策定フェーズ (Co-Creation Discovery)
+- **担当**: 人間 ＋ ネイティブコマンド（`/grill-me` 等）
 - **目的**: What to Build の具体化と「仕様の穴」の実装前炙り出し。
 - **実行手順**:
   1. **Socratic Discovery**: 要求のヒアリングと業務シナリオの言語化。
   2. **6大観点ストレステスト**: エッジケース（主系, 冪等性, 境界値, 外部調停, 異常系, 不変条件）に関する意図的な問いかけ。
-  3. **spec.md 生成**: 合意内容を Timeless SSOT として契約（I/O型, 例外型, シナリオ）に記述。
+  3. **spec.md 生成**: 合意内容を Timeless SSOT として記述。
 - **🚪【関所 1: Human Gate (仕様承認)】**:
-  - ユーザーから明示的な「Approve（承認）」を得るまで、テスト・実装コードの作成には絶対に進まない。
+  - `session-manager` は `spec.md` が論理破綻していないか品質Gateで検証し、承認（Approve）を得るまで実装ループには進まない。
 
 ---
 
-### ⚙️ Loop 2: 自律ダブルループTDD (Autonomous Double-Loop TDD)
-- **担当**: `sdd-loop-orchestrator` (Subagent Delegation による自律型)
+### ⚙️ Loop 2: 自律ダブルループTDD (Double-Loop TDD Harness)
+- **統括**: `session-manager` (ルーター)
+- **実働**: 物理隔離された `tdd-red-worker` と `tdd-green-worker`
 - **入力**: ユーザー承認済みの `spec.md`
 - **実行手順**:
-  1. **Outer Red**: `tests/integration/` に失敗する結合テストを作成（バグ修正時はバグ再現テスト）。`verify_loop_state.py --phase outer-red` で物理検証。
-  2. **Inner Green**: `tdd-green-refactorer` が最小限の実装を行い、`tests/unit/` を補強（Green確認）。
-  3. **Quality Gate**: `make check-all`（カバレッジ >= 90%, Ruff lint/format, AST双方向トレーサビリティ）の物理合格。
-- **🚪【関所 2: Compliance Gate (司法承認と多重防衛線)】**:
-  - 実装前に「どのコードとドキュメント（SSOT）に影響が及ぶか」を事前分析（**Impact Analysis**）させる。
-  - `global-alignment-reviewer` サブエージェントが「Why（大局の方針）との整合性」を独立審査する。
-  - `compliance-reviewer` サブエージェントが「How（法律）の遵守」と、特に**「コードと関連ドキュメントの同時更新（Atomic Update）」**が行われているかを独立審査する。
-- **Commit & Handoff**: 全自動検証合格後のアトミックコミットと `progress.md` 完了記録。
+  1. **Outer Red (テスト作成)**: 親が `tdd-red-worker` を起動。ワーカーは `spec.md` だけを見て失敗する結合テスト（Proofs of Red）を作成。
+  2. **Inner Green (実装)**: 親が `tdd-green-worker` を起動。ワーカーはテストを絶対の防波堤として実装し、ドメイン意図を汲んでリファクタリング。
+  3. **Quality Gate**: ワーカーからの Reporting Contract を受け取り、親が `make check-all` を機械的に検証。
+- **🚪【関所 2: Compliance Gate (非常ベルと多重防衛線)】**:
+  - `session-manager` はループ回数を Tracker に記録し、「3周以上同じエラー」や未決事項が発生した場合は直ちに非常ベルを鳴らし（Check-out）、人間にエスカレーションする。
+  - 実装前後に `global-alignment-reviewer`（Whyの整合性）や `compliance-reviewer`（Howの遵守）を独立審査させる。
+- **Commit & Handoff (Epicの永続化)**: 全自動検証合格後、KNOWLEDGE_SYNC（ドキュメントの矛盾解消と永続化）とSENSE_MAKING（教訓抽出）を経てアトミックコミット。
 
 ---
 
