@@ -55,36 +55,48 @@ def audit_skill_file(skill_path: Path) -> list[str]:
     return errors
 
 
-def verify_template_ssot(repo_root: Path) -> list[str]:
-    """spec_template.md と sdd_tdd_heuristics.md の6大観点が同期しているかを検証"""
-    # HOWの強制排除の方針により、特定のキーワード（Happy Path等）の完全一致チェックは廃止
-    return []
-
+def verify_ssot_docs(agent_core_root: Path) -> list[str]:
+    """
+    正本ドキュメント（docs/architecture.md, docs/rules/*.md, AGENTS.md, README.md）が:
+    1. WHY（存在目的）を明記していること
+    2. 移行期の時系列ノイズ（【確定】、ステータス、ロードマップ等）を含まない Timeless SSOT であること
+    を機械的に検証する。
+    """
     errors = []
-    spec_template = repo_root / "agent-core" / "docs" / "templates" / "spec_template.md"
-    testing_strategy = repo_root / "agent-core" / "docs" / "agent_rules" / "sdd_tdd_heuristics.md"
-
-    dimensions = [
-        "Happy Path",
-        "Idempotency",
-        "Boundary",
-        "Reconciliation",
-        "Fault Tolerance",
-        "Domain Invariants",
+    ssot_targets = [
+        agent_core_root / "AGENTS.md",
+        agent_core_root / "README.md",
+        agent_core_root / "docs" / "architecture.md",
     ]
+    rules_dir = agent_core_root / "docs" / "rules"
+    if rules_dir.exists():
+        ssot_targets.extend(sorted(rules_dir.glob("*.md")))
 
-    for dim in dimensions:
-        if dim not in template_content:
-            errors.append(f"spec_template.md is missing dimension '{dim}'")
-        if dim not in strategy_content:
-            errors.append(f"testing_constraints.md is missing dimension '{dim}'")
+    transient_markers = ["— 【確定】", "—【確定】", "アジャイル実装ロードマップ", "旧19スキル"]
+
+    for doc_path in ssot_targets:
+        if not doc_path.exists():
+            errors.append(f"SSOT Audit: Required document missing: {doc_path.relative_to(agent_core_root)}")
+            continue
+        content = doc_path.read_text(encoding="utf-8")
+        rel_name = str(doc_path.relative_to(agent_core_root))
+
+        if "WHY" not in content:
+            errors.append(
+                f"SSOT Audit ({rel_name}): Missing 'WHY' (Document Purpose). Every SSOT document must follow WHY -> WHAT -> HOW."
+            )
+
+        for marker in transient_markers:
+            if marker in content:
+                errors.append(
+                    f"SSOT Audit ({rel_name}): Transient/historical marker '{marker}' detected! SSOT documents must be timeless."
+                )
 
     return errors
 
 
 def main():
-    agent_core_root = Path(__file__).parent.parent
-    repo_root = agent_core_root.parent
+    agent_core_root = Path(__file__).resolve().parent.parent
     skills_dir = agent_core_root / "skills"
 
     if not skills_dir.exists():
@@ -103,9 +115,9 @@ def main():
         errs = audit_skill_file(skill_file)
         all_errors.extend(errs)
 
-    # 2. Audit SSOT Template Sync
-    template_errs = verify_template_ssot(repo_root)
-    all_errors.extend(template_errs)
+    # 2. Audit SSOT Documents (WHY -> WHAT -> HOW & Timeless SSOT)
+    ssot_errs = verify_ssot_docs(agent_core_root)
+    all_errors.extend(ssot_errs)
 
     if all_errors:
         print("❌ Skill & SSOT Audit Validation Failed!\n")
@@ -113,7 +125,9 @@ def main():
             print(f"  - {err}")
         sys.exit(1)
 
-    print(f"✅ All {len(skill_files)} SKILL files and SSOT templates mathematically passed architecture and format audits.")
+    print(
+        f"✅ All {len(skill_files)} SKILL files and SSOT documents mathematically passed WHY-WHAT-HOW and Timeless SSOT audits."
+    )
     sys.exit(0)
 
 

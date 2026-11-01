@@ -8,8 +8,8 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus / Handoff Point)
-- **「`WHY ➔ WHAT ➔ HOW` の順序原則」および「Timeless SSOT（時系列ノイズの排除・現在形の断面図）」** の観点から全主要ドキュメントを見直し、`core-service` と `agent-core` の両方で `make check-all` パス＆コミット完了。
-- 社長へ整備結果を報告し、今回の気づき（ルートB）の `second-brain` 蒸留、または Step 4（第1回作戦会議）への移行を確認する。
+- **「`WHY ➔ WHAT ➔ HOW` 原則」と「Timeless SSOT（時系列ノイズ排除）」を単なる文書記載に留めず、① Linter（`tools/audit_skills.py`）による機械的検知、② 独立レビュアー（`compliance-reviewer`）の監査観点、③ 経験ストック（`[EXP-08]`）の3層で完全に仕組み化・コミット完了**。
+- 社長へ仕組み化の完了を報告し、クローズ（または `second-brain` への内省蒸留）を確認する。
 
 ## 📌 完了サマリー (Final Verification Digest)
 1. **`docs/architecture.md` の Timeless SSOT 化**:
