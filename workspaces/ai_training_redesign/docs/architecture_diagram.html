@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background: #0f172a;
+    color: #f8fafc;
+    width: 1400px;
+    height: 900px;
+    padding: 36px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  /* Header */
+  .header {
+    border-bottom: 2px solid #334155;
+    padding-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .title-group h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .title-group p {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+  .badge {
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: #38bdf8;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Two Routes Layout */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin: 20px 0;
+  }
+
+  .card {
+    background: #1e293b;
+    border-radius: 16px;
+    border: 1px solid #334155;
+    padding: 24px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .card.route-a {
+    border-top: 4px solid #38bdf8;
+  }
+  .card.route-b {
+    border-top: 4px solid #a855f7;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card.route-a .card-title { color: #38bdf8; }
+  .card.route-b .card-title { color: #c084fc; }
+
+  .target-tag {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .route-a .target-tag { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; }
+  .route-b .target-tag { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; }
+
+  .item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .item {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .item-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  .item-value {
+    font-size: 14px;
+    color: #e2e8f0;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .highlight-a { color: #38bdf8; font-weight: 700; }
+  .highlight-b { color: #c084fc; font-weight: 700; }
+
+  /* Bottom Loop Section */
+  .loop-container {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border: 2px dashed #475569;
+    border-radius: 16px;
+    padding: 18px 24px;
+  }
+  .loop-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .loop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .loop-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .loop-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-bottom: 4px;
+  }
+  .loop-card p {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.4;
+  }
+
+  /* Philosophy Footer */
+  .footer-bar {
+    background: #0284c7;
+    background: linear-gradient(90deg, #0369a1 0%, #4338ca 100%);
+    border-radius: 8px;
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-bar span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title-group">
+      <h1>AI研修・FDE育成の全体アーキテクチャ（2大ルートと好循環）</h1>
+      <p>「全社底上げ」と「FDE（高度人材）育成」を明確に分離し、社内実践でつなぐ自走型モデル</p>
+    </div>
+    <div class="badge">大阪技術部 長谷川 提案骨子</div>
+  </div>
+
+  <!-- 2 Routes Grid -->
+  <div class="grid">
+    
+    <!-- Route A -->
+    <div class="card route-a">
+      <div class="card-header">
+        <div class="card-title">
+          <span>🌱 ルートA：全社スキルの底上げ</span>
+        </div>
+        <span class="target-tag">マス層（全社員・エンジニア）</span>
+      </div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-label">🎯 目的 & ゴール</div>
+          <div class="item-value">全社員の日常業務効率化・AIアレルギー払拭。<br><span class="highlight-a">「AIと協業できるレベル（日常の相棒化）」</span>を目指す。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">🛠 カリキュラム・アプローチ</div>
+          <div class="item-value">感動大学、社内勉強会、プロンプト基礎、Cursor/Copilot活用。<br>セキュリティ・社内ガイドラインの徹底。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">📜 資格の位置づけ</div>
+          <div class="item-value">インフラ系ではなく、<span class="highlight-a">Claude認定や生成AIパスポート</span>等の「業務課題解決・プロンプト系資格」を学習意欲の動機づけに活用。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">💡 PM観点の要否</div>
+          <div class="item-value"><span class="highlight-a">不要</span>（仕様やタスクに対してAIを相棒に実装・作業できれば十分）。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">🎓 誰が教えるのか（最重要）</div>
+          <div class="item-value">外部任せにせず、<span class="highlight-a">ルートB（FDE候補）が講師・メンターとして還元</span>。<br>「自社のあの業務をこうAI化した」実例を題材にするため定着率が高い。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route B -->
+    <div class="card route-b">
+      <div class="card-header">
+        <div class="card-title">
+          <span>🚀 ルートB：FDE（現場展開型）人材育成</span>
+        </div>
+        <span class="target-tag">トップ層（リサーチエンジニア / 月5万手当）</span>
+      </div>
+      <div class="item-list">
+        <div class="item">
+          <div class="item-label">🎯 目的 & ゴール</div>
+          <div class="item-value">高単価案件の開拓（単金UP）＆ 自社DXの推進。<br><span class="highlight-b">「現場の課題を特定し、AIで仕組みを作り価値を出すFDE」</span>。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">🏢 実践の場（鶏と卵の解消）</div>
+          <div class="item-value"><span class="highlight-b">自社システム改善チーム（社内SIer / 社内ベンチャー型）</span>。<br>客先案件を待たず、自社のグループウェア等を実践サンドボックスにする。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">👔 上流工程・業務知識の習得</div>
+          <div class="item-value">自社の営業部やバックオフィスに課題をヒアリングし、RAGやAIエージェントで自動化する＝<span class="highlight-b">FDE必須の上流思考を実体験</span>。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">💡 PM観点の要否</div>
+          <div class="item-value"><span class="highlight-b">必須</span>（「AIを使う＝部下を持つ」こと。ビジネス成果まで考慮してスタートライン）。</div>
+        </div>
+        <div class="item">
+          <div class="item-label">💼 営業への最大の武器</div>
+          <div class="item-value">「自社システムを実際にAIエージェントで内製・自動化した」という<br><span class="highlight-b">動く実績</span>を持って、客先へ高単価提案が可能になる。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Loop & Synergy -->
+  <div class="loop-container">
+    <div class="loop-title">
+      <span>🔄 2つのルートを繋ぐ「3つの好循環サイクル」</span>
+    </div>
+    <div class="loop-grid">
+      <div class="loop-card">
+        <h4>1. 属人化防止 ＆ 後続の育成登竜門</h4>
+        <p>自社開発は「ペア/チーム開発」を原則とし、ルートAの意欲ある後輩を巻き込んでOJT。属人化を防ぎつつFDEへの階段を作る。</p>
+      </div>
+      <div class="loop-card">
+        <h4>2. 手当5万円の正当なROI回収</h4>
+        <p>客先単金頼みではなく、「自社システム改善・DX業務への労働対価」として支給するため、会社としても内製化・業務削減で確実に回収。</p>
+      </div>
+      <div class="loop-card">
+        <h4>3. 実践知の全社還元（社内講師）</h4>
+        <p>ルートBで泥臭く「作って・壊して・直した」エンジニアがルートAの講師になることで、社内に生きたナレッジが自走蓄積される。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Philosophy Footer -->
+  <div class="footer-bar">
+    <span>💡 思想のコア：AIを活用する ＝ 優秀だが指示待ちの「部下」を持つこと。上位者目線とビジネス価値まで考慮できて初めてFDEのスタートライン。</span>
+    <span>株式会社BOLD</span>
+  </div>
+
+</body>
+</html>
