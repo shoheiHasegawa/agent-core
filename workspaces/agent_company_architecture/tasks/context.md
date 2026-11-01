@@ -8,14 +8,13 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus / Handoff Point)
-- **Epic `agent_company_architecture` の全実装・実サブエージェント試運転・`main` マージ・Worktree回収（`make ws-harvest`）が完了**。
-- 社長へクローズ時の **「3点内省ブリーフィング（Executive Digest）」** を提示し、今回の気づき（ルートB）を `second-brain` へ蒸留するか、または Step 4（第1回作戦会議）へ進むかを確認する。
+- **「`WHY ➔ WHAT ➔ HOW` の順序原則」および「Timeless SSOT（時系列ノイズの排除・現在形の断面図）」** の観点から全主要ドキュメントを見直し、`core-service` と `agent-core` の両方で `make check-all` パス＆コミット完了。
+- 社長へ整備結果を報告し、今回の気づき（ルートB）の `second-brain` 蒸留、または Step 4（第1回作戦会議）への移行を確認する。
 
 ## 📌 完了サマリー (Final Verification Digest)
-1. **ドキュメント統廃合とSSOT昇格（引き算の達成）**:
-   - `agent-core/docs/` の旧 `system/`・`agent_rules/`・旧テンプレート（計22ファイル）を削除し、正本 [`docs/architecture.md`](../../../docs/architecture.md)、思考原則 [`docs/rules/`](../../../docs/rules/thinking_os_and_loop_principles.md)（2ファイル）、経験ストック [`docs/experiences/`](../../../docs/experiences/README.md)（2ファイル）へ完全統合。
-   - `core-service` も `INDEX.md`・`AGENT.md`・`docs/_index.md`・`docs/spec/` を整理し、`README.md` と `AGENTS.md` に一本化。
-2. **実サブエージェント協働（2-Passループ）による公式CLI実装と検証**:
-   - `team-leader`（`2f05ff1a`, `Model="pro"`）が自らコードを書かず、`tdd-red-worker`（`64572896`, `flash`）➔ `tdd-green-worker`（`ec948bed`, `flash`）➔ `compliance-reviewer`（`788d34d8`, `pro`）を計4回起動。
-   - Pass 1 で生じた DTO への不要な足し算パッチを `compliance-reviewer` が検知し、Pass 2 の引き算リファクタリングで完全解消（`MUST: 0, SHOULD: 0, IMO: 1`）。
-   - `core-service`（169 tests passed, Cov `93.99%`）および `agent-core` の両方で `make check-all` 完全パスを確認し、`main` へのマージと `make ws-harvest` を完遂。
+1. **`docs/architecture.md` の Timeless SSOT 化**:
+   - 移行期の時系列ノイズ（ステータス、旧19スキル廃止、Step 1〜4ロードマップ）を全削除し、冒頭にドキュメント自身の **WHY（①会社の現在地の俯瞰・ブラックボックス化防止、②将来のカイゼン時のベースライン）** を明記。
+   - **1. WHY（4大設計思想）➔ 2. WHAT（4層組織図・前例3段階トリアージ・SoR境界）➔ 3. HOW（4大業務フローのシーケンス図・2-Passループ）➔ 4. カイゼン規約** の構造へ刷新。
+   - アジャイル段階移行のノウハウは [`agent_antipatterns_and_precedents.md`](../../../docs/experiences/agent_antipatterns_and_precedents.md) の **`[PREC-04]`** として経験ストックへ移管。
+2. **思考のOSへの `WHY ➔ WHAT ➔ HOW` 原則のインストール**:
+   - [`thinking_os_and_loop_principles.md`](../../../docs/rules/thinking_os_and_loop_principles.md) の第0章に「思考の最上位アルゴリズム：`WHY ➔ WHAT ➔ HOW` の順序原則（HOWへの飛びつき禁止・全ドキュメントへのWHY明記鉄則）」を追加し、他文書（[`zettelkasten_and_dialog_principles.md`](../../../docs/rules/zettelkasten_and_dialog_principles.md), [`AGENTS.md`](../../../AGENTS.md), [`README.md`](../../../README.md), [`core-service/docs/architecture.md`](../../../../core-service/docs/architecture.md)）もすべて `WHY ➔ WHAT ➔ HOW` 構造に統一。

@@ -1,19 +1,20 @@
 # 🏢 agent-core (You_Inc Headquarters)
 
+## 🎯 本リポジトリの存在目的 (WHY)
 `agent-core` は、You_Inc（「社長 ⇄ 秘書 ⇄ チームリーダー ⇄ メンバー」で稼働する自律型Agent会社）の**本社・司令塔リポジトリ**です。
-全社の憲法・思考原則・経験ストック・SKILL定義・環境設定（Config/Secret）、および各プロジェクト（Epic）の隔離ワークスペースを管理します。
+ビジネスロジックや定型機械処理（`core-service`）および社長個人の知識資産（`second-brain`）から独立し、**「全社の憲法・思考原則・経験ストック・SKILL契約・環境設定（Config/Secret）・隔離Worktreeハーネス」を一元統括して自律チームの学習と実行を制御するため**に存在します。
 
 ---
 
-## 📂 ディレクトリ構造マップ
+## 📂 WHAT：ディレクトリ構造マップ
 
-| パス | 役割・内容 |
+| パス | 役割・内容（WHY / WHAT） |
 | :--- | :--- |
-| [`GEMINI.md`](GEMINI.md) | **Layer 1（全社憲法）**: 全リポジトリ・全Agentが遵守する最上位原則 |
+| [`GEMINI.md`](GEMINI.md) | **Layer 1（全社憲法）**: 全リポジトリ・全Agentが遵守する最上位の目的（WHY）と絶対境界 |
 | [`AGENTS.md`](AGENTS.md) | **Layer 2（本社コンテキスト）**: 秘書（`executive-secretary`）の起動と4層組織・3層知識のルーティング |
-| [`docs/architecture.md`](docs/architecture.md) | **全社アーキテクチャ設計書 (SSOT)**: 4層組織・2-Passループ・Worktree戦略・DI/CLI境界の正本 |
-| [`docs/rules/`](docs/rules/thinking_os_and_loop_principles.md) | **Layer B（思考のOS）**: DDD/SOLID/YAGNI、引き算ファースト、2-Pass スパイラルループ、Zettelkasten 対話原則 |
-| [`docs/experiences/`](docs/experiences/README.md) | **Layer C（経験・前例ストック）**: 現場で起きた失敗パターン・アンチパターン・過去の社長判断（前例）の蓄積 |
+| [`docs/architecture.md`](docs/architecture.md) | **全社アーキテクチャ設計書 (Timeless SSOT)**: 会社の現在地の俯瞰と、将来のカイゼン時のベースラインとなる設計正本 |
+| [`docs/rules/`](docs/rules/thinking_os_and_loop_principles.md) | **Layer B（思考のOS）**: `WHY ➔ WHAT ➔ HOW`、引き算ファースト、DDD/SOLID、2-Passループ、Zettelkasten 対話原則 |
+| [`docs/experiences/`](docs/experiences/README.md) | **Layer C（経験・前例ストック）**: 現場で起きた失敗パターン（`[EXP-XX]`）と過去の社長判断・前例（`[PREC-XX]`）の蓄積 |
 | [`docs/templates/`](docs/templates/spec_template.md) | `spec_template.md`（SDD 6大観点の仕様テンプレート） |
 | [`skills/`](skills/README.md) | **Layer A（薄いSKILL群）**: 秘書・チームリーダー・TDDワーカー・独立レビュアー・知識蒸留の7コアスキル |
 | [`tools/`](tools/README.md) | Worktree管理（[`workspace_manager.py`](tools/workspace_manager.py)）およびリポジトリ品質ゲート用Linter群 |
@@ -24,7 +25,7 @@
 
 ---
 
-## 🛠️ 主要コマンド (`Makefile`)
+## 🛠️ HOW：主要コマンド (`Makefile`)
 
 ```bash
 # 1. 新規Epicワークスペースの立ち上げとWorktreeマウント (branch: epic/<name>)
