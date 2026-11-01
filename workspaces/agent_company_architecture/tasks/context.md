@@ -8,8 +8,8 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus / Handoff Point)
-- **「`WHY ➔ WHAT ➔ HOW` 原則」と「Timeless SSOT（時系列ノイズ排除）」を単なる文書記載に留めず、① Linter（`tools/audit_skills.py`）による機械的検知、② 独立レビュアー（`compliance-reviewer`）の監査観点、③ 経験ストック（`[EXP-08]`）の3層で完全に仕組み化・コミット完了**。
-- 社長へ仕組み化の完了を報告し、クローズ（または `second-brain` への内省蒸留）を確認する。
+- **残作業の仕上げ（① `workspace_manager.py` の `ws-harvest` 時における `review_report.md` 存在・`PASS` 判定の機械的強制、② `second-brain/` の `README.md` / `AGENTS.md` 統一、③ 達成済み旧バックログの削除）** もすべて完了。
+- これにて新体制の初期構築は完全クローズ。社長と「今回の気づきの `second-brain` 蒸留」または「実務 Issue 起票」へ進む。
 
 ## 📌 完了サマリー (Final Verification Digest)
 1. **`docs/architecture.md` の Timeless SSOT 化**:

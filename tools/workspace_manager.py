@@ -170,6 +170,19 @@ def cmd_harvest(args: argparse.Namespace) -> None:
         print(f"❌ Workspace not found: workspaces/{epic}/")
         sys.exit(1)
 
+    review_report = ws_dir / "scratch" / "review_report.md"
+    if not args.skip_review_check:
+        if not review_report.exists():
+            print(
+                f"❌ Independent review report missing at workspaces/{epic}/scratch/review_report.md!\n"
+                "   Team Leader MUST invoke compliance-reviewer before harvesting ([EXP-07])."
+            )
+            sys.exit(1)
+        report_text = review_report.read_text(encoding="utf-8")
+        if "PASS" not in report_text:
+            print(f"❌ Review report at workspaces/{epic}/scratch/review_report.md does not contain 'PASS' verdict!")
+            sys.exit(1)
+
     wt_parent = ws_dir / "worktrees"
     if wt_parent.exists():
         for wt_dir in sorted(wt_parent.iterdir()):
@@ -222,6 +235,7 @@ def main() -> None:
 
     p_harvest = sub.add_parser("harvest", help="Unmount worktrees and clean temporary files for closing")
     p_harvest.add_argument("--epic", required=True, help="Epic name")
+    p_harvest.add_argument("--skip-review-check", action="store_true", help="Skip review_report.md check (emergency only)")
 
     sub.add_parser("list", help="List workspaces and mounted worktrees")
 
