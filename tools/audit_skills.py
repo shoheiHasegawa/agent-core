@@ -44,11 +44,11 @@ def audit_skill_file(skill_path: Path) -> list[str]:
             )
 
     # 4. Dead Link Check (JITロード対象ドキュメント等の実在チェック)
-    # skill_path: <repo_root>/agent-core/skills/<role>/<skill_name>/SKILL.md
-    repo_root = skill_path.parent.parent.parent.parent.parent
+    agent_core_root = Path(__file__).resolve().parent.parent
     linked_paths = set(re.findall(r"agent-core/docs/[\w/.-]+", content))
     for p in linked_paths:
-        target_file = repo_root / p
+        rel_p = p.removeprefix("agent-core/")
+        target_file = agent_core_root / rel_p
         if not target_file.exists():
             errors.append(f"{skill_path.parent.name}/SKILL.md: Dead link detected: '{p}' does not exist.")
 

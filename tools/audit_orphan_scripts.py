@@ -25,7 +25,7 @@ def main():
     if DOCS_DIR.exists():
         md_files_to_search.extend(DOCS_DIR.rglob("*.md"))
         
-    for root_md in ["AGENT.md", "INDEX.md", "README.md", "GEMINI.md"]:
+    for root_md in ["AGENTS.md", "AGENT.md", "INDEX.md", "README.md", "GEMINI.md"]:
         root_md_path = AGENT_CORE_DIR / root_md
         if root_md_path.exists():
             md_files_to_search.append(root_md_path)
@@ -33,6 +33,10 @@ def main():
     tools_readme = TOOLS_DIR / "README.md"
     if tools_readme.exists():
         md_files_to_search.append(tools_readme)
+
+    jobs_readme = JOBS_DIR / "README.md"
+    if jobs_readme.exists():
+        md_files_to_search.append(jobs_readme)
 
     reference_text = ""
     for md_file in md_files_to_search:

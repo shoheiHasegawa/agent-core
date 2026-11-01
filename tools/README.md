@@ -15,6 +15,7 @@
 | [`manage_agent_task.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/manage_agent_task.py) | Write/Read | Agent Task の追加・取得・完了・失敗状態の管理 (CRUD) |
 | [`update_task.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/update_task.py) | Write | Task Registry 内のタスク状態（Status, Priority等）の更新 |
 | [`verify_loop_state.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/verify_loop_state.py) | Audit | SDD/TDDループの各フェーズ（Outer Red, Green, Quality）の機械的判定 |
+| [`audit_skills.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/audit_skills.py) | Audit | `skills/` 配下の全 `SKILL.md` の構文・リンク整合性検証 |
 | [`audit_orphan_scripts.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/audit_orphan_scripts.py) | Audit | どこからも参照されていない孤立スクリプトの監査検知 |
 | [`pre_handoff_verify.sh`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/pre_handoff_verify.sh) | Audit | コミット前の総合検証（テスト・Lint・SDD・孤立監査）の一括実行 |
 | [`verify_cleanliness.py`](file:///Users/shoheihasegawa/you_inc/agent-core/tools/verify_cleanliness.py) | Audit | Agent OS の物理的クリーンネス（Leave No Trace, 行数制限）の機械的検証 |
