@@ -13,7 +13,7 @@ type: Worker
 ## 📥 入力と出力の契約 (I/O Contract)
 - **Input**:
   - 対象機能の `spec.md` および `tdd-red-worker` が作成したテストファイルパス
-  - `agent-core/docs/agent_rules/thinking_os_and_loop_principles.md`（思考OS・引き算ファースト原則）
+  - `agent-core/docs/rules/thinking_os_and_loop_principles.md`（思考OS・引き算ファースト原則）
   - 対象リポジトリの設計ルール（`core-service/docs/rules/ddd_guidelines.md`, `dependency_injection.md`）
 - **Output**:
   - 全テストおよび `make check-all` を通過したプロダクションコード

@@ -15,7 +15,7 @@
 | **具体例** | ・`tdd-red-worker` はプロダクションコードを見ない<br>・`core-service` の CLI は `src/entrypoints/cli/` に置く<br>・Worktree 内での親パス参照バグの防止策 | ・AIレビュアーの「無限指摘バイアス」と MUST/SHOULD/IMO による QCD 制御の法則<br>・権限委譲における「ブラックボックス化（裸の王様化）」と内省タッチポイントの設計論 |
 | **書き手・承認** | **チームリーダーが自律追記 ➔ PRで事後承認** | **社長と秘書（`zk-distiller`）が壁打ちして言語化・蒸留** |
 
-> 💡 **両方に該当する場合**: 「普遍的なマネジメント・設計思想（`second-brain`）」であり、かつ「社内の具体的な運用ルール（`docs/experiences/` または `docs/agent_rules/`）」でもある場合は、**抽象的な洞察を `second-brain` に蒸留し、具体的な施工ルールを `agent-core` に書く**。
+> 💡 **両方に該当する場合**: 「普遍的なマネジメント・設計思想（`second-brain`）」であり、かつ「社内の具体的な運用ルール（`docs/experiences/` または `docs/rules/`）」でもある場合は、**抽象的な洞察を `second-brain` に蒸留し、具体的な施工ルールを `agent-core` に書く**。
 
 ---
 

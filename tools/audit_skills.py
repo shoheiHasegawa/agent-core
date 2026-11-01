@@ -40,7 +40,7 @@ def audit_skill_file(skill_path: Path) -> list[str]:
     if skill_path.parent.name == "compliance-reviewer":
         if "Happy Path" in content or "Idempotency" in content:
             errors.append(
-                f"{skill_path.parent.name}/SKILL.md: Hardcoded domain rules detected in compliance-reviewer! Must dynamically extract rules from docs/agent_rules/."
+                f"{skill_path.parent.name}/SKILL.md: Hardcoded domain rules detected in compliance-reviewer! Must dynamically extract rules from docs/rules/."
             )
 
     # 4. Dead Link Check (JITロード対象ドキュメント等の実在チェック)

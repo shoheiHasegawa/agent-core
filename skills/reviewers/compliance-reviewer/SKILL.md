@@ -13,7 +13,7 @@ type: Worker
 ## 📥 入力と出力の契約 (I/O Contract)
 - **Input**:
   - 検査の分母となる `spec.md`、および対象リポジトリの実装・テストコード
-  - `agent-core/docs/agent_rules/thinking_os_and_loop_principles.md`（思考OS・引き算ファースト・重要度判定基準）
+  - `agent-core/docs/rules/thinking_os_and_loop_principles.md`（思考OS・引き算ファースト・重要度判定基準）
   - 対象リポジトリのルール（`core-service/docs/rules/` 等）およびリーダーから指定された経験ストック（`agent-core/docs/experiences/agent_antipatterns_and_precedents.md`）
 - **Output**:
   - 詳細レビューレポートファイル（`scratch/review_report.md`）

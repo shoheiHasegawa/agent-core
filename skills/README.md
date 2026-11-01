@@ -1,7 +1,7 @@
 # 🧩 You_Inc Core Skills Catalog
 
 本ディレクトリは、4大業務フローから逆算して設計された「薄いSKILL（入出力の契約・手順・停止条件）」を格納する。
-判断基準の詳細は [`docs/agent_rules/`](../docs/agent_rules/thinking_os_and_loop_principles.md)（思考原則）および [`docs/experiences/`](../docs/experiences/README.md)（経験・前例ストック）を参照せよ。
+判断基準の詳細は [`docs/rules/`](../docs/rules/thinking_os_and_loop_principles.md)（思考原則）および [`docs/experiences/`](../docs/experiences/README.md)（経験・前例ストック）を参照せよ。
 
 ## ⚙️ サブエージェント起動時の `Model` 指定仕様
 Antigravity の `invoke_subagent` ツールにおける `Model` 引数は `["inherit", "pro", "flash", "flash_lite"]` の4種類である（※Effortの `High/Medium/Low` は親チャットのUI設定であり、サブエージェント呼び出し時は以下の `Model` 値で制御する）：

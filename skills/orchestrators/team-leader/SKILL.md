@@ -11,7 +11,7 @@ type: Orchestrator
 隔離された Worktree 環境（`workspaces/<epic>/worktrees/`）において、コンテキスト純度を保ちながら「過品質の無限ループ」と「DDD崩壊」を防ぎ、決定論的な品質ゲートをクリアした PR を作成するため。
 
 ## 📥 入力と出力の契約 (I/O Contract)
-- **Input**: `workspaces/<epic>/AGENTS.md`（Goal/DoD）、対象 GitHub Issue、`agent-core/docs/agent_rules/thinking_os_and_loop_principles.md`、`agent-core/docs/experiences/agent_antipatterns_and_precedents.md`
+- **Input**: `workspaces/<epic>/AGENTS.md`（Goal/DoD）、対象 GitHub Issue、`agent-core/docs/rules/thinking_os_and_loop_principles.md`、`agent-core/docs/experiences/agent_antipatterns_and_precedents.md`
 - **Output**:
   1. 確定した `spec.md`（分母シナリオID一覧）
   2. `make check-all` パス ＆ 独立レビュー `MUST = 0` を達成したコードと GitHub PR (`gh pr create`)
@@ -20,7 +20,7 @@ type: Orchestrator
 ## 🛠️ 実行手順とループ定義 (HOW & 5 Loop Elements)
 
 ### Phase 0: 分母の事前固定と上流ゲート (Denominator Lock)
-1. `agent-core/docs/agent_rules/sdd_tdd_heuristics.md` の6大観点に基づき、対象機能の `spec.md` に満たすべき全シナリオID（例：`[SC-01]〜[SC-08]` ＝ **検査の分母**）を定義する。
+1. `agent-core/docs/rules/thinking_os_and_loop_principles.md`（および [`spec_template.md`](../../docs/templates/spec_template.md)）の6大観点に基づき、対象機能の `spec.md` に満たすべき全シナリオID（例：`[SC-01]〜[SC-08]` ＝ **検査の分母**）を定義する。
 2. `compliance-reviewer`（またはセルフレビュー）で、**後続ワーカーが誤解する曖昧な表現・用語の揺れ（🔴 `MUST`）がゼロであること**を確認する（[EXP-03] 準拠）。
 3. `agent-core/docs/experiences/agent_antipatterns_and_precedents.md` から今回のタスクに関連する失敗パターンを選定し、ワーカーへの指示書に参照パスとして含める。
 
@@ -47,5 +47,5 @@ type: Orchestrator
   - 停止時は `tasks/context.md` に「①停止理由、②原因仮説、③A/B選択肢」を記載して秘書・社長へエスカレーションせよ。
 
 ### Phase 3: クローズ・学習還流（ルートA）と PR 回収
-1. 作業中に `tasks/lessons_learned.md` に記録された技術的な学び（ルートA）を、①Linter/CI、②`docs/agent_rules/`、③`docs/experiences/`、④`SKILL.md` のいずれかへ自律的に反映してコミットする。
+1. 作業中に `tasks/lessons_learned.md` に記録された技術的な学び（ルートA）を、①Linter/CI、②`docs/rules/`、③`docs/experiences/`、④`SKILL.md` のいずれかへ自律的に反映してコミットする。
 2. 各 Worktree でブランチを Push して `gh pr create` で PR を作成し、`make ws-harvest EPIC=<name>` を実行した上で、秘書（または社長）へ **3点内省ブリーフィング** 用のサマリーを報告する。

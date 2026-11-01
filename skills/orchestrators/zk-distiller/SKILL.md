@@ -1,7 +1,7 @@
 ---
 name: zk-distiller
 description: ソクラテス式の問いかけで社長の思考・内省（ルートBの学び）を深掘りし、生々しい熱量（Why）を保ったまま Zettelkasten のノートへ蒸留・保存するスキル。
-model: flash
+model: pro
 type: Orchestrator
 ---
 
@@ -11,7 +11,7 @@ type: Orchestrator
 日々の意思決定やプロジェクト完遂（ルートBの還流）、または `Mobile Vault` の着想メモから、社長自身の頭を通して普遍的な知見を引き出し、熱量（Whyのエントロピー）を殺さずに `second-brain` の資産へ変換するため。
 
 ## 📥 入力と出力の契約 (I/O Contract)
-- **Input**: 社長の気づき・着想メモ・プロジェクト振り返りのトピック、および `agent-core/docs/agent_rules/zettelkasten_heuristics.md`
+- **Input**: 社長の気づき・着想メモ・プロジェクト振り返りのトピック、および `agent-core/docs/rules/zettelkasten_and_dialog_principles.md`
 - **Output**: 社長承認済みの Zettelkasten ノート（`20_Sense_Making` または `40_Permanent_Notes`）の登録とリンク整合性検証パス
 
 ## 🛠️ 実行手順 (HOW)
@@ -21,7 +21,7 @@ type: Orchestrator
 2. いきなりAIが答えを書いてまとめるのではなく、**「なぜそう感じたのか？」「一見〇〇に見えるが、本質は△△だとしたらどうなるか？」「他の領域にも言える普遍的な構造は何か？」** という問いを1〜2問投げかけ、社長自身の言葉を引き出す。
 
 ### 2. 熱量（Whyのエントロピー）を保つドラフト作成 ([EXP-06] 準拠)
-1. `agent-core/docs/agent_rules/zettelkasten_heuristics.md` のフォーマット・双方向リンク規則に従い、ノートのドラフトを作成する。
+1. `agent-core/docs/rules/zettelkasten_and_dialog_principles.md` のフォーマット・双方向リンク規則に従い、ノートのドラフトを作成する。
 2. **絶対制約**: AI特有の教科書的で無難な要約に丸めてはならない。社長が語った生々しい表現、トレードオフの葛藤、具体例をそのまま核として残すこと。
 
 ### 3. 承認と公式CLIによる登録

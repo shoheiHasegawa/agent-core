@@ -1,7 +1,7 @@
 ---
 name: research-worker
 description: コードやファイルを一切変更せず、指定された仮説や前例・影響範囲を調査して scratch/research_report.md に出力する非破壊調査ワーカー。
-model: flash
+model: flash_lite
 type: Worker
 ---
 
