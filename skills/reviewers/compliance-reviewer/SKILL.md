@@ -1,7 +1,7 @@
 ---
 name: compliance-reviewer
 description: 実装者と分離された独立監査役として、spec.mdの分母引き算レビューとDDD/SOLID原則の検査を行い、後続波及リスクに基づき MUST / SHOULD / IMO を判定するレビュアー。
-model: flash
+model: pro
 type: Worker
 ---
 
