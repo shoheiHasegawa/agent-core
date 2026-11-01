@@ -24,4 +24,9 @@
     - `[x]` `agent-core/app_context.py` および旧SQLite用 `tools/`・`jobs/` の完全廃止（-1,102行の引き算達成）
     - `[x]` `team-leader (pro)` ➔ `tdd-red-worker (flash)` ➔ `tdd-green-worker (flash)` ➔ `compliance-reviewer (pro)` の実サブエージェント起動（計4回）により、`core-service/src/entrypoints/cli/main.py` を2-Passスパイラルループで実装・監査パス（169 tests passed, Cov 93.99%, MUST=0, SHOULD=0）
     - `[x]` `core-service` / `agent-core` の独立 GitHub Actions CI（`.github/workflows/ci.yml`）配置完了
-- `[ ]` **Phase 6: 最終クローズ（Issue起票ルールの確定・やり残し課題のIssue起票・`second-brain` への内省蒸留）** 👈 Next Session!
+- `[x]` **Phase 6: 最終クローズ（Issue起票ルールの確定・やり残し課題のIssue起票・`second-brain` への内省蒸留）**
+  - `[x]` GitHub Issue 起票ルールの合意とテンプレート配置（`.github/ISSUE_TEMPLATE/`）
+  - `[x]` `backlog/` の `second-brain` 移管と完全引き算削除
+  - `[x]` 残課題3件の起票（Issue #1 SQLite引き算, Issue #2 Docker隔離, Issue #3 Google Cal/Tasks連携）
+  - `[x]` 「引き算ファースト」から「目的ドリブンとWHYへの純化」への思考原則是正（`thinking_os_and_loop_principles.md`, `architecture.md`）
+  - `[x]` 社長の内省を `second-brain/40_Permanent_Notes/` へ2件蒸留・永続化完了

@@ -7,19 +7,16 @@
 
 ---
 
-## 🎯 現在の焦点 (Current Focus / Handoff Point)
-- アーキテクチャ実装・`main` マージ・Worktree回収・Timeless SSOT化・Linter仕組み化まで100%完了。
-- **次セッションでの最終クローズ条件（残り3ステップ）**:
-  1. **GitHub Issue 起票ルールの壁打ち・定義**: どこのリポジトリに、どの粒度・フォーマット（`WHY ➔ WHAT [DoD] ➔ HOW`）で起票し、どう `backlog/` と使い分けるかを合意する。
-  2. **やり残し課題の実際の Issue 起票 (`gh issue create`)**:
-     - 候補①：`core-service` 内の旧 SQLite タスク管理ドメイン（`task_operations` / `daily_planning` / `agent_task`）の引き算整理
-     - 候補②：OSレベル完全隔離サンドボックス（Docker / DevContainer）対応
-     - 候補③：PC（Antigravity 秘書）からの Google Calendar / Tasks 直接連携
-  3. **クローズ時の知識蒸留（ルートB — `second-brain`）**:
-     - 今回の社長の核心的気づき（`WHY ➔ WHAT ➔ HOW` の思考の型、引き算ファースト、ブラックボックス化を防ぐ内省タッチポイント、上流の曖昧さのブルウィップ効果と2-Passループ）を壁打ちして Permanent Note / Sense Making Note へ蒸留する。
+## 🎯 最終クローズ完了 (Epic Closed / 100% Done)
+- **Phase 1〜6 全行程完了**:
+  - `[x]` **① Issue起票ルールの確定と仕組み化**: `.github/ISSUE_TEMPLATE/` 整備、`backlog/` 引き算完了。
+  - `[x]` **② 残課題の Issue 起票**: Issue #1 (SQLite引き算), Issue #2 (Docker隔離), Issue #3 (Cal/Tasks連携) 登録完了。
+  - `[x]` **③ 思考原則の是正と second-brain 蒸留**:
+    - 「引き算ファースト」から「目的ドリブンとWHYへの純化」へ思考原則（`docs/rules/`, `docs/architecture.md`）を是正。
+    - Permanent Note 2件を公式CLI（`zk-register`）で登録・永続化完了。
 
-## 📌 完了済み基盤サマリー
-- **3リポジトリ統一 & Timeless SSOT**: `agent-core`, `core-service`, `second-brain` すべてで `README.md` / `AGENTS.md` / [`docs/architecture.md`](../../../docs/architecture.md) を `WHY ➔ WHAT ➔ HOW` 構造に統一。
-- **機械的ガードレール**:
-  - [`audit_skills.py`](../../../tools/audit_skills.py): 正本ドキュメントの `WHY` 欠如および時系列ノイズ混入を pre-commit / `make check-all` で自動ブロック。
-  - [`workspace_manager.py`](../../../tools/workspace_manager.py): `make ws-harvest` 時に独立レビュアーの `scratch/review_report.md` (`PASS`) が無ければ回収を物理拒否。
+## 📌 成果物・リンク
+- 正本アーキテクチャ: [`docs/architecture.md`](../../../docs/architecture.md)
+- 思考原則: [`docs/rules/thinking_os_and_loop_principles.md`](../../../docs/rules/thinking_os_and_loop_principles.md)
+- GitHub Issues: #1, #2, #3 ([shoheiHasegawa/agent-core](https://github.com/shoheiHasegawa/agent-core/issues))
+- 蒸留Note: `40_Permanent_Notes/` (権限委譲の本質、目的への純化)

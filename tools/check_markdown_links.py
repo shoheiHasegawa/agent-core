@@ -35,7 +35,7 @@ def main():
                 continue
 
             clean_link = link.split("#")[0]
-            if not clean_link:
+            if not clean_link or clean_link.isdigit():
                 continue
 
             if clean_link.startswith("file://"):
