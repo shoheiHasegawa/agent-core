@@ -1,0 +1,45 @@
+name: 🏛️ Epic
+description: 複数Worktreeや中長期に渡る親課題の起票
+title: "[Epic] "
+labels: ["type:epic", "prio:p1-next", "size:L"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You_Inc の親課題（Epic）用テンプレートです。
+  - type: textarea
+    id: why
+    attributes:
+      label: 🎯 WHY (背景と事業/システムインパクト)
+      description: なぜこのEpicを立ち上げるのか？何を達成したいか？
+      placeholder: 背景と達成したい世界観
+    validations:
+      required: true
+  - type: textarea
+    id: what_dod
+    attributes:
+      label: 📋 WHAT / DoD (親Epic完了条件)
+      description: Epic全体の包括的な完了条件
+      placeholder: |
+        - [ ] 子タスク/サブIssueの完了
+        - [ ] アーキテクチャ正本への昇格
+    validations:
+      required: true
+  - type: textarea
+    id: non_scope
+    attributes:
+      label: 🚫 Non-Scope (今回は絶対にやらないこと)
+      description: Epic肥大化を防ぐ境界線
+      placeholder: 今回のEpicに含めない事項
+    validations:
+      required: true
+  - type: textarea
+    id: subtasks
+    attributes:
+      label: 🧱 Subtasks (想定されるサブタスク/Worktree分割案)
+      description: 分割候補となるIssue案
+      placeholder: |
+        - [ ] Task 1
+        - [ ] Task 2
+    validations:
+      required: false

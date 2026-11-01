@@ -1,0 +1,43 @@
+name: 🚀 Feature
+description: 新規機能・CLIコマンド・連携機能の起票
+title: "[Feature] "
+labels: ["type:feature", "prio:p2-backlog", "size:M"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You_Inc 公式 Issue テンプレートです。「WHY ➔ WHAT [DoD] ➔ HOW」の思考OSに沿って記入してください。
+  - type: textarea
+    id: why
+    attributes:
+      label: 🎯 WHY (背景と目的)
+      description: なぜ今これをやるのか？どのようなエントロピーや不便を解消するか？
+      placeholder: 背景・動機・放置した場合のコスト
+    validations:
+      required: true
+  - type: textarea
+    id: what_dod
+    attributes:
+      label: 📋 WHAT / DoD (スコープと定量的完了条件)
+      description: 客観的・定量的に検証可能な合格判定基準
+      placeholder: |
+        - [ ] 条件1 (例: make check-all 通過)
+        - [ ] 条件2 (例: CLIコマンドの挙動検証)
+    validations:
+      required: true
+  - type: textarea
+    id: non_scope
+    attributes:
+      label: 🚫 Non-Scope (今回は絶対にやらないこと)
+      description: 過品質や迷走を防ぐための境界線
+      placeholder: 今回はスコープ外とする項目
+    validations:
+      required: true
+  - type: textarea
+    id: how_constraints
+    attributes:
+      label: 🛠️ HOW & CONSTRAINTS (想定アプローチと制約)
+      description: 対象リポジトリ、準拠すべき設計原則、禁止事項
+      placeholder: 対象リポジトリや設計アプローチ
+    validations:
+      required: false
