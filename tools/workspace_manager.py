@@ -212,16 +212,44 @@ def cmd_harvest(args: argparse.Namespace) -> None:
     print(f"🎉 Workspace '{epic}' is ready for harvest/close!")
 
 
+def cmd_clean(args: argparse.Namespace) -> None:
+    epic = args.epic
+    ws_dir = WORKSPACES_DIR / epic
+    if not ws_dir.exists():
+        print(f"ℹ️  Workspace already cleaned or not found: workspaces/{epic}/")
+        return
+
+    wt_parent = ws_dir / "worktrees"
+    if wt_parent.exists():
+        active_wts = [d.name for d in wt_parent.iterdir() if d.is_dir()]
+        if active_wts:
+            print(f"❌ Cannot clean workspace '{epic}': active worktrees still mounted: {', '.join(active_wts)}")
+            print(f"   Run 'make ws-harvest EPIC={epic}' first.")
+            sys.exit(1)
+
+    shutil.rmtree(ws_dir)
+    print(f"🧹 Cleaned up workspace completely: workspaces/{epic}/ (更地化完了)")
+
+
 def cmd_list(_args: argparse.Namespace) -> None:
-    print("=== Active Workspaces ===")
+    print("=== Workspaces ===")
     if WORKSPACES_DIR.exists():
         for ws in sorted(WORKSPACES_DIR.iterdir()):
-            if ws.is_dir():
+            if ws.is_dir() and not ws.name.startswith("."):
                 wts = []
                 if (ws / "worktrees").exists():
                     wts = [d.name for d in (ws / "worktrees").iterdir() if d.is_dir()]
                 wt_info = f" (worktrees: {', '.join(wts)})" if wts else ""
-                print(f"  - {ws.name}{wt_info}")
+
+                status = "unknown"
+                meta_file = ws / "AGENTS.md" if (ws / "AGENTS.md").exists() else ws / "_index.md"
+                if meta_file.exists():
+                    text = meta_file.read_text(encoding="utf-8")
+                    for line in text.splitlines():
+                        if line.startswith("status:"):
+                            status = line.split(":", 1)[1].strip()
+                            break
+                print(f"  - [{status}] {ws.name}{wt_info}")
 
 
 def main() -> None:
@@ -237,6 +265,9 @@ def main() -> None:
     p_harvest.add_argument("--epic", required=True, help="Epic name")
     p_harvest.add_argument("--skip-review-check", action="store_true", help="Skip review_report.md check (emergency only)")
 
+    p_clean = sub.add_parser("clean", help="Completely remove a harvested workspace directory")
+    p_clean.add_argument("--epic", required=True, help="Epic name to clean")
+
     sub.add_parser("list", help="List workspaces and mounted worktrees")
 
     args = parser.parse_args()
@@ -244,6 +275,8 @@ def main() -> None:
         cmd_new(args)
     elif args.command == "harvest":
         cmd_harvest(args)
+    elif args.command == "clean":
+        cmd_clean(args)
     elif args.command == "list":
         cmd_list(args)
 

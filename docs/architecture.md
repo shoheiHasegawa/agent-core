@@ -108,8 +108,10 @@ sequenceDiagram
     Note over CEO,SB: 【Flow 3 & 4】クローズ・2系統学習還流 & 内省蒸留
     TL->>TL: ルートA還流: Agentの学びを Linter / rules / experiences / SKILL へ反映
     TL-->>SEC: ブランチコミット & 完了報告
-    SEC->>CEO: 📊 3点内省ブリーフィング (①構造変化 ②Agentの学び ③社長への内省の問い)
-    CEO->>SEC: マージ承認 & make ws-harvest (Worktree回収)
+    SEC->>SEC: gh pr create (3点ブリーフィング記載 & Closes #XX)
+    SEC->>CEO: 📊 3点内省ブリーフィング ＆ PR確認依頼
+    CEO->>SEC: マージ承認 (GitHub上でPRマージ)
+    SEC->>SEC: make ws-harvest & ws-clean (Worktree回収 ＆ ワークスペース更地化)
     opt ルートB: 社長自身の気づきを蒸留する場合 (Flow 4)
         CEO->>SEC: 気づきの壁打ち (zk-distiller)
         SEC->>CLI: zk-register & make zk-audit
@@ -124,6 +126,12 @@ sequenceDiagram
 3. **Pass 2（2周目：全体俯瞰と純化 — Make it Right）**: テスト防波堤が100%揃った状態で全体を俯瞰し、**「目的への純化（Purpose ➔ Delete ➔ Simplify ➔ Add）」** で不要パッチ削除・UseCase から Domain 層へのロジック抽出・🟡 `SHOULD` の一括解消を行う（🟢 `IMO` は切り捨てる）。
 4. **定量的完了条件（Exit Criteria）**: `make check-all` 終了コード `== 0`（Cov $\ge 90\%$、SDD差分 `0`） **かつ** 独立レビュアーの 🔴 `MUST == 0件`。
 5. **定量的異常停止条件（Circuit Breaker）**: **同一エラー連続失敗 `== 2回`**、**1バッチ往復上限 `== 3周`**、または **🔴 Tier 3（前例なしの仕様矛盾）発生** で即座に強制停止し、`tasks/context.md` に原因仮説とA/B案を書いてエスカレーションする。
+
+### 3.2 ワークスペースの完全ライフサイクル（PR駆動と更地化の原則）
+「過去の作業ログを捨てるのが怖くてローカルに古いワークスペースが溜まり続ける問題（足し算バイアス）」を防ぐため、以下のライフサイクルを厳格に適用する：
+1. **ブランチ起動**: `make ws-new` 実行時、`agent-core` 自身も `epic/<name>` ブランチを切り、現場 Worktree をマウントする。すべての作業・タスク更新・試行錯誤はそのブランチ上で行う。
+2. **GitHub PR が唯一の恒久アーカイブ（SoR）**: 独立レビュアー `PASS` 後、秘書が `gh pr create` で PR を作成し、PR本文に「3点内省ブリーフィング」を記録して関連 Issue（`Closes #XX`）と紐付ける。PRのタイムラインとコミットログこそが議論と検証の完全な記録である。
+3. **マージ後の完全更地化（足場の解体）**: 社長が PR をマージした後、`make ws-harvest` および `make ws-clean` により、ローカルの `workspaces/<name>/` ディレクトリを完全削除（`git rm -rf`）する。ローカルには「現在進行中のActive Epicのみ」を残し、過去のアーカイブフォルダを作ってはならない（[`[PREC-05]`](experiences/agent_antipatterns_and_precedents.md)）。
 
 ---
 

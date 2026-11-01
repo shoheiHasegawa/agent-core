@@ -1,4 +1,4 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-list zk-audit vault-peek validate-skills validate-orphans validate-cleanliness validate-links check-all
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek validate-skills validate-orphans validate-cleanliness validate-links check-all
 
 EPIC ?=
 REPOS ?= core-service
@@ -25,6 +25,10 @@ ws-new:
 ws-harvest:
 	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-harvest EPIC=<name>"; exit 1; fi
 	@uv run python tools/workspace_manager.py harvest --epic "$(EPIC)"
+
+ws-clean:
+	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-clean EPIC=<name>"; exit 1; fi
+	@uv run python tools/workspace_manager.py clean --epic "$(EPIC)"
 
 ws-list:
 	@uv run python tools/workspace_manager.py list
