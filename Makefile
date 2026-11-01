@@ -1,12 +1,26 @@
-.PHONY: secrets-encrypt secrets-decrypt
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-list validate-skills validate-orphans validate-cleanliness validate-links check-all
+
+EPIC ?=
+REPOS ?= core-service
+ISSUE ?=
+
+# ---------------------------------------------------------
+# Workspace & Worktree Harness (方式A)
+# ---------------------------------------------------------
+ws-new:
+	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-new EPIC=<name> [REPOS=core-service,agent-core] [ISSUE=123]"; exit 1; fi
+	@uv run python tools/workspace_manager.py new --epic "$(EPIC)" --repos "$(REPOS)" $(if $(ISSUE),--issue "$(ISSUE)",)
+
+ws-harvest:
+	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-harvest EPIC=<name>"; exit 1; fi
+	@uv run python tools/workspace_manager.py harvest --epic "$(EPIC)"
+
+ws-list:
+	@uv run python tools/workspace_manager.py list
 
 # ---------------------------------------------------------
 # Secrets Management (sops)
 # ---------------------------------------------------------
-# agent-core は、core-service をはじめとする各サービスへの
-# 接続情報（APIキー等）を管理するオーケストレーターです。
-# 本番環境およびローカル環境でのシークレット管理は sops を使用します。
-
 secrets-encrypt:
 	@echo "Encrypting secrets..."
 	@sops --encrypt --in-place .env || echo "Failed to encrypt. Check if .sops.yaml is configured and .env exists."
@@ -18,14 +32,9 @@ secrets-decrypt:
 # ---------------------------------------------------------
 # Quality Gate & Architecture Validation
 # ---------------------------------------------------------
-
 validate-skills:
 	@echo "Auditing skills..."
 	@uv run python tools/audit_skills.py
-
-validate-sdd:
-	@echo "Validating SDD and architecture..."
-	@uv run python tools/validate_sdd.py
 
 validate-orphans:
 	@echo "Auditing orphan scripts..."
@@ -35,6 +44,9 @@ validate-cleanliness:
 	@echo "Validating cleanliness..."
 	@uv run python tools/verify_cleanliness.py
 
-check-all: validate-skills validate-sdd validate-orphans validate-cleanliness
-	@echo "✅ All agent-core Quality Gates passed!"
+validate-links:
+	@echo "Validating markdown links..."
+	@uv run python tools/check_markdown_links.py
 
+check-all: validate-skills validate-orphans validate-cleanliness validate-links
+	@echo "✅ All agent-core Quality Gates passed!"

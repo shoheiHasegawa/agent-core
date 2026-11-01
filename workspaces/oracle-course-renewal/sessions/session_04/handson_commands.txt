@@ -1,0 +1,318 @@
+================================================================================
+25上期 Oracle基礎勉強会 第4回：後半ハンズオン「本日の総まとめ実験」
+コピペ専用コマンド集 (handson_commands.txt)
+================================================================================
+【使い方】
+・各ステップのコマンドには「$」や「SQL>」などのプロンプト記号を含めていません。
+・ブロックごとにそのままコピーして、VS Codeのターミナル（またはSQL*Plus画面）に
+  貼り付けて実行してください。
+・意図的にエラー（「壁」）を発生させて観察するステップには【⚡壁の目撃】と書いてあります。
+  エラーが出たら大成功です！エラー番号とメッセージの意味を確認しましょう。
+================================================================================
+
+
+################################################################################
+# 【事前準備】OSユーザー oracle への切り替えと管理者 bold でのログイン (所要2分)
+# ※ Linuxのターミナル画面（ec2-user）からスタートします。
+################################################################################
+
+# 1. OSユーザーを oracle に切り替え
+sudo su - oracle
+
+# 2. 管理者ユーザー bold で PDB (freepdb1) にログイン
+# （※もし ORA-12154 エラーが出る場合は sqlplus bold/bold@localhost:1521/freepdb1 を実行）
+sqlplus bold/bold@freepdb1
+
+
+-- ▼ ここから下は SQL*Plus (SQL> プロンプト) の画面に貼り付けます ▼
+
+-- 3. 画面の表示幅を整え、現在ログイン中のユーザーとコンテナ(PDB)を確認
+SET LINESIZE 120
+SET PAGESIZE 50
+SHOW USER
+SHOW CON_NAME
+
+-- 【期待される画面出力】
+-- ユーザーは"BOLD"です。 (USER is "BOLD")
+-- CON_NAME : FREEPDB1
+
+
+
+################################################################################
+-- 🧪 実験1：資料（表）の作成と「主キー制約（書き方ルール）」の威力 (所要7分)
+-- 【シナリオ】社員番号(主キー)・氏名・部署・年収(極秘)を持つ人事極秘台帳 emp_secret と
+--            別紙の索引カード(INDEX)を作成し、主キーの記入規約が重複や空欄(NULL)を弾く瞬間を目撃します。
+################################################################################
+
+-- [Step 1-1] 既存の同名表があれば削除（26aiの IF EXISTS 構文なので初回もエラーになりません）
+DROP TABLE IF EXISTS emp_secret CASCADE CONSTRAINTS;
+
+-- [Step 1-2] 主キー(PRIMARY KEY：管理番号ルール)と非NULL(NOT NULL：空欄禁止ルール)つきの人事極秘台帳を作成
+CREATE TABLE emp_secret (
+  emp_id    NUMBER(4)    PRIMARY KEY,
+  emp_name  VARCHAR2(20) NOT NULL,
+  dept_name VARCHAR2(20),
+  salary    NUMBER(10)
+);
+
+-- [Step 1-3] 部署名(dept_name)での検索を高速化する別紙の索引カード(INDEX)を作成
+CREATE INDEX idx_emp_dept ON emp_secret(dept_name);
+
+-- [Step 1-4] 正常な社員データを2件記入(INSERT)して確定(COMMIT)
+INSERT INTO emp_secret VALUES (101, 'Sato',   'Sales', 6000000);
+INSERT INTO emp_secret VALUES (102, 'Suzuki', 'Dev',   7500000);
+COMMIT;
+
+-- [Step 1-5] 台帳に記録された2件のデータを確認
+SELECT * FROM emp_secret;
+
+-- 【期待される画面出力】
+-- 101 Sato (Sales / 6000000) と 102 Suzuki (Dev / 7500000) の2行が表示されます。
+
+
+-- -----------------------------------------------------------------------------
+-- ⚡ [Step 1-6] 【壁の目撃①】わざと既存の社員番号「101」を重複記入してみる！
+-- （予測：すでに101番のSatoさんがいるのに、同じ101番を入れるとどうなる？）
+-- -----------------------------------------------------------------------------
+INSERT INTO emp_secret VALUES (101, 'Takahashi', 'HR', 5000000);
+
+-- 【期待される画面出力（このエラーが出れば大成功！）】
+-- ORA-00001: 一意制約(BOLD.SYS_C00...)に反しています
+-- (ORA-00001: unique constraint (BOLD.SYS_C00...) violated)
+-- 👉 主キーの書き方ルール（記入規約）が「社員番号101の重複」を水際でブロックしました！
+
+
+-- -----------------------------------------------------------------------------
+-- ⚡ [Step 1-7] 【壁の目撃②】わざと社員番号に「NULL（空欄）」を記入してみる！
+-- （予測：主キーである社員番号を空欄 NULL にするとどうなる？）
+-- -----------------------------------------------------------------------------
+INSERT INTO emp_secret VALUES (NULL, 'Tanaka', 'Sales', 4500000);
+
+-- 【期待される画面出力（このエラーが出れば大成功！）】
+-- ORA-01400: ("BOLD"."EMP_SECRET"."EMP_ID")にはNULLは挿入できません
+-- (ORA-01400: cannot insert NULL into ("BOLD"."EMP_SECRET"."EMP_ID"))
+-- 👉 主キーの書き方ルール（記入規約）は「空欄(NULL)」も確実にブロックしました！
+
+
+
+################################################################################
+-- 🧪 実験2：マイ本棚の壁と「閲覧用フィルター(VIEW) × 役職バッジ(ロール)」による機密列の保護 (所要10分)
+-- 【シナリオ】一般社員 u1 を作成し、資料室入館ゲートの壁(ORA-01045)と他人の本棚の壁(ORA-00942)を
+--            目撃したあと、「年収欄を目隠しした閲覧用フィルター(VIEW) × 役職バッジ(ロール)」で安全に名簿を公開します。
+################################################################################
+
+-- [Step 2-1] 管理者 bold に接続し、一般社員 u1 とロールを初期化・新規作成
+CONN bold/bold@freepdb1
+DROP USER IF EXISTS u1 CASCADE;
+DROP ROLE IF EXISTS staff_role;
+
+-- 一般社員 u1 の会員証を作成（まだ何の権限も付与しないゼロ権限状態！）
+CREATE USER u1 IDENTIFIED BY benkyokai;
+
+
+-- -----------------------------------------------------------------------------
+-- ⚡ [Step 2-2] 【壁の目撃①】作ったばかりの u1（権限ゼロ）で資料室に入館(ログイン)してみる！
+-- （予測：会員証を作っただけで、まだ入館権限を渡していないとログインできる？）
+-- -----------------------------------------------------------------------------
+CONN u1/benkyokai@freepdb1
+
+-- 【期待される画面出力（このエラーが出れば大成功！）】
+-- ORA-01045: ユーザーU1にはCREATE SESSION権限がありません。ログオンが拒否されました
+-- (ORA-01045: user U1 lacks CREATE SESSION privilege; logon denied)
+-- 👉 最小権限の原則により、資料室の入館ゲート通行証（CREATE SESSION）がないと入館すらできません！
+
+
+-- -----------------------------------------------------------------------------
+-- ⚡ [Step 2-3 & 2-4] 入館通行証だけ渡して、他人の本棚の極秘台帳 (bold.emp_secret) を覗き見する！
+-- -----------------------------------------------------------------------------
+-- 管理者 bold に戻り、u1 に資料室の入館ゲート通行証（CREATE SESSION システム権限）だけを付与
+CONN bold/bold@freepdb1
+GRANT CREATE SESSION TO u1;
+
+-- 今度は u1 で入館（ログイン）成功！そのまま bold の本棚にある人事極秘台帳を SELECT してみる！
+CONN u1/benkyokai@freepdb1
+SHOW USER
+SELECT * FROM bold.emp_secret;
+
+-- 【期待される画面出力（このエラーが出れば大成功！）】
+-- ユーザーは"U1"です。
+-- ORA-00942: 表またはビュー"BOLD"."EMP_SECRET"が存在しません。
+-- (ORA-00942: table or view "BOLD"."EMP_SECRET" does not exist)
+-- 👉 オブジェクト権限（閲覧許可）がない他人のマイ本棚の資料は、存在すら見えないように隠されます！
+
+
+-- -----------------------------------------------------------------------------
+-- ✨ [Step 2-5] 【解決策の実装】管理者 bold に戻り、「閲覧用フィルター(VIEW) × 役職バッジ(ロール)」を作成！
+-- （もし emp_secret 台帳自体のSELECT権限を渡すと「年収」まで見えてしまうため、
+--   年収欄を目隠しした閲覧用フィルター枠 v_emp_public を作り、役職バッジ経由で u1 に付与します）
+-- -----------------------------------------------------------------------------
+CONN bold/bold@freepdb1
+
+-- ① 年収(salary)列を除外した「閲覧用フィルター枠（ビュー v_emp_public）」を作成
+CREATE OR REPLACE VIEW v_emp_public AS
+  SELECT emp_id, emp_name, dept_name FROM emp_secret;
+
+-- ② 役職バッジ「staff_role（一般社員ロール）」を作成
+CREATE ROLE staff_role;
+
+-- ③ 役職バッジ(staff_role)に、「元の極秘台帳」ではなく「閲覧用フィルター(v_emp_public)」のSELECT権限を入れる！
+GRANT SELECT ON v_emp_public TO staff_role;
+
+-- ④ 一般社員 u1 に役職バッジ(staff_role)を授与する！
+GRANT staff_role TO u1;
+
+
+-- -----------------------------------------------------------------------------
+-- 🎉 [Step 2-6] 【Afterの確認】再び一般社員 u1 でログインし、元の台帳と閲覧用フィルターを比較！
+-- -----------------------------------------------------------------------------
+CONN u1/benkyokai@freepdb1
+SHOW USER
+
+-- 1) まず、年収が書かれた元の極秘台帳（bold.emp_secret）を直接開こうとすると…？
+SELECT * FROM bold.emp_secret;
+
+-- 【期待される画面出力】
+-- ORA-00942: 表またはビュー"BOLD"."EMP_SECRET"が存在しません。
+-- 👉 元の極秘台帳（年収データ）は引き続きブロックされて守られています！
+
+-- 2) 次に、許可された閲覧用フィルター枠（bold.v_emp_public）を通して見てみると…？
+SELECT * FROM bold.v_emp_public;
+
+-- 【期待される画面出力】
+-- EMP_ID(101, 102), EMP_NAME(Sato, Suzuki), DEPT_NAME(Sales, Dev) の3列だけが表示！
+-- 👉 元の台帳の閲覧権を渡さなくても、閲覧用フィルター(VIEW)のSELECT権限だけで公開項目のみ安全に見せられました！
+
+
+
+################################################################################
+-- 🧪 実験3：本編の資料廃棄 (DROP TABLE) の連鎖とオブジェクトの寿命 (所要6分)
+-- 【シナリオ】本編の極秘台帳 emp_secret を DROP TABLE で廃棄したとき、
+--            付属品の「索引カード(INDEX)」と別棚の「閲覧用フィルター枠(VIEW)」のどちらが消え、どちらが残るか検証します。
+################################################################################
+
+-- [Step 3-1] 管理者 bold に戻り、廃棄前の「索引カード(INDEX)」と「閲覧用フィルター枠(VIEW)」の状態を確認
+CONN bold/bold@freepdb1
+COLUMN object_name FORMAT A20
+COLUMN object_type FORMAT A15
+COLUMN status FORMAT A10
+
+SELECT index_name, table_name FROM user_indexes WHERE table_name = 'EMP_SECRET';
+SELECT object_name, object_type, status FROM user_objects WHERE object_name IN ('EMP_SECRET', 'IDX_EMP_DEPT', 'V_EMP_PUBLIC');
+
+-- 【期待される画面出力】
+-- ・user_indexes に主キー自動作成INDEX(SYS_C00...)と手動作成INDEX(IDX_EMP_DEPT)の2枚の索引カードが表示
+-- ・user_objects に TABLE, INDEX, VIEW の3つすべてが「VALID（有効）」で表示
+
+
+-- -----------------------------------------------------------------------------
+-- 💥 [Step 3-2 & 3-3] 本編の極秘台帳 emp_secret を廃棄(DROP TABLE)し、直後の状態を確認！
+-- -----------------------------------------------------------------------------
+DROP TABLE emp_secret;
+
+SELECT index_name, table_name FROM user_indexes WHERE table_name = 'EMP_SECRET';
+SELECT object_name, object_type, status FROM user_objects WHERE object_name IN ('EMP_SECRET', 'IDX_EMP_DEPT', 'V_EMP_PUBLIC');
+
+-- 【期待される画面出力】
+-- ・user_indexes：「レコードが選択されませんでした。(no rows selected)」
+--   👉 付属品である索引カード(INDEX)は本編の台帳と運命を共にして完全に廃棄（消滅）されました！
+-- ・user_objects：V_EMP_PUBLIC (VIEW) だけが本棚に残り、STATUS が「INVALID（無効）」に変化！
+--   👉 別棚の閲覧用フィルター枠(VIEW)は削除されずに残りますが、参照先の台帳を失って INVALID になります！
+
+
+-- -----------------------------------------------------------------------------
+-- ⚡ [Step 3-4] 【壁の目撃】INVALID になって残っている閲覧用フィルター枠(VIEW)を覗き込んでみる！
+-- -----------------------------------------------------------------------------
+SELECT * FROM v_emp_public;
+
+-- 【期待される画面出力（このエラーが出れば大成功！）】
+-- ORA-04063: view "BOLD.V_EMP_PUBLIC"にエラーがあります
+-- (ORA-04063: view "BOLD.V_EMP_PUBLIC" has errors)
+
+
+-- -----------------------------------------------------------------------------
+-- [Step 3-5] 本編実験のお片付け（クリーンアップして OS シェルへ戻る）
+-- -----------------------------------------------------------------------------
+DROP VIEW IF EXISTS v_emp_public;
+DROP USER IF EXISTS u1 CASCADE;
+DROP ROLE IF EXISTS staff_role;
+EXIT
+
+
+
+################################################################################
+# 🎁 おまけ実験（時間が余った方・自宅復習用）：SQL*Loader と Data Pump 自己完結デモ
+# ※ ここからは SQL*Plus を抜けた Linux OS（oracle ユーザーの $ プロンプト）に
+#    そのままブロックごと貼り付けて実行できます！
+################################################################################
+
+# ==============================================================================
+# 【おまけA】SQL*Loader (sqlldr：高速自動転記マシン) で外部CSV束から一括データ転記
+# ==============================================================================
+
+# 1. 転記先の台帳 (load_test) と Data Pump用ディレクトリ (dp_dir) を作成
+sqlplus bold/bold@freepdb1 << 'EOF'
+DROP TABLE IF EXISTS load_test;
+CREATE TABLE load_test (
+  id   NUMBER(4) PRIMARY KEY,
+  name VARCHAR2(20),
+  role VARCHAR2(20)
+);
+CREATE OR REPLACE DIRECTORY dp_dir AS '/tmp';
+EXIT
+EOF
+
+# 2. 外部データファイル (/tmp/members.csv：外部から届いた伝票束) をその場で自動生成
+cat << 'EOF' > /tmp/members.csv
+1,Sato,Infra
+2,Suzuki,Developer
+3,Takahashi,Manager
+EOF
+
+# 3. 制御ファイル (/tmp/members.ctl：どの区切りでどの記入欄に転記するかの指示書) を自動生成
+cat << 'EOF' > /tmp/members.ctl
+LOAD DATA
+INFILE '/tmp/members.csv'
+INTO TABLE load_test
+FIELDS TERMINATED BY ','
+(id, name, role)
+EOF
+
+# 4. SQL*Loader (sqlldr) を実行して外部CSVから台帳へ一括自動転記！
+sqlldr bold/bold@freepdb1 CONTROL=/tmp/members.ctl LOG=/tmp/members.log BAD=/tmp/members.bad
+
+# 5. 台帳（表）に3件のデータが転記されたことを確認！
+sqlplus -s bold/bold@freepdb1 << 'EOF'
+SET PAGESIZE 20
+SELECT * FROM load_test;
+EXIT
+EOF
+
+
+# ==============================================================================
+# 【おまけB】Oracle Data Pump (expdp / impdp：専用引っ越しコンテナ便) で論理バックアップ＆復元
+# ==============================================================================
+
+# 1. 3件データが入った load_test 台帳を Data Pump (expdp) で専用コンテナ (.dmp) に梱包・書き出し！
+expdp bold/bold@freepdb1 TABLES=load_test DIRECTORY=dp_dir DUMPFILE=load_test_bk.dmp LOGFILE=exp_load_test.log REUSE_DUMPFILES=YES
+
+# 2. /tmp 配下に Oracle専用バイナリのダンプファイル (.dmp) が作られたことを確認！
+ls -lh /tmp/load_test_bk.dmp
+
+# 3. わざと load_test 台帳を DROP TABLE で廃棄し、消滅した（ORA-00942）ことを確認！
+sqlplus -s bold/bold@freepdb1 << 'EOF'
+DROP TABLE load_test;
+SELECT * FROM load_test;
+EXIT
+EOF
+
+# 4. Data Pump (impdp) を使って、専用コンテナ (.dmp) から台帳とデータを丸ごと荷解き・復元！
+impdp bold/bold@freepdb1 TABLES=load_test DIRECTORY=dp_dir DUMPFILE=load_test_bk.dmp LOGFILE=imp_load_test.log
+
+# 5. 廃棄したはずの load_test 台帳と3件のデータが完全に復活したことを確認し、お片付け！
+sqlplus -s bold/bold@freepdb1 << 'EOF'
+SET PAGESIZE 20
+SELECT * FROM load_test;
+DROP TABLE IF EXISTS load_test;
+EXIT
+EOF
+rm -f /tmp/members.csv /tmp/members.ctl /tmp/members.log /tmp/members.bad /tmp/load_test_bk.dmp /tmp/exp_load_test.log /tmp/imp_load_test.log

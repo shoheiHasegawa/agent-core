@@ -8,16 +8,20 @@ data/*
 events/*
 !events/.gitkeep
 
-# 3. Agent Sandbox (唯一の公式作業領域)
+# 3. Agent Sandbox & Worktree Mounts
 scratch/
+workspaces/*/scratch/
+workspaces/*/worktrees/
 
-# 3.5 Tasks & States
-tasks/progress.md
-tasks/context.md
+# 4. Tasks & States
 *.db
 
-# 4. Python Caches & Logs
+# 5. Python Caches, Virtualenv & OS Files
+.venv/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 *.log
+.DS_Store
+*.pem
+*.key

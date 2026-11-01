@@ -26,12 +26,14 @@ def main():
             
             ws_name = ws_path.name
             index_path = ws_path / "_index.md"
+            agents_path = ws_path / "AGENTS.md"
             progress_path = ws_path / "tasks" / "progress.md"
             context_path = ws_path / "tasks" / "context.md"
 
-            # Check structural integrity
+            # Check structural integrity (allow either AGENTS.md or legacy _index.md)
             missing_files = []
-            if not index_path.exists(): missing_files.append("_index.md")
+            if not index_path.exists() and not agents_path.exists():
+                missing_files.append("AGENTS.md (or _index.md)")
             if not progress_path.exists(): missing_files.append("tasks/progress.md")
             if not context_path.exists(): missing_files.append("tasks/context.md")
 

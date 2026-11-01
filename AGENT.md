@@ -15,21 +15,17 @@ You_Incの司令塔（Orchestrator）として、ユーザーの抽象的な意�
 ## <jit_routing>
 司令塔として、必要な知識は以下のポインタから動的にロード（JIT）すること。
 - 会社のルール・戦略・指針: `second-brain/10_Areas/`
-- ドメインの設計ルール: `core-service/docs/rules/`
-- システム全体の構成図・データフロー: `agent-core/docs/architecture/`
-- **プロジェクト（Epic）とワークスペースの運用ルール**: `agent-core/docs/architecture/workspace_management.md`
-- **ツールの設計標準（JSON-First Protocol）**: `agent-core/docs/rules/tool_design_principles.md`
+- ドメインの設計ルール: `core-service/docs/agent_rules/`
+- システム全体の構成図・データフロー: `agent-core/docs/system/`
+- **プロジェクト（Epic）とワークスペースの運用ルール**: `agent-core/docs/system/workspace_management.md`
+- **ツールの設計標準（JSON-First Protocol）**: `agent-core/docs/agent_rules/tool_design_principles.md`
 - 各種テンプレート: `second-brain/90_Meta/Templates/`
 - **サブエージェント契約テンプレート**: `agent-core/docs/templates/Subagent_Prompt_Template.md`
 </jit_routing>
 
-## <workspace_awareness>
-現在のワークスペース（`play_ground/`）は、移行中の旧環境（`-legacy`）と新環境の3本柱（`agent-core`, `core-service`, `second-brain`）が並立している特別な状態である。
-</workspace_awareness>
-
 ## <execution_flow>
-- **【セッション管理（起動・終了）】**: セッション開始時、またはセッションを終了（中断）する際は、必ず `agent-core/skills/session-manager/SKILL.md` をロードし、記載された「イベント駆動ルーティング」および「Handoffプロトコル」に従って行動すること。
-- **【プロジェクト運用】**: 新しいプロジェクト（Epic）を開始する際、およびワークスペースを運用する際は、必ず `agent-core/docs/architecture/workspace_management.md` のルール（`_index.md`, `docs/`, `tasks/`, `scratch/` の構造化）に従うこと。
+- **【セッション管理（起動・終了）】**: セッション開始時、またはセッションを終了（中断）する際は、必ず `agent-core/skills/orchestrators/session-manager/SKILL.md` をロードし、記載された「イベント駆動ルーティング」および「Handoffプロトコル」に従って行動すること。
+- **【プロジェクト運用】**: 新しいプロジェクト（Epic）を開始する際、およびワークスペースを運用する際は、必ず `agent-core/docs/system/workspace_management.md` のルール（`_index.md`, `docs/`, `tasks/`, `scratch/` の構造化）に従うこと。
 
 ## <progress_and_playbook>
 - 【状態管理とコンテキスト・ハーネス】ワークスペースの進行管理は、マクロな手順書（Playbook）に基づいて行われる。
@@ -43,5 +39,5 @@ You_Incの司令塔（Orchestrator）として、ユーザーの抽象的な意�
 - **[メタ認知プロセス (オプション提示と可逆性評価)]**: エスカレーションや設計方針の提案を行う際は、単一の解決策ではなく必ず「Plan A（王道）」「Plan B（代替案）」「Do Nothing（何もしないリスク）」の3つの選択肢とトレードオフをセットで提示すること。
 - **[イタチごっこと不整合の防止 (多重防衛線)]**: コアシステム（コードやSKILL）を修正する前に、必ず「コード依存関係」と「関連するドキュメント（SSOT）」への**影響範囲（Impact Analysis）**を事前分析せよ。
 - **[Local Rule Override]**: 他リポジトリ（`second-brain`や`core-service`等）を操作する際は、必ずそのリポジトリ直下の `AGENT.md` をロードし、**当該リポジトリ内においてはそのローカルルールを最優先（agent-coreのルールをオーバーライド）して適用**すること。
-- ※ 具体的な実装制約（Dependency Injectionの作法や _index.md の配置ルールなど）は、`docs/rules/` および `docs/architecture/` 配下を参照すること。
+- ※ 具体的な実装制約（Dependency Injectionの作法や _index.md の配置ルールなど）は、`docs/agent_rules/` および `docs/system/` 配下を参照すること。
 </governance>

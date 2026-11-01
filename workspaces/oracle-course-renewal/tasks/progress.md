@@ -1,0 +1,42 @@
+# Progress: Oracle Course Renewal
+
+## タスク一覧
+
+- [x] **【次回セッション最優先】前任者の講義設計・意図・矛盾の監査分析（Opusサブエージェント）**
+  - [x] 24下期過去問アーカイブ (`docs/quiz_archive_24h2.md`) の完備
+  - [x] 25上期過去問アーカイブ (`docs/quiz_archive_25h1.md`) の完備
+  - [x] 全6回のスライド生データ (`sessions/session_01`〜`session_06`) の完備
+  - [x] **Opusによる深層分析**: 前任者は何を目指していたのか？どこに講義設計・出題・実務の矛盾や課題感があるのか？ (`docs/predecessor_audit_report.md`)
+  - [x] **方針決定の壁打ち**: 途中引き継ぎを踏まえ「2段階ロードマップ（今期第4〜6回＝大枠維持×『講義設計➔問題設計➔WHY/WHAT/HOW資料設計』のプロトタイプ実験）」に裁定
+- [x] **第3回 講義資料の作成 (緊急・最優先)**
+  - [x] スライド画像の受取とMarkdown・Mermaid抽出（SSOT化）
+  - [x] 構成、メタファー、ストーリーに関する壁打ち
+  - [x] 挿絵のテイスト決定（パターンC）と全体ガイドラインの策定
+  - [x] SSOT Markdown (`session_03_final.md`) と NotebookLM用プロンプトの出力
+- [x] **第4回 講義資料の作成（完了）**
+  - [x] 画像からの情報抽出（SSOT化） (`session_04/raw_extracted.md`)
+  - [x] 24下期過去問の抽出・アーカイブ完了 (`docs/quiz_archive_24h2.md` / `docs/quiz_archive_25h1.md`)
+  - [x] **Step 1（講義設計）& Step 2（問題設計）**: 120分シークエンス・全10トピック設計＆練習問題全20問（5問×4セット：本質編＋Oracle専門編、言い切り表現排除・高情報フィードバック付き）の確定 (`session_04/design_blueprint.md`, `session_04/quiz_set_25h1.md`)
+  - [x] **Step 3（資料・ハンズオン設計）**: WHY➔WHAT➔HOW構成＋統一メタファー（重要資料室とマイ本棚）＋中盤10分ストレッチ＆NSDRコーナー＋POE融合ハンズオン3実験（26ai日本語出力対応）＋コピペ用テキスト作成 (`session_04/handson_commands.txt`)
+  - [x] Opus Gate 1 独立監査 (`session_04/opus_review_report.md`) & 最終SSOT Markdown (`session_04/final_ssot.md`) / NotebookLM サンドイッチ方式3分割ソース＆プロンプト (`slide_part0_frame.md`, `slide_part1_ch7.md`, `slide_part2_ch8.md`, `notebook_prompt.txt`) / Google Forms 3フォーム＆社員番号KEY集計Dashboard自動生成GAS (`session_04/generate_session04_forms.gs`, `scripts/build_oracle_gas.py`) 出力完了
+- [ ] **第5回 講義資料の作成（次回ターゲット）**
+  - [x] 画像からの情報抽出（SSOT化） (`session_05/raw_extracted.md`)
+  - [x] 24下期過去問の抽出・アーカイブ完了 (`docs/quiz_archive_24h2.md` / `docs/quiz_archive_25h1.md`)
+  - [ ] 練習問題の再設計・最新化（24下期ベース）
+  - [ ] 構成、メタファー、ストーリーに関する壁打ち (Sonnet 5.5)
+  - [ ] 最終ブラッシュアップ・レビュー (Opus 5.5)
+  - [ ] SSOT Markdown と NotebookLM用プロンプト・HTML出力 (Gemini系)
+- [ ] 第6回 講義資料の作成
+  - [x] 画像からの情報抽出（SSOT化） (`session_06/raw_extracted.md` 完了)
+  - [ ] まとめテスト（ローカル試験形式・全20問・8割合格ボーダー）の設計（※`docs/quiz_archive_24h2.md` より厳選・リファクタリング）
+  - [ ] 総復習講義の構成、メタファー、ストーリーに関する壁打ち (Sonnet 5.5)
+  - [ ] 最終ブラッシュアップ・レビュー (Opus 5.5)
+  - [ ] SSOT Markdown と NotebookLM用プロンプト・HTML出力 (Gemini系)
+- [ ] 第1回 講義資料の作成 (リファクタリング)
+  - [x] 画像からの情報抽出（SSOT化） (`session_01/raw_extracted.md`)
+  - [ ] 構成、メタファー、ストーリーに関する壁打ち
+  - [ ] SSOT Markdown と NotebookLM用プロンプトの出力
+- [ ] 第2回 講義資料の作成 (リファクタリング)
+  - [x] 画像からの情報抽出（SSOT化） (`session_02/raw_extracted.md`)
+  - [ ] 構成、メタファー、ストーリーに関する壁打ち
+  - [ ] SSOT Markdown と NotebookLM用プロンプトの出力

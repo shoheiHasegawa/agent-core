@@ -6,7 +6,7 @@ agent-core/skills/ 配下の全 SKILL.md およびテンプレートの静的整
 1. YAML Frontmatter の検証: `name`, `description` が正しく存在すること。
 2. グローバル・スキーマ検証: 実行手順内に Action（アクション）タグが含まれていること。
 3. 立法と司法の分離（ハードコード防止）: compliance-reviewer が特定個別ルールを直書きしていないか。
-4. SSOT整合性検証: spec_template.md と core-service testing_strategy.md の6大観点定義の一致。
+4. SSOT整合性検証: spec_template.md と core-service testing_constraints.md の6大観点定義の一致。
 """
 
 import re
@@ -40,12 +40,12 @@ def audit_skill_file(skill_path: Path) -> list[str]:
     if skill_path.parent.name == "compliance-reviewer":
         if "Happy Path" in content or "Idempotency" in content:
             errors.append(
-                f"{skill_path.parent.name}/SKILL.md: Hardcoded domain rules detected in compliance-reviewer! Must dynamically extract rules from docs/rules/."
+                f"{skill_path.parent.name}/SKILL.md: Hardcoded domain rules detected in compliance-reviewer! Must dynamically extract rules from docs/agent_rules/."
             )
 
     # 4. Dead Link Check (JITロード対象ドキュメント等の実在チェック)
-    # skill_path: <repo_root>/agent-core/skills/<skill_name>/SKILL.md
-    repo_root = skill_path.parent.parent.parent.parent
+    # skill_path: <repo_root>/agent-core/skills/<role>/<skill_name>/SKILL.md
+    repo_root = skill_path.parent.parent.parent.parent.parent
     linked_paths = set(re.findall(r"agent-core/docs/[\w/.-]+", content))
     for p in linked_paths:
         target_file = repo_root / p
@@ -62,7 +62,7 @@ def verify_template_ssot(repo_root: Path) -> list[str]:
 
     errors = []
     spec_template = repo_root / "agent-core" / "docs" / "templates" / "spec_template.md"
-    testing_strategy = repo_root / "agent-core" / "docs" / "rules" / "sdd_tdd_heuristics.md"
+    testing_strategy = repo_root / "agent-core" / "docs" / "agent_rules" / "sdd_tdd_heuristics.md"
 
     dimensions = [
         "Happy Path",
@@ -77,7 +77,7 @@ def verify_template_ssot(repo_root: Path) -> list[str]:
         if dim not in template_content:
             errors.append(f"spec_template.md is missing dimension '{dim}'")
         if dim not in strategy_content:
-            errors.append(f"testing_strategy.md is missing dimension '{dim}'")
+            errors.append(f"testing_constraints.md is missing dimension '{dim}'")
 
     return errors
 
