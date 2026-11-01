@@ -6,8 +6,6 @@ authors = [{ name = "You_Inc", email = "info@example.com" }]
 requires-python = ">=3.11"
 dependencies = [
     "core-service",
-    "python-dotenv",
-    "sqlalchemy",
 ]
 
 [tool.uv.sources]

@@ -13,16 +13,10 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "core-service" },
-    { name = "python-dotenv" },
-    { name = "sqlalchemy" },
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "core-service", editable = "../core-service" },
-    { name = "python-dotenv" },
-    { name = "sqlalchemy" },
-]
+requires-dist = [{ name = "core-service", editable = "../core-service" }]
 
 [[package]]
 name = "certifi"
