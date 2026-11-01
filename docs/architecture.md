@@ -21,7 +21,7 @@ You_Inc のすべての組織構造・ルール・ツールは、以下の4つ�
    - **WHY**: 個別の失敗が起きるたびに手順書（SKILL）やルールに例外をパッチ追記し、ドキュメントが無限膨張して誰にも読まれなくなるのを防ぐため。
    - **原則**:
      - **Layer A — 薄い SKILL ([`skills/`](../skills/README.md))**: 各ロールの入出力契約・基本手順・停止条件のみを薄く定義する。
-     - **Layer B — 鋭い思考原則 ([`docs/rules/`](rules/thinking_os_and_loop_principles.md))**: `WHY ➔ WHAT ➔ HOW`、引き算ファースト、DDD/SOLID、2-Passループという抽象度の高い思考のOSを定義する。
+     - **Layer B — 鋭い思考原則 ([`docs/rules/`](rules/thinking_os_and_loop_principles.md))**: `WHY ➔ WHAT ➔ HOW`、目的ドリブンとWHYへの純化、DDD/SOLID、2-Passループという抽象度の高い思考のOSを定義する。
      - **Layer C — 厚い経験・前例ストック ([`docs/experiences/`](experiences/README.md))**: 現場で起きた具体的な失敗パターンや過去の社長判断（前例）を蓄積し、チームリーダーがタスクに応じて必要なものだけをピンポイントでJIT注入する。
 4. **「AIの推論（`agent-core`）」と「安定した機械（`core-service`）」の完全分離**:
    - **WHY**: 静的に検証できるチェックや定型業務をAIの推論（確率的動作）に委ねることによるコスト増と不安定さを排除するため。
@@ -121,7 +121,7 @@ sequenceDiagram
 「1周で完璧を目指して迷走する問題」と「レビュアーが無限に指摘を出して過品質になる問題」を防ぐため、[`thinking_os_and_loop_principles.md`](rules/thinking_os_and_loop_principles.md) に基づき以下の2段階ループを回す：
 1. **Phase 0（上流ゲート）**: `spec.md` の6大観点シナリオID（検査の分母）を固定する。**上流の `spec.md` における曖昧な表現は後続で100倍の手戻りを生む（ブルウィップ効果）ため、無条件で 🔴 `MUST` として即排除する**。
 2. **Pass 1（1周目：貫通 — Make it Work）**: 小バッチで全シナリオを一通り Green にする。🔴 `MUST` のみ即修正し、1周動かして見えた構造改善（🟡 `SHOULD`）は記録して Pass 2 へ送る。
-3. **Pass 2（2周目：全体俯瞰と引き算 — Make it Right）**: テスト防波堤が100%揃った状態で全体を俯瞰し、**「引き算ファースト（Delete ➔ Simplify ➔ Add）」** で不要コード削除・UseCase から Domain 層へのロジック抽出・🟡 `SHOULD` の一括解消を行う（🟢 `IMO` は切り捨てる）。
+3. **Pass 2（2周目：全体俯瞰と純化 — Make it Right）**: テスト防波堤が100%揃った状態で全体を俯瞰し、**「目的への純化（Purpose ➔ Delete ➔ Simplify ➔ Add）」** で不要パッチ削除・UseCase から Domain 層へのロジック抽出・🟡 `SHOULD` の一括解消を行う（🟢 `IMO` は切り捨てる）。
 4. **定量的完了条件（Exit Criteria）**: `make check-all` 終了コード `== 0`（Cov $\ge 90\%$、SDD差分 `0`） **かつ** 独立レビュアーの 🔴 `MUST == 0件`。
 5. **定量的異常停止条件（Circuit Breaker）**: **同一エラー連続失敗 `== 2回`**、**1バッチ往復上限 `== 3周`**、または **🔴 Tier 3（前例なしの仕様矛盾）発生** で即座に強制停止し、`tasks/context.md` に原因仮説とA/B案を書いてエスカレーションする。
 
@@ -135,7 +135,7 @@ sequenceDiagram
 - **Layer 3 (`workspaces/<epic>/AGENTS.md`)**: 個別Epicの Goal・DoD・ルーティングを保持する現場監督（`team-leader`）の常駐メモリ。
 
 ### 4.2 このアーキテクチャ自体のカイゼン規約（Change Protocol）
-運用を通じて新たな課題や改善点が見つかった際は、**「WHY ➔ WHAT ➔ HOW」** と **「引き算ファースト」** に従い、以下の優先順位で還流させる：
+運用を通じて新たな課題や改善点が見つかった際は、**「WHY ➔ WHAT ➔ HOW」** と **「目的ドリブンとWHYへの純化」** に従い、以下の優先順位で還流させる：
 1. **機械化できるか？（CI / Linter / CLI）**: 人間やAgentの注意力に頼らず、`core-service/tools/` や `agent-core/tools/` の静的検証スクリプトで自動検知できないか？
 2. **既存の思考原則に統合できるか？（[`docs/rules/`](rules/thinking_os_and_loop_principles.md)）**: ルール行数を増やすのではなく、既存の原則の表現を鋭くすることでカバーできないか？
 3. **具体的な失敗事例・前例か？（[`docs/experiences/`](experiences/README.md)）**: 現場固有のアンチパターンや社長の判断基準（Precedent）であれば、`[EXP-XX]` / `[PREC-XX]` として厚くストックする。
