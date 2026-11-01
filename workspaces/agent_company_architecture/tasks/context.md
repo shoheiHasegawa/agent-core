@@ -13,7 +13,7 @@
 
 ## 📌 完了サマリー (Final Verification Digest)
 1. **ドキュメント統廃合とSSOT昇格（引き算の達成）**:
-   - `agent-core/docs/` の旧 `system/`・`agent_rules/`・旧テンプレート（計22ファイル）を削除し、正本 [`docs/architecture.md`](../../docs/architecture.md)、思考原則 [`docs/rules/`](../../docs/rules/thinking_os_and_loop_principles.md)（2ファイル）、経験ストック [`docs/experiences/`](../../docs/experiences/README.md)（2ファイル）へ完全統合。
+   - `agent-core/docs/` の旧 `system/`・`agent_rules/`・旧テンプレート（計22ファイル）を削除し、正本 [`docs/architecture.md`](../../../docs/architecture.md)、思考原則 [`docs/rules/`](../../../docs/rules/thinking_os_and_loop_principles.md)（2ファイル）、経験ストック [`docs/experiences/`](../../../docs/experiences/README.md)（2ファイル）へ完全統合。
    - `core-service` も `INDEX.md`・`AGENT.md`・`docs/_index.md`・`docs/spec/` を整理し、`README.md` と `AGENTS.md` に一本化。
 2. **実サブエージェント協働（2-Passループ）による公式CLI実装と検証**:
    - `team-leader`（`2f05ff1a`, `Model="pro"`）が自らコードを書かず、`tdd-red-worker`（`64572896`, `flash`）➔ `tdd-green-worker`（`ec948bed`, `flash`）➔ `compliance-reviewer`（`788d34d8`, `pro`）を計4回起動。

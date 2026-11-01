@@ -20,7 +20,7 @@ type: Orchestrator
 ## 🛠️ 実行手順とループ定義 (HOW & 5 Loop Elements)
 
 ### Phase 0: 分母の事前固定と上流ゲート (Denominator Lock)
-1. `agent-core/docs/rules/thinking_os_and_loop_principles.md`（および [`spec_template.md`](../../docs/templates/spec_template.md)）の6大観点に基づき、対象機能の `spec.md` に満たすべき全シナリオID（例：`[SC-01]〜[SC-08]` ＝ **検査の分母**）を定義する。
+1. `agent-core/docs/rules/thinking_os_and_loop_principles.md`（および [`spec_template.md`](../../../docs/templates/spec_template.md)）の6大観点に基づき、対象機能の `spec.md` に満たすべき全シナリオID（例：`[SC-01]〜[SC-08]` ＝ **検査の分母**）を定義する。
 2. `compliance-reviewer`（またはセルフレビュー）で、**後続ワーカーが誤解する曖昧な表現・用語の揺れ（🔴 `MUST`）がゼロであること**を確認する（[EXP-03] 準拠）。
 3. `agent-core/docs/experiences/agent_antipatterns_and_precedents.md` から今回のタスクに関連する失敗パターンを選定し、ワーカーへの指示書に参照パスとして含める。
 
