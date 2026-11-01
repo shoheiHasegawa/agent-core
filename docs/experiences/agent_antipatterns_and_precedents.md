@@ -41,6 +41,12 @@
 - **対策（教訓）**:
   - `zk-distiller` はAI特有の平滑化された要約を避け、社長自身の言葉・具体例・対比構造（「一見〇〇に見えるが、実は△△である」）をそのまま核として残せ。
 
+### [EXP-07] チームリーダーの「自分で書いた方が早いバイアス」による委譲スキップと自己レビュー
+- **失敗の現象**: `team-leader` に実装タスクを委譲した際、リーダーがサブエージェント起動のオーバーヘッドを嫌い、自らテストと実装の両方を直接書いて自己レビューで完了報告してしまう（結果として情報隔離 `[EXP-01]` が破られ、確証バイアスが再発する）。
+- **対策（教訓）**:
+  - ドメインロジックや新規機能追加（SDD×TDD対象）では、`team-leader` が `.py` を直接編集することを禁じ、必ず `tdd-red-worker`（`Model="flash"`）と `tdd-green-worker`（`Model="flash"`）を起動させよ。
+  - また、いかなる場合も完了判定前には必ず別サブエージェントとして `compliance-reviewer`（`Model="pro"`）を起動させ、トランスクリプト上の `invoke_subagent` 実行証跡と `scratch/review_report.md` の出力をもって監査完了とせよ。
+
 ---
 
 ## Part 2: 社長の意思決定・アーキテクチャ判断の前例集 (Executive Precedents)
@@ -56,3 +62,9 @@
   - 社長個人の予定・期限付きタスク・ルーティンは **Google Calendar & Google Tasks**（スマホのGeminiアプリ＆iPhoneウィジェット連携）を正本とし、ローカルSQLiteでの人間タスク管理は行わない。
   - 会社（Agentチーム）が動く開発・改善課題は **GitHub Issues (`gh issue`)** を正本とする。
   - 思考メモ・着想の種は **Obsidian (`Mobile Vault` / `second-brain`)** を正本とする。
+
+### [PREC-03] Antigravity モデル枠（Argon vs Gemini Models）の最適配分
+- **判断基準（前例）**:
+  - `Gemini 4 Argon` は週次固定枠（5h回復なし）のため、ゼロからの重いアーキテクチャ設計時のみ親チャットで切り替えて使用する。
+  - 日常の秘書対話・壁打ちは親チャットの **`Flash (High)`** を基本とする。
+  - サブエージェント（`invoke_subagent`）は5時間ごとに高速回復する `Gemini Models` 枠をフル活用し、判断の要である `team-leader`・`compliance-reviewer`・`zk-distiller` には **`Model="pro"`**、実装ワーカー（`tdd-red/green-worker`）には **`Model="flash"`**、非破壊調査（`research-worker`）には **`Model="flash_lite"`** を割り当てる。

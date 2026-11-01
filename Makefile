@@ -1,8 +1,19 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-list validate-skills validate-orphans validate-cleanliness validate-links check-all
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-list zk-audit vault-peek validate-skills validate-orphans validate-cleanliness validate-links check-all
 
 EPIC ?=
 REPOS ?= core-service
 ISSUE ?=
+CORE_SERVICE_DIR ?= ../core-service
+ENV_FILE ?= config/conf.env
+
+# ---------------------------------------------------------
+# Official core-service CLI Wrappers (Stateless Execution)
+# ---------------------------------------------------------
+zk-audit:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main zk-audit
+
+vault-peek:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main vault-peek
 
 # ---------------------------------------------------------
 # Workspace & Worktree Harness (方式A)

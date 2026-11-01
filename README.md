@@ -36,6 +36,10 @@ make ws-list
 # 3. Epic完了時のWorktreeアンマウントと一時ファイル掃除（PR回収準備）
 make ws-harvest EPIC=<name>
 
-# 4. 本社リポジトリの品質ゲート一括実行（SKILL構文・クリーンネス・孤立スクリプト・リンク検証）
+# 4. core-service 公式CLIの実行（Zettelkasten 監査・Mobile Vault 確認）
+make zk-audit
+make vault-peek
+
+# 5. 本社リポジトリの品質ゲート一括実行（SKILL構文・クリーンネス・孤立スクリプト・リンク検証）
 make check-all
 ```
