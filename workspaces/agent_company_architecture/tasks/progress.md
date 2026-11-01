@@ -24,4 +24,4 @@
     - `[x]` `agent-core/app_context.py` および旧SQLite用 `tools/`・`jobs/` の完全廃止（-1,102行の引き算達成）
     - `[x]` `team-leader (pro)` ➔ `tdd-red-worker (flash)` ➔ `tdd-green-worker (flash)` ➔ `compliance-reviewer (pro)` の実サブエージェント起動（計4回）により、`core-service/src/entrypoints/cli/main.py` を2-Passスパイラルループで実装・監査パス（169 tests passed, Cov 93.99%, MUST=0, SHOULD=0）
     - `[x]` `core-service` / `agent-core` の独立 GitHub Actions CI（`.github/workflows/ci.yml`）配置完了
-- `[x]` **Phase 6: クローズ・`main` マージ・Worktree回収 (`make ws-harvest`) と3点内省ブリーフィング**
+- `[ ]` **Phase 6: 最終クローズ（Issue起票ルールの確定・やり残し課題のIssue起票・`second-brain` への内省蒸留）** 👈 Next Session!

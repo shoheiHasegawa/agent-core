@@ -8,13 +8,18 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus / Handoff Point)
-- **残作業の仕上げ（① `workspace_manager.py` の `ws-harvest` 時における `review_report.md` 存在・`PASS` 判定の機械的強制、② `second-brain/` の `README.md` / `AGENTS.md` 統一、③ 達成済み旧バックログの削除）** もすべて完了。
-- これにて新体制の初期構築は完全クローズ。社長と「今回の気づきの `second-brain` 蒸留」または「実務 Issue 起票」へ進む。
+- アーキテクチャ実装・`main` マージ・Worktree回収・Timeless SSOT化・Linter仕組み化まで100%完了。
+- **次セッションでの最終クローズ条件（残り3ステップ）**:
+  1. **GitHub Issue 起票ルールの壁打ち・定義**: どこのリポジトリに、どの粒度・フォーマット（`WHY ➔ WHAT [DoD] ➔ HOW`）で起票し、どう `backlog/` と使い分けるかを合意する。
+  2. **やり残し課題の実際の Issue 起票 (`gh issue create`)**:
+     - 候補①：`core-service` 内の旧 SQLite タスク管理ドメイン（`task_operations` / `daily_planning` / `agent_task`）の引き算整理
+     - 候補②：OSレベル完全隔離サンドボックス（Docker / DevContainer）対応
+     - 候補③：PC（Antigravity 秘書）からの Google Calendar / Tasks 直接連携
+  3. **クローズ時の知識蒸留（ルートB — `second-brain`）**:
+     - 今回の社長の核心的気づき（`WHY ➔ WHAT ➔ HOW` の思考の型、引き算ファースト、ブラックボックス化を防ぐ内省タッチポイント、上流の曖昧さのブルウィップ効果と2-Passループ）を壁打ちして Permanent Note / Sense Making Note へ蒸留する。
 
-## 📌 完了サマリー (Final Verification Digest)
-1. **`docs/architecture.md` の Timeless SSOT 化**:
-   - 移行期の時系列ノイズ（ステータス、旧19スキル廃止、Step 1〜4ロードマップ）を全削除し、冒頭にドキュメント自身の **WHY（①会社の現在地の俯瞰・ブラックボックス化防止、②将来のカイゼン時のベースライン）** を明記。
-   - **1. WHY（4大設計思想）➔ 2. WHAT（4層組織図・前例3段階トリアージ・SoR境界）➔ 3. HOW（4大業務フローのシーケンス図・2-Passループ）➔ 4. カイゼン規約** の構造へ刷新。
-   - アジャイル段階移行のノウハウは [`agent_antipatterns_and_precedents.md`](../../../docs/experiences/agent_antipatterns_and_precedents.md) の **`[PREC-04]`** として経験ストックへ移管。
-2. **思考のOSへの `WHY ➔ WHAT ➔ HOW` 原則のインストール**:
-   - [`thinking_os_and_loop_principles.md`](../../../docs/rules/thinking_os_and_loop_principles.md) の第0章に「思考の最上位アルゴリズム：`WHY ➔ WHAT ➔ HOW` の順序原則（HOWへの飛びつき禁止・全ドキュメントへのWHY明記鉄則）」を追加し、他文書（[`zettelkasten_and_dialog_principles.md`](../../../docs/rules/zettelkasten_and_dialog_principles.md), [`AGENTS.md`](../../../AGENTS.md), [`README.md`](../../../README.md), [`core-service/docs/architecture.md`](../../../../core-service/docs/architecture.md)）もすべて `WHY ➔ WHAT ➔ HOW` 構造に統一。
+## 📌 完了済み基盤サマリー
+- **3リポジトリ統一 & Timeless SSOT**: `agent-core`, `core-service`, `second-brain` すべてで `README.md` / `AGENTS.md` / [`docs/architecture.md`](../../../docs/architecture.md) を `WHY ➔ WHAT ➔ HOW` 構造に統一。
+- **機械的ガードレール**:
+  - [`audit_skills.py`](../../../tools/audit_skills.py): 正本ドキュメントの `WHY` 欠如および時系列ノイズ混入を pre-commit / `make check-all` で自動ブロック。
+  - [`workspace_manager.py`](../../../tools/workspace_manager.py): `make ws-harvest` 時に独立レビュアーの `scratch/review_report.md` (`PASS`) が無ければ回収を物理拒否。
