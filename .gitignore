@@ -1,6 +1,8 @@
 # 1. Environment & Credentials
 config/secret.env
 config/credentials.json
+config/client_secret.json
+config/token.json
 
 # 2. Runtime Data & Queues
 data/*
