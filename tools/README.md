@@ -8,6 +8,7 @@
 | ツール名 | 種別 | 目的 (What / Why) |
 | :--- | :--- | :--- |
 | [`workspace_manager.py`](workspace_manager.py) | Harness | Epic Workspace および Git Worktree（`ws-new`, `ws-harvest`, `ws-list`）の管理 |
+| [`authenticate_google.py`](authenticate_google.py) | Auth | Google Tasks & Calendar API の初回 OAuth 2.0 認可ワンショットスクリプト |
 | [`audit_skills.py`](audit_skills.py) | Audit | `skills/` 配下の全 `SKILL.md` の構文・リンク整合性検証 |
 | [`audit_orphan_scripts.py`](audit_orphan_scripts.py) | Audit | どこからも参照されていない孤立スクリプト・テンプレートの監査検知 |
 | [`verify_cleanliness.py`](verify_cleanliness.py) | Audit | Agent OS の物理的クリーンネス（Leave No Trace, `context.md` 行数制限）の機械的検証 |
