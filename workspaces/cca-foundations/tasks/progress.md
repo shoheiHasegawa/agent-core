@@ -1,0 +1,34 @@
+# Epic Workspace Progress: cca-foundations
+
+## 📋 タスクリスト (Sub-Issues)
+- [x] **#7: [Setup] CCA-F 現場ワークスペース立ち上げ & 🔴 MUSTトピックのインデックス網羅**
+  - [x] GitHub Epic `#6` および Sub-Issues `#7`〜`#13` の一括起票
+  - [x] 現場ワークスペース `workspaces/cca-foundations/` の初期化
+  - [x] 正本ドキュメント `docs/spec.md` の策定（哲学・SMART・ループ設計・社長のメガネ）
+  - [x] 5大ドメインのトピックインデックス（`docs/topic_index.md`）の網羅策定（🔴 MUST 15項目 / 🟡 SHOULD 10項目）
+  - [x] ELT前処理パイプライン（`tools/build_cleaned_packs.py`）作成 ＆ 5大Cleaned Pack生成
+  - [x] カバレッジ監査レポート（`docs/coverage_report.md`）で全25項目（100%）の網羅検証完了
+- [ ] **#8: [Phase 1: Pass 1] 🔴 MUST概念のソクラテス壁打ち ＆ second-brain 結晶化**
+  - [ ] Domain 1: Agent Architecture（🔴 MUST 3項目）の壁打ち
+  - [ ] Domain 2: Tool & MCP（🔴 MUST 3項目）の壁打ち
+  - [ ] Domain 3: Claude Code（🔴 MUST 3項目）の壁打ち
+  - [ ] Domain 4: Prompt & Structured Output（🔴 MUST 3項目）の壁打ち
+  - [ ] Domain 5: Context & Reliability（🔴 MUST 3項目）の壁打ち
+  - [ ] `second-brain/40_Permanent_Notes/` にアトミックノート蓄積（目標10〜15本以上）
+- [ ] **#9: [Phase 1: Ear] NotebookLM環境構築（音声解説・マインドマップ・フラッシュカード）による耳学習反復**
+  - [ ] 5つのCleaned PacksのNotebookLM投入
+  - [ ] 日本語ポッドキャスト（音声解説）生成 ＆ 3周聴了
+  - [ ] フラッシュカード・マインドマップの生成 ＆ スキマ時間活用
+- [ ] **#10: [Milestone] Pearson VUE 12月中旬本番受験の予約・確定**
+  - [ ] 12月中旬（12/12〜12/16頃）の受験日確定・決済
+- [ ] **#11: [Phase 2: Pass 2] Udemy英語模試反復 ＆ 🟡 SHOULD（Delta）の壁打ち深掘り**
+  - [ ] Udemy英語模擬試験の実施（初見 75%目標）
+  - [ ] 誤答（Delta）の壁打ち ＆ Permanent Notes 更新
+  - [ ] 連続2回 90%以上 ＆ 1問平均90秒以内の達成
+- [ ] **#12: [Phase 3] CCA-F 本番受験 ＆ 合格達成**
+  - [ ] Pearson VUE 本番受験
+  - [ ] スコア 720点以上で合格 🎉
+- [ ] **#13: [Asset] NotebookLM Studio連携による「勉強会パッケージ」のドキュメント化**
+  - [ ] Permanent Notes の NotebookLM 投入
+  - [ ] Studio（スライド・レポート）による勉強会プレゼン原案出力
+  - [ ] 「AI資格ハック学習フレームワーク」として手順のドキュメント化
