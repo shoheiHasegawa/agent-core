@@ -25,10 +25,30 @@ type: Orchestrator
 - 🟡 **Tier 2（前例の応用・軽微な選択）**: 「過去の〇〇の原則に照らすと【案A（推奨）】が整合的です。案Aで進めてよいですか？」と根拠込みで1タップ承認を求める。
 - 🔴 **Tier 3（初めての判断・前例なし）**: 「前例のない初めての判断です」と明示し、Plan A / Plan B のトレードオフを提示して社長の事前承認を得る（決定事項は必ず `agent-core/docs/experiences/agent_antipatterns_and_precedents.md` へ追記させる）。
 
-### 2. 作戦会議・タスク振り分けとチーム起動
-1. **個人の予定・期限タスク**: Google Calendar & Google Tasks へ整理する。
-2. **会社（Agentチーム）の課題**: `gh issue create` で目的（WHY）と完了条件（DoD）を明記して起票する。
-3. **現場の立ち上げ**: `make ws-new EPIC=<epic_name> REPOS=<target_repos> ISSUE=<num>` を実行して隔離 Worktree を生成し、`team-leader` へ作業を委譲する。
+### 2. 週次作戦会議・タスク同期とチーム起動 (Weekly Planning & Tasks Sync)
+
+#### A. 日曜起点・土曜作戦会議 (System Saturday Planning)
+毎週土曜日に社長と次週の作戦会議を実施し、日曜日からのロケットスタートを準備する：
+1. **固定予定の把握**:
+   - `make calendar-events ARGS="--start-date <YYYY-MM-DD> --end-date <YYYY-MM-DD>"` で次週のカレンダー固定予定（Fixed Time）を把握する。
+2. **未整理タスクの棚卸し**:
+   - `make tasks-list ARGS="--list Inbox"` で出先・スマホから放り込まれた未整理タスクを取得する。
+3. **3-3-3 Method に基づくトリアージ**:
+   - ⭐️ **`[Must]`（最大3件）**: その日の最重要タスク。計画日（`planned_date`）を設定して昇格（`make tasks-update ARGS="--task-id <id> --planned-date <YYYY-MM-DD> --target-list Must"`）。※カレンダー終日枠に表示されるのは Must のみ。
+   - 📌 **`[Should]`（最大3件）**: 余力があれば着手するタスク。カレンダー視認性を守るため期日は付けずに配置。
+   - 🔧 **`[Maintenance]`**: 定常ルーティンや30分未満の小用。
+4. **締め切り前倒し（Hard Deadline vs Planned Date）**:
+   - メモ内の絶対締切（`[deadline: YYYY-MM-DD]`）に対して、当日にパンクしないよう計画日を前倒し逆算配置する。
+
+#### B. 日常のタスク操作 (Daily Operations)
+- タスク一覧: `make tasks-list ARGS="--planned-date <YYYY-MM-DD>"` または `make tasks-list ARGS="--list Must"`
+- タスク登録: `make tasks-add ARGS="--title '<title>' --list '<list>' [--planned-date <YYYY-MM-DD>] [--hard-deadline <YYYY-MM-DD>] [--notes '<notes>]"`
+- タスク完了: `make tasks-complete ARGS="--task-id '<id>' --list '<list>'"`
+- タスク更新: `make tasks-update ARGS="--task-id '<id>' [--title '<title>'] [--target-list '<list>']"`
+
+#### C. 会社（Agentチーム）の課題と現場起動
+1. **会社の課題**: `gh issue create` で目的（WHY）と完了条件（DoD）を明記して起票する。
+2. **現場の立ち上げ**: `make ws-new EPIC=<epic_name> REPOS=<target_repos> ISSUE=<num>` を実行して隔離 Worktree を生成し、`team-leader` へ作業を委譲する。
 
 ### 3. クローズ時の「PR起票・3点内省ブリーフィング」と現場更地化
 チームリーダーから完了報告（独立レビューPASS）を受けた際、単なる「終わりました」で済まさず、以下の手順を厳格に完遂せよ：
@@ -42,3 +62,8 @@ type: Orchestrator
    - 社長がPR内容とブリーフィングを確認し、マージを承認する。
 3. **ワークスペース更地化 (`make ws-clean`)**:
    - マージ後、ローカルに残った `workspaces/<epic_name>/` ディレクトリを完全削除（`git rm -rf`）せよ。ローカルに過去のアーカイブフォルダを残すことを禁ずる（`[PREC-05]`）。
+
+---
+
+## 📚 関連リファレンス (References)
+- 📱 スマホ出張秘書プロンプト仕様: [`references/mobile_gemini_prompt_guide.md`](references/mobile_gemini_prompt_guide.md)

@@ -1,10 +1,11 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek validate-skills validate-orphans validate-cleanliness validate-links check-all
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events validate-skills validate-orphans validate-cleanliness validate-links check-all
 
 EPIC ?=
 REPOS ?= core-service
 ISSUE ?=
 CORE_SERVICE_DIR ?= ../core-service
 ENV_FILE ?= config/conf.env
+ARGS ?=
 
 # ---------------------------------------------------------
 # Official core-service CLI Wrappers (Stateless Execution)
@@ -14,6 +15,21 @@ zk-audit:
 
 vault-peek:
 	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main vault-peek
+
+tasks-list:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main tasks-list $(ARGS)
+
+tasks-add:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main tasks-add $(ARGS)
+
+tasks-complete:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main tasks-complete $(ARGS)
+
+tasks-update:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main tasks-update $(ARGS)
+
+calendar-events:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main calendar-events $(ARGS)
 
 # ---------------------------------------------------------
 # Workspace & Worktree Harness (方式A)

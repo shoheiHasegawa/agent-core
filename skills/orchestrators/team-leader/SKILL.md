@@ -47,5 +47,5 @@ type: Orchestrator
   - 停止時は `tasks/context.md` に「①停止理由、②原因仮説、③A/B選択肢」を記載して秘書・社長へエスカレーションせよ。
 
 ### Phase 3: クローズ・学習還流（ルートA）と PR 回収
-1. 作業中に `tasks/lessons_learned.md` に記録された技術的な学び（ルートA）を、①Linter/CI、②`docs/rules/`、③`docs/experiences/`、④`SKILL.md` のいずれかへ自律的に反映してコミットする。
+1. 作業中に `tasks/lessons_learned.md` に記録された技術的な学び（ルートA）を、①Linter/CI、②`docs/rules/`、③`docs/experiences/`、④`SKILL.md` のいずれかへ自律的に反映してコミットする。（※成果物としての正本ドキュメントは必ず worktree 内に配置して PR 対象に含めること。使い捨ての workspace に置くことを禁ずる `[EXP-08]`）
 2. 各 Worktree でブランチを Push して `gh pr create` で PR を作成し、`make ws-harvest EPIC=<name>` を実行した上で、秘書（または社長）へ **3点内省ブリーフィング** 用のサマリーを報告する。
