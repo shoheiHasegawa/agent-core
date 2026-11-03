@@ -96,6 +96,17 @@
     3. 社長承認で PR をマージする。
     4. マージ後に `make ws-clean` でワークスペースディレクトリを完全削除し、ローカルを常に「作業中の現場のみ」に保つ。
 
+### [PREC-06] `second-brain` の二刀流運用（日常 Direct Push vs トピック Worktree/PR）
+- **判断基準（前例）**:
+  - `second-brain` に対する「全面的な直接Push禁止」は、思考の摩擦（認知コスト）を増大させ、Obsidianとの同期断絶やロングブランチでのコンフリクトを招くため採用しない（引き算ファースト）。
+  - 代わりに、**作業の性質に応じた二刀流運用** を徹底する：
+    1. **日常モード（Direct Push）**:
+       - 対象: 日常の殴り書き（Inbox）、単発ノートの追記・タイポ修正、単発の Permanent Note 登録。
+       - 運用: 思考の摩擦ゼロと即時性を最優先とし、`main` へ直接コミット＆プッシュ（Conventional Commits 必須）。
+    2. **トピック / Epicモード（Worktree & PR）**:
+       - 対象: 体系的学習（`cca-foundations` 等の集中蒸留）、大掃除・バックログ消化（Inbox棚卸し）、構造改革（全ノートフォーマット変更等）。
+       - 運用: GitHub Issue を起票し、`make ws-new EPIC=<name> REPOS=second-brain ISSUE=<num>` で隔離 Worktree を作成。作業完了時に PR（3点ブリーフィング付き）を作成し、即時マージ ＆ `make ws-clean` で更地化して史実を恒久アーカイブする。
+
 ---
 
 ## 3. Google Tasks & Calendar 連携と組織アーキテクチャ刷新の学び（Issue #3）

@@ -48,7 +48,7 @@ type: Orchestrator
 
 #### C. 会社（Agentチーム）の課題と現場起動
 1. **会社の課題**: `gh issue create` で目的（WHY）と完了条件（DoD）を明記して起票する。
-2. **現場の立ち上げ**: `make ws-new EPIC=<epic_name> REPOS=<target_repos> ISSUE=<num>` を実行して隔離 Worktree を生成し、`team-leader` へ作業を委譲する。
+2. **現場の立ち上げ**: `make ws-new EPIC=<epic_name> REPOS=<target_repos> ISSUE=<num>` を実行して隔離 Worktree を生成し、`team-leader` へ作業を委譲する（※`REPOS` には `core-service`, `agent-core` に加え、トピック単位の蒸留・大掃除では `second-brain` も指定可能 — `[PREC-06]`）。
 
 ### 3. クローズ時の「PR起票・3点内省ブリーフィング」と現場更地化
 チームリーダーから完了報告（独立レビューPASS）を受けた際、単なる「終わりました」で済まさず、以下の手順を厳格に完遂せよ：
