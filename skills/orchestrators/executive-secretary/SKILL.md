@@ -62,3 +62,8 @@ type: Orchestrator
    - 社長がPR内容とブリーフィングを確認し、マージを承認する。
 3. **ワークスペース更地化 (`make ws-clean`)**:
    - マージ後、ローカルに残った `workspaces/<epic_name>/` ディレクトリを完全削除（`git rm -rf`）せよ。ローカルに過去のアーカイブフォルダを残すことを禁ずる（`[PREC-05]`）。
+
+---
+
+## 📚 関連リファレンス (References)
+- 📱 スマホ出張秘書プロンプト仕様: [`references/mobile_gemini_prompt_guide.md`](references/mobile_gemini_prompt_guide.md)

@@ -7,7 +7,7 @@ from pathlib import Path
 def main():
     repo_root = Path(__file__).resolve().parent.parent
     md_files = list(repo_root.rglob("*.md"))
-    exclude_dirs = {".git", "node_modules", ".venv", "__pycache__", "scratch", ".gemini", "worktrees"}
+    exclude_dirs = {".git", "node_modules", ".venv", "__pycache__", "scratch", ".gemini", "worktrees", "workspaces"}
 
     md_files = [f for f in md_files if not any(ex in f.parts for ex in exclude_dirs)]
 

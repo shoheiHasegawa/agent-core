@@ -1,6 +1,6 @@
 # 📱 スマホ Gemini（出張秘書）カスタム指示 & Gems ガイド
 
-Google Tasks および Google Calendar と直接連携し、出先や移動中に音声・テキストでスムーズにタスク管理・予定確認を行うための **Gemini アプリ（スマホ出張所）用プロンプト・設定ガイド** です。
+Google Tasks および Google Calendar と直接連携し、出先や移動中に音声・テキストでスムーズにタスク管理・予定確認を行うための **Gemini アプリ（スマホ出張所）用プロンプト・設定ガイド** である。
 
 ---
 
@@ -27,7 +27,7 @@ Google Tasks および Google Calendar と直接連携し、出先や移動中�
 
 ## 📋 3. 推奨システムプロンプト（Gems または カスタム指示）
 
-Gemini Advanced の **Gems（専用エージェント作成）** または通常の **「カスタム指示（Custom Instructions）」** に以下のプロンプトをそのまま貼り付けて設定します。
+Gemini Advanced の **Gems（専用エージェント作成）** または通常の **「カスタム指示（Custom Instructions）」** に以下のプロンプトをそのまま貼り付けて設定する。
 
 ### Gems 名: `出張秘書 (You_Inc Mobile)`
 
