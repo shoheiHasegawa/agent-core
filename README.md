@@ -20,7 +20,6 @@
 | [`tools/`](tools/README.md) | Worktree管理（[`workspace_manager.py`](tools/workspace_manager.py)）およびリポジトリ品質ゲート用Linter群 |
 | `config/` | 環境設定（`conf.env`）および SOPS 暗号化された機密情報（`secret.env`）の保管庫 |
 | `workspaces/` | Epic単位の作業空間。内部の `worktrees/<repo>/`（`.gitignore` 対象）に各リポジトリのブランチをマウントして隔離開発を行う |
-| `backlog/` | 長期構想・バックログメモの保管庫（日常の課題管理は GitHub Issues を正本とする） |
 | `scratch/` | 一時ファイル用サンドボックス（作業完了時に破棄） |
 
 ---

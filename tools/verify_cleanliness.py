@@ -83,7 +83,7 @@ def main():
         results["violations"].append({
             "type": "legacy_epics_dir",
             "file": "epics/",
-            "message": "The epics/ directory is deprecated. Use backlog/ or workspaces/ instead."
+            "message": "The epics/ directory is deprecated. Use GitHub Issues and workspaces/ instead."
         })
 
     if results["violations"]:
