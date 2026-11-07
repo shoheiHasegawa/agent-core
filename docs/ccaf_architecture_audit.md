@@ -106,9 +106,22 @@ CCA-F Pack 1 の第一原則は **「Start with simple workflows before escalati
 
 ---
 
-## 6. 後続タスク（Sub-Issues）の確定仕様と起票ドラフト
+## 6. 後続タスク（Sub-Issues）の確定仕様と GitHub 復旧時同期キュー `[PENDING_GITHUB_SYNC]`
 
-GitHub API 復旧後に即座に起票・着手できるよう、後続の実装タスクを以下の2つの Sub-Issue（Issue #2 精緻化 ＋ Phase 3 統合レール構築）として完全に仕様化した。
+> [!IMPORTANT]
+> **🔄 `[PENDING_GITHUB_SYNC]` (GitHub API 復旧後の反映手順)**:
+> 2026-11-07 時点で GitHub API (`gh`) が一時停止中のため、以下の Issue 更新・起票内容を本正本に完全な形で記録している（`tools/verify_cleanliness.py` が本マーカー `[PENDING_GITHUB_SYNC]` を検知し、GitHub 反映が完了して本マーカーを削除するまで `make check-all` 実行時に常時リマインドを表示する）。
+> GitHub 復旧時は以下の `gh` コマンドを実行して Issue へ反映し、反映後に本ブロックのマーカーを `[SYNCED_TO_GITHUB]` へ変更せよ：
+> ```bash
+> # 1. 親Epic #14 へ本監査レポートと3点ブリーフィングを記録
+> gh issue comment 14 --body "CCA-F アーキテクチャ適合性監査（Step 1〜4）および正本更新が完了しました。詳細は agent-core/docs/ccaf_architecture_audit.md およびコミット履歴を参照してください。"
+>
+> # 2. Issue #2 (OSレベル完全隔離サンドボックス) の仕様を確定版で更新
+> gh issue edit 2 --title "[Security/Harness] OSレベル完全隔離サンドボックス (sandbox-exec) と最小権限ハーネスの構築" --body "$(sed -n '/### 🛡️ Sub-Issue A/,/### ⚙️ Sub-Issue B/p' docs/ccaf_architecture_audit.md)"
+>
+> # 3. Phase 3 (構造化CLI・Verdict機械検証・アンチパターンLinterレール) を新規起票
+> gh issue create --title "[Architecture/Rail] CCA-F アンチパターン検知 Linter・構造化 CLI・自動検問所（Git Hook & Harness）の実装" --body "$(sed -n '/### ⚙️ Sub-Issue B/,$p' docs/ccaf_architecture_audit.md)"
+> ```
 
 ---
 
