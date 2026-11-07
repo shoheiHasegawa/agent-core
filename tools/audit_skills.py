@@ -4,9 +4,9 @@ audit_skills.py
 
 agent-core/skills/ 配下の全 SKILL.md およびテンプレートの静的整合性を検証するLinterです。
 1. YAML Frontmatter の検証: `name`, `description` が正しく存在すること。
-2. グローバル・スキーマ検証: 実行手順内に Action（アクション）タグが含まれていること。
+2. 最大行数検証 (Thin Skill 原則): SKILL.md は80行以内であること。
 3. 立法と司法の分離（ハードコード防止）: compliance-reviewer が特定個別ルールを直書きしていないか。
-4. SSOT整合性検証: spec_template.md と core-service testing_constraints.md の6大観点定義の一致。
+4. SSOT整合性検証: 憲法 GEMINI.md のルートと agent-core の同一性検証、正本ドキュメントの WHY 記述検証。
 """
 
 import re
@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 REQUIRED_FRONTMATTER = ["name", "description"]
+MAX_SKILL_LINES = 80
 
 
 def audit_skill_file(skill_path: Path) -> list[str]:
@@ -33,8 +34,12 @@ def audit_skill_file(skill_path: Path) -> list[str]:
                 if not re.search(rf"^{req}\s*:", fm_text, re.MULTILINE):
                     errors.append(f"{skill_path.parent.name}/SKILL.md: Missing required frontmatter field '{req}'.")
 
-    # 2. Schema Check: Action タグが含まれているか (撤廃)
-    # HOWの強制を避けるため、具体的なActionタグの必須チェックは行わない。
+    # 2. Line Limit check (Thin Skill principle: <= 80 lines)
+    line_count = len(content.splitlines())
+    if line_count > MAX_SKILL_LINES:
+        errors.append(
+            f"{skill_path.parent.name}/SKILL.md: Line count ({line_count}) exceeds limit of {MAX_SKILL_LINES} lines (Thin Skill principle violation)."
+        )
 
     # 3. Hardcoding Check (特定の個別ルール列挙のハードコード検知)
     if skill_path.parent.name == "compliance-reviewer":
@@ -51,6 +56,38 @@ def audit_skill_file(skill_path: Path) -> list[str]:
         target_file = agent_core_root / rel_p
         if not target_file.exists():
             errors.append(f"{skill_path.parent.name}/SKILL.md: Dead link detected: '{p}' does not exist.")
+
+    return errors
+
+
+def verify_gemini_identity(agent_core_root: Path, root_gemini_path: Path | None = None) -> list[str]:
+    """
+    リポジトリ最上位ルートの GEMINI.md と agent-core/GEMINI.md が完全一致することを検証する。
+    """
+    errors = []
+    if root_gemini_path is None:
+        for p in agent_core_root.parents:
+            if (p / "GEMINI.md").exists() and (p / "agent-core").is_dir():
+                root_gemini_path = p / "GEMINI.md"
+                break
+        if root_gemini_path is None:
+            root_gemini_path = agent_core_root.parent / "GEMINI.md"
+
+    agent_gemini = agent_core_root / "GEMINI.md"
+
+    if not root_gemini_path.exists():
+        errors.append(f"Root GEMINI.md not found at {root_gemini_path}")
+    if not agent_gemini.exists():
+        errors.append(f"agent-core/GEMINI.md not found at {agent_gemini}")
+
+    if not errors:
+        root_content = root_gemini_path.read_text(encoding="utf-8")
+        agent_content = agent_gemini.read_text(encoding="utf-8")
+        if root_content != agent_content:
+            errors.append(
+                f"GEMINI.md mismatch between root ({root_gemini_path}) and agent-core ({agent_gemini})! "
+                "Global Constitution must be completely identical across both locations."
+            )
 
     return errors
 
@@ -115,7 +152,11 @@ def main():
         errs = audit_skill_file(skill_file)
         all_errors.extend(errs)
 
-    # 2. Audit SSOT Documents (WHY -> WHAT -> HOW & Timeless SSOT)
+    # 2. Audit GEMINI.md Identity
+    gemini_errs = verify_gemini_identity(agent_core_root)
+    all_errors.extend(gemini_errs)
+
+    # 3. Audit SSOT Documents (WHY -> WHAT -> HOW & Timeless SSOT)
     ssot_errs = verify_ssot_docs(agent_core_root)
     all_errors.extend(ssot_errs)
 

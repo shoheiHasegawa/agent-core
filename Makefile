@@ -1,4 +1,4 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events validate-skills validate-orphans validate-cleanliness validate-links check-all
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
 
 EPIC ?=
 REPOS ?= core-service
@@ -31,6 +31,9 @@ tasks-update:
 calendar-events:
 	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main calendar-events $(ARGS)
 
+brief-saturday:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main saturday-briefing $(ARGS)
+
 # ---------------------------------------------------------
 # Workspace & Worktree Harness (方式A)
 # ---------------------------------------------------------
@@ -48,6 +51,16 @@ ws-clean:
 
 ws-list:
 	@uv run python tools/workspace_manager.py list
+
+# ---------------------------------------------------------
+# Git Hook Installation
+# ---------------------------------------------------------
+install-hooks:
+	@HOOKS_DIR=$$(git rev-parse --git-path hooks); \
+	mkdir -p "$$HOOKS_DIR" && \
+	cp tools/pre_handoff_verify.sh "$$HOOKS_DIR/pre-commit" && \
+	chmod +x "$$HOOKS_DIR/pre-commit" && \
+	echo "✅ Git pre-commit hook installed to $$HOOKS_DIR/pre-commit"
 
 # ---------------------------------------------------------
 # Secrets Management (sops)
@@ -79,5 +92,9 @@ validate-links:
 	@echo "Validating markdown links..."
 	@uv run python tools/check_markdown_links.py
 
-check-all: validate-skills validate-orphans validate-cleanliness validate-links
+validate-tests:
+	@echo "Running unit tests..."
+	@uv run python -m unittest discover -s tests -p "test_*.py"
+
+check-all: validate-skills validate-orphans validate-cleanliness validate-links validate-tests
 	@echo "✅ All agent-core Quality Gates passed!"
