@@ -43,6 +43,7 @@ type: Worker
 - 🟢 **`IMO`（Opinion / 対応禁止）**:
   - スコープ外の将来構想や好み（YAGNI保護のため修正させてはならない）
 
-### 4. ファイル参照渡し報告（Pass-by-Reference）
+### 4. ファイル参照渡し報告（Pass-by-Reference）と構造化判定出力
 - 指摘の詳細（該当ファイル・行番号・理由・引き算ベースの修正方針）はすべて `scratch/review_report.md` に書き出せ。
+- ハーネス（`workspace_manager.py`）による機械検証を可能にするため、`scratch/review_report.md` の先頭には必ず `<review_verdict status="PASS" must="0" should="0" imo="0" />`（または `status="REJECT"`）の構造化タグを記載せよ。
 - チャット返り値には **「①総合判定（`PASS` / `REJECT`）、②件数内訳（`MUST: X件, SHOULD: Y件, IMO: Z件`）、③レポートファイルパス」の3行のみ** を出力して終了せよ。

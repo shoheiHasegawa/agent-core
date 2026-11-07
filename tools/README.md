@@ -13,7 +13,7 @@
 | [`audit_orphan_scripts.py`](audit_orphan_scripts.py) | Audit | どこからも参照されていない孤立スクリプト・テンプレートの監査検知 |
 | [`verify_cleanliness.py`](verify_cleanliness.py) | Audit | Agent OS の物理的クリーンネス（Leave No Trace, `context.md` 行数制限）の機械的検証 |
 | [`check_markdown_links.py`](check_markdown_links.py) | Audit | Markdown ファイル内の相対・絶対リンク切れ検証 |
-| [`pre_handoff_verify.sh`](pre_handoff_verify.sh) | Audit | コミット前の総合検証（クリーンネス・SKILL監査・孤立監査・リンク検証）の一括実行 |
+| [`pre_handoff_verify.sh`](pre_handoff_verify.sh) | Hook Gate | Git `pre-commit` フックから呼び出される物理検証エントリポイント（`make check-all` を実行し違反時にコミットを即ブロック） |
 
 > [!NOTE]
 > 各ツールの詳細な引数は、各スクリプトの先頭 Docstring または `--help` 引数を参照せよ。
