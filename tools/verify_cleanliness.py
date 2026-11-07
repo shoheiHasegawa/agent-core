@@ -86,19 +86,6 @@ def main():
             "message": "The epics/ directory is deprecated. Use GitHub Issues and workspaces/ instead."
         })
 
-    # 5. Check for pending offline GitHub Issue sync items
-    audit_doc = AGENT_CORE_DIR / "docs" / "ccaf_architecture_audit.md"
-    if audit_doc.exists():
-        try:
-            if "[PENDING_GITHUB_SYNC]" in audit_doc.read_text(encoding="utf-8"):
-                results["warnings"].append({
-                    "type": "pending_github_sync",
-                    "workspace": "docs/ccaf_architecture_audit.md",
-                    "message": "Pending GitHub Issue updates/creations (#14, #2, Phase 3) queued in docs/ccaf_architecture_audit.md. Run sync commands once GitHub API recovers."
-                })
-        except Exception:
-            pass
-
     if results["violations"]:
         results["status"] = "failure"
 
