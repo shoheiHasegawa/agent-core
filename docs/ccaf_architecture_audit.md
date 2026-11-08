@@ -113,14 +113,14 @@ CCA-F Pack 1 の第一原則は **「Start with simple workflows before escalati
 > 2026-11-07 時点で GitHub API (`gh`) が一時停止中のため、以下の Issue 更新・起票内容を本正本に完全な形で記録している（`tools/verify_cleanliness.py` が本マーカー `[PENDING_GITHUB_SYNC]` を検知し、GitHub 反映が完了して本マーカーを削除するまで `make check-all` 実行時に常時リマインドを表示する）。
 > GitHub 復旧時は以下の `gh` コマンドを実行して Issue へ反映し、反映後に本ブロックのマーカーを `[SYNCED_TO_GITHUB]` へ変更せよ：
 > ```bash
-> # 1. 親Epic #14 へ本監査レポートと3点ブリーフィングを記録
-> gh issue comment 14 --body "CCA-F アーキテクチャ適合性監査（Step 1〜4）および正本更新が完了しました。詳細は agent-core/docs/ccaf_architecture_audit.md およびコミット履歴を参照してください。"
+> # 1. 親Epic #14 へ本監査レポートと Phase 3 (ccaf-phase3-rail) 完了の3点ブリーフィングを記録
+> gh issue comment 14 --body "CCA-F アーキテクチャ適合性監査（Step 1〜4）および Phase 3（Sub-Issue B: 構造化CLI・Verdict機械検証・アンチパターンLinterレール）の実装が完了しました。
+> - core-service: saturday-briefing 一括取得, <untrusted_content> 自動ラップ, 共通エラーハンドラ (Self-Healing JSON)
+> - agent-core: workspace_manager.py (<review_verdict> 厳密検証, 未回収ドキュメント検知ブロック, ws/docs & progress.md 廃止), audit_skills.py (GEMINI.md 同一性検証, SKILL.md <=80行チェック), verify_cleanliness.py (放置Workspace警告)
+> - 学びの還流: [EXP-17] (警告抑制パッチと固定日付時限爆弾の防止) を docs/experiences/ へ追加済み。"
 >
 > # 2. Issue #2 (OSレベル完全隔離サンドボックス) の仕様を確定版で更新
 > gh issue edit 2 --title "[Security/Harness] OSレベル完全隔離サンドボックス (sandbox-exec) と最小権限ハーネスの構築" --body "$(sed -n '/### 🛡️ Sub-Issue A/,/### ⚙️ Sub-Issue B/p' docs/ccaf_architecture_audit.md)"
->
-> # 3. Phase 3 (構造化CLI・Verdict機械検証・アンチパターンLinterレール) を新規起票
-> gh issue create --title "[Architecture/Rail] CCA-F アンチパターン検知 Linter・構造化 CLI・自動検問所（Git Hook & Harness）の実装" --body "$(sed -n '/### ⚙️ Sub-Issue B/,$p' docs/ccaf_architecture_audit.md)"
 > ```
 
 ---
@@ -165,13 +165,13 @@ CCA-F 監査で特定されたアンチパターン（①定型データ収集�
 
 #### 2. 🛠️ HOW（実装すべき3つの物理ロックと完了条件 DoD）
 1. **ロック①：`core-service` CLI の Self-Healing 構造化 ＆ `<untrusted_content>` 隔離**
-   - [ ] `core-service/src/entrypoints/cli/main.py` に共通エラーハンドラを実装し、例外発生時に生 Traceback ではなく `{"status": "error", "error_code": "...", "message": "...", "recovery_hint": "..."}` を出力させる。
-   - [ ] `vault-peek` および `tasks-list` の外部由来テキスト（`notes` / `content`）を `<untrusted_content>...</untrusted_content>` タグでラップして出力させる。
-   - [ ] 土曜作戦会議用の3コマンド（Calendar + Tasks + Vault）を1回で一括取得・出力する `saturday-briefing` サブコマンド（および `make brief-saturday`）を実装する。
+   - [x] `core-service/src/entrypoints/cli/main.py` に共通エラーハンドラを実装し、例外発生時に生 Traceback ではなく `{"status": "error", "error_code": "...", "message": "...", "recovery_hint": "..."}` を出力させる。
+   - [x] `vault-peek` および `tasks-list` の外部由来テキスト（`notes` / `content`）を `<untrusted_content>...</untrusted_content>` タグでラップして出力させる。
+   - [x] 土曜作戦会議用の3コマンド（Calendar + Tasks + Vault）を1回で一括取得・出力する `saturday-briefing` サブコマンド（および `make brief-saturday`）を実装する。
 2. **ロック②：`workspace_manager.py` の構造化 Verdict 検証と Workspace 簡素化**
-   - [ ] `make ws-new` から `workspaces/<epic>/docs/` と `tasks/progress.md` の生成を廃止し、DoD チェックリストを `AGENTS.md` に一本化する。
-   - [ ] `make ws-harvest` において、`scratch/review_report.md` 内の `<review_verdict status="PASS" must_count="0" />`（または JSON）を厳密にパースし、`status == "PASS"` かつ `must_count == 0` でない限り Exit 1 でブロックする。
-   - [ ] `make ws-harvest` 時に、Worktree 外（`workspaces/<epic>/` 直下や `docs/`）に未回収の `.md` ドキュメントが残っている場合、`[EXP-08]` 違反として Exit 1 でブロックする。
+   - [x] `make ws-new` から `workspaces/<epic>/docs/` と `tasks/progress.md` の生成を廃止し、DoD チェックリストを `AGENTS.md` に一本化する。
+   - [x] `make ws-harvest` において、`scratch/review_report.md` 内の `<review_verdict status="PASS" must_count="0" />`（または JSON）を厳密にパースし、`status == "PASS"` かつ `must_count == 0` でない限り Exit 1 でブロックする。
+   - [x] `make ws-harvest` 時に、Worktree 外（`workspaces/<epic>/` 直下や `docs/`）に未回収の `.md` ドキュメントが残っている場合、`[EXP-08]` 違反として Exit 1 でブロックする。
 3. **ロック③：アンチパターン検知 Linter と Git Pre-Commit 自動検問所**
-   - [ ] `agent-core/tools/audit_skills.py` / `verify_cleanliness.py` を拡張し、① `GEMINI.md` のシンボリックリンク同一性検証、②各 `SKILL.md` の行数上限（<= 80行）チェック、③7日以上更新のない放置 Workspace の警告を追加する。
-   - [ ] `.githooks/pre-commit`（および `make install-hooks`）を整備し、コミット時に自動で `make check-all` を走らせて違反があれば 0秒でコミットをブロックする。
+   - [x] `agent-core/tools/audit_skills.py` / `verify_cleanliness.py` を拡張し、① `GEMINI.md` のシンボリックリンク同一性検証、②各 `SKILL.md` の行数上限（<= 80行）チェック、③7日以上更新のない放置 Workspace の警告を追加する。
+   - [x] `.githooks/pre-commit`（および `make install-hooks`）を整備し、コミット時に自動で `make check-all` を走らせて違反があれば 0秒でコミットをブロックする。

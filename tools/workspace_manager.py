@@ -3,15 +3,16 @@
 workspace_manager.py
 
 Epic Workspace と Git Worktree（方式A）のライフサイクルを管理するハーネススクリプト。
-- `new`: workspaces/<epic>/ の雛形（AGENTS.md, tasks/, docs/, scratch/）を生成し、
+- `new`: workspaces/<epic>/ の雛形（AGENTS.md, tasks/, scratch/）を生成し、
          指定されたリポジトリ（agent-core, core-service 等）の git worktree を
          workspaces/<epic>/worktrees/<repo>/ (branch: epic/<epic>) にマウントする。
-- `harvest`: クローズ前チェック（context.md 行数、worktree の未コミット差分）を行い、
+- `harvest`: クローズ前チェック（未回収ドキュメント、独立レビュー合格判定、worktree の未コミット差分）を行い、
              worktree マウントを安全に解除して scratch/ を掃除する。
 - `list`: 現在の Workspace とマウント中の Worktree 一覧を表示する。
 """
 
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -35,7 +36,6 @@ def run_git(repo_dir: Path, args: list[str], check: bool = True) -> subprocess.C
 def create_workspace_files(ws_dir: Path, epic: str, issue: str | None) -> None:
     today = date.today().isoformat()
     (ws_dir / "tasks").mkdir(parents=True, exist_ok=True)
-    (ws_dir / "docs").mkdir(parents=True, exist_ok=True)
     (ws_dir / "scratch").mkdir(parents=True, exist_ok=True)
     (ws_dir / "worktrees").mkdir(parents=True, exist_ok=True)
 
@@ -57,21 +57,18 @@ created: "{today}"
 - 目的: （ここにEpicの目的を記載）
 
 ## ✅ DoD (完了条件)
-- [ ] `spec.md` の分母シナリオ定義と上流 `MUST` 指摘ゼロ
-- [ ] Pass 1（貫通）＆ Pass 2（引き算リファクタリング）の完了
+- [ ] Phase 0: 仕様固定 (`spec.md` 分母確定 & 上流レビュー)
+- [ ] Phase 1: Pass 1（貫通 — Make it Work）
+- [ ] Phase 2: Pass 2（引き算リファクタリング — Make it Right）
+- [ ] Phase 3: 学習還流 & PR回収 (`make ws-harvest`)
 - [ ] 対象リポジトリの `make check-all` パスと独立レビュアー `MUST = 0`
-- [ ] 学びの還流と PR 作成・3点ブリーフィングの完了
 
 ## 🧭 Routing
 - Working Memory (<=50 lines): [tasks/context.md](tasks/context.md)
-- Task Checklist: [tasks/progress.md](tasks/progress.md)
 - Lessons Learned: [tasks/lessons_learned.md](tasks/lessons_learned.md)
 """,
             encoding="utf-8",
         )
-
-    # 旧 verify_cleanliness.py 互換のため Step 2 で 완전移行するまで _index.md もシンボリックまたは同内容で保持可能にするが、
-    # verify_cleanliness.py 自体を AGENTS.md / _index.md 両対応に更新する。
 
     context_md = ws_dir / "tasks" / "context.md"
     if not context_md.exists():
@@ -95,20 +92,6 @@ created: "{today}"
             encoding="utf-8",
         )
 
-    progress_md = ws_dir / "tasks" / "progress.md"
-    if not progress_md.exists():
-        progress_md.write_text(
-            f"""# Epic Workspace Progress: {epic}
-
-## 📋 タスクリスト
-- `[ ]` **Phase 0: 仕様固定 (`spec.md` 分母確定 & 上流レビュー)**
-- `[ ]` **Phase 1: Pass 1（貫通 — Make it Work）**
-- `[ ]` **Phase 2: Pass 2（引き算リファクタリング — Make it Right）**
-- `[ ]` **Phase 3: 学習還流 & PR回収 (`make ws-harvest`)**
-""",
-            encoding="utf-8",
-        )
-
     lessons_md = ws_dir / "tasks" / "lessons_learned.md"
     if not lessons_md.exists():
         lessons_md.write_text(
@@ -122,6 +105,63 @@ created: "{today}"
 """,
             encoding="utf-8",
         )
+
+
+def parse_review_verdict(report_text: str) -> tuple[bool, str]:
+    tag_match = re.search(r"<review_verdict\s+([^>]+?)/?>", report_text)
+    if not tag_match:
+        return (False, "Missing or invalid <review_verdict ... /> tag")
+
+    attrs = dict(re.findall(r'(\w+)\s*=\s*"([^"]*)"', tag_match.group(1)))
+    status = attrs.get("status", "").upper()
+    if status != "PASS":
+        return (False, f"Review verdict status is '{status}', expected 'PASS'")
+
+    must_raw = attrs.get("must", attrs.get("must_count", "-1"))
+    try:
+        must_count = int(must_raw)
+    except ValueError:
+        return (False, f"Invalid must count: '{must_raw}'")
+
+    if must_count != 0:
+        return (False, f"Review verdict has {must_count} blocker(s) (must > 0)")
+
+    return (True, "OK")
+
+
+def find_unharvested_docs(ws_dir: Path) -> list[Path]:
+    unharvested: list[Path] = []
+    allowed_files = {
+        (ws_dir / "AGENTS.md").resolve(),
+        (ws_dir / "_index.md").resolve(),
+        (ws_dir / "tasks" / "context.md").resolve(),
+        (ws_dir / "tasks" / "lessons_learned.md").resolve(),
+        (ws_dir / "tasks" / "progress.md").resolve(),
+    }
+    ignored_dirs = {
+        (ws_dir / "worktrees").resolve(),
+        (ws_dir / "scratch").resolve(),
+    }
+
+    if not ws_dir.exists():
+        return []
+
+    for p in ws_dir.rglob("*"):
+        if p.is_dir():
+            continue
+        resolved_p = p.resolve()
+        if any(ignored in resolved_p.parents or ignored == resolved_p for ignored in ignored_dirs):
+            continue
+
+        docs_dir = (ws_dir / "docs").resolve()
+        if docs_dir in resolved_p.parents or docs_dir == resolved_p:
+            unharvested.append(p)
+            continue
+
+        if p.suffix == ".md" and resolved_p not in allowed_files:
+            unharvested.append(p)
+
+    return sorted(unharvested)
 
 
 def mount_worktree(ws_dir: Path, epic: str, repo_name: str) -> None:
@@ -170,6 +210,14 @@ def cmd_harvest(args: argparse.Namespace) -> None:
         print(f"❌ Workspace not found: workspaces/{epic}/")
         sys.exit(1)
 
+    unharvested = find_unharvested_docs(ws_dir)
+    if unharvested:
+        print("❌ [EXP-08] Unharvested documents found outside worktree:")
+        for p in unharvested:
+            print(f"   - {p}")
+        print("   All design/spec/docs must be committed inside the repository worktree.")
+        sys.exit(1)
+
     review_report = ws_dir / "scratch" / "review_report.md"
     if not args.skip_review_check:
         if not review_report.exists():
@@ -179,8 +227,9 @@ def cmd_harvest(args: argparse.Namespace) -> None:
             )
             sys.exit(1)
         report_text = review_report.read_text(encoding="utf-8")
-        if "PASS" not in report_text:
-            print(f"❌ Review report at workspaces/{epic}/scratch/review_report.md does not contain 'PASS' verdict!")
+        ok, reason = parse_review_verdict(report_text)
+        if not ok:
+            print(f"❌ Review verdict failed: {reason}")
             sys.exit(1)
 
     wt_parent = ws_dir / "worktrees"

@@ -118,6 +118,14 @@
 - **再発防止策（前例）**:
   - `agent-core/pyproject.toml` は外部リポジトリへの相対パス依存を持たない完全自立構成（`dependencies = []`）に保ち、どの階層の Worktree にマウントされても単体で `make check-all` が完走するようにせよ。
 
+### [EXP-17] テスト通過を目的化した「警告抑制パッチ（`ignore::ResourceWarning`）」と「固定日付の時限爆弾」
+- **失敗事象**:
+  1. 結合テスト追加時に `ResourceWarning: unclosed database` が発生した際、ワーカーが未クローズ接続の発生源（引数検証前のコンテナ生成）を直さず、`pyproject.toml` に `ignore::ResourceWarning` を足し算してテストを通そうとした（独立レビュアーが 🔴 `MUST` でブロック）。
+  2. 単体テスト内で「未遅延タスク（`is_overdue == False`）」を検証するために近い未来の日付（`"2026-11-05"`）をハードコードしていたため、数日後の実行時に期限切れとなってテストが自然崩壊（Time-Bomb）した。
+- **再発防止策（前例）**:
+  1. `pyproject.toml` の `filterwarnings = ["error"]` や Linter ルールを緩和して警告を握り潰すパッチは厳禁とし、必ずリソース生成順序の遅延化・明示的クローズ・Fake/Dummy 注入によって根本原因を解消せよ。
+  2. 日付比較を伴うテストで「未来日」を表現する際は、数日後に腐る直近日付をハードコードせず、十分な未来年（例: `2099`）または `date.today() + timedelta(...)` を使用せよ。
+
 ---
 
 ## Part 2: 社長の意思決定・アーキテクチャ判断の前例集 (Executive Precedents)
