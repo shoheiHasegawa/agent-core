@@ -6,14 +6,14 @@ Anthropic 公式の CCA-F（Claude Certified Architect Foundations）5大知見�
 
 ---
 
-## 1. エグゼクティブ・サマリー：4大観点＋追加観点の監査合否判定
+## 1. エグゼクティブ・サマリー：4大観点＋追加観点の監査合否判定（Post-Implementation 完了状態）
 
-| 監査観点 | 対象 CCA-F Pack | 現行の評価 | 炙り出された核心的アンチパターン（NG） | 刷新・仕組み化の結論（How to Fix） |
+| 監査観点 | 対象 CCA-F Pack | 当初評価 ➔ 最終評価 | 解消された核心的アンチパターン（Before） | 物理ロック・仕組み化の到達点（After: Verified PASS） |
 | :--- | :---: | :---: | :--- | :--- |
-| **① Workflow vs. Agent 境界** | Pack 1, 3 | 🟡 **一部NG**<br>(過剰エージェント化) | ・土曜作戦会議の定型データ収集（Calendar/Tasks/Vault）で秘書が3ターン連続でCLIを個別実行している。<br>・ループ停止条件（同一エラー2回等）やレビュー判定が「プロンプト上の指示」と単純な `"PASS"` 文字列検索に依存している。 | ・**Context Bundler（一括取得Workflow）** により定型収集を1コマンド化。<br>・レビュー合否とループ状態を **構造化JSON/XML（`<review_verdict>`）** で出力させ、`workspace_manager.py` が機械的に `json.loads` 検証してゲート制御する。 |
-| **② Context Management & Cache** | Pack 1, 4, 5 | 🟡 **改善余地**<br>(構造・境界の曖昧さ) | ・Subagent委譲プロンプトの順序（Static Prefix ➔ Dynamic Suffix）が未統一でPrompt Cache効率が低い。<br>・Workspace内の `AGENTS.md`（DoD）と `tasks/progress.md` が二重管理。<br>・`workspaces/<epic>/docs/` が存在するため、一時的な議論メモと永続納品物の境界が曖昧（`[EXP-08]`）。 | ・Subagent委譲を **XMLタグ＋固定Prefix順序** に標準化。<br>・アクセスパターン（コンテキスト粒度）に基づき、二重管理の `progress.md` は `AGENTS.md` に統合しつつ、毎ターン読む `context.md`（<=50行）と一時議論・調査置き場の `scratch/` は厳格に分離（`ws/docs/` 廃止）。 |
-| **③ Tool & Security** | Pack 2, 3, 4 | 🔴 **要対策**<br>(物理隔離・自己修復の欠如) | ・`core-service` CLI が例外時に生の Python Traceback でクラッシュし、Agentが自己修復（Self-Healing）できない。<br>・外部テキスト（Vaultメモ、Tasks詳細）が `<untrusted_content>` タグなしで返り、Prompt Injection に無防備。<br>・OSレベルのサンドボックスがなく、ワーカーが `config/secret.env` 等を物理的に読めてしまう。 | ・CLI共通エラーハンドラで **`recovery_hint` 付き構造化エラーJSON** を返却。<br>・CLI出力側で外部入力フィールドを **`<untrusted_content>` タグ自動ラップ**。<br>・macOS `sandbox-exec`（Issue #2）で機密Read遮断とWorktree外Write遮断を物理強制。 |
-| **④ 引き算（Delete First）と WHY の高凝集保持** | Pack 3, 5<br>+ 社内原則 | 🟡 **要整理**<br>(コピペ重複とゾンビ資産) | ・`GEMINI.md` がルートと `agent-core/` に完全同一で二重配置。<br>・廃止済みの `data/*.db`、`jobs/`、`__pycache__` が残存。<br>・`[EXP-08]` のID重複、および5階層にわたる共通ルールの長文コピペ。<br>・一方で「乱暴な単一ファイル化やWHY削除」はコンテキスト汚染とチェスタトンのフェンス破壊を招く。 | ・**`[EXP-15]`（過剰な引き算の罠）** を教訓化：各ルールの直前に **「1行の鋭いWHY」を高凝集で残し**、他ファイルからの**コピペ重複文のみを引き算**。<br>・`pyproject.toml` の相対パス結合（`[EXP-16]`）、`data/*.db`、`jobs/` を完全削除。 |
+| **① Workflow vs. Agent 境界** | Pack 1, 3 | 🟡 一部NG<br>⬇<br>🟢 **PASS** | ・土曜作戦会議の定型データ収集（Calendar/Tasks/Vault）で秘書が3ターン連続でCLIを個別実行。<br>・レビュー判定が単純な `"PASS"` 部分文字列検索に依存（偽陽性リスク）。 | ・**Context Bundler（`saturday-briefing` / `make brief-saturday`）** により定型収集を1コマンド一括取得化（`[GTC-BRIEF-01]`, `[GTC-BRIEF-02]`）。<br>・`workspace_manager.py` が **`<review_verdict status="PASS" must="0" />`** を機械パースしてゲート制御（`[AC-WS-02]`, `[AC-WS-03]`）。 |
+| **② Context Management & Cache** | Pack 1, 4, 5 | 🟡 改善余地<br>⬇<br>🟢 **PASS** | ・Workspace内の `AGENTS.md`（DoD）と `tasks/progress.md` が二重管理。<br>・`workspaces/<epic>/docs/` が存在し、一時メモと永続納品物の境界が曖昧（`[EXP-08]`）。 | ・`make ws-new` から `docs/` と `progress.md` 生成を廃止し、DoD を `AGENTS.md` に一本化（`[AC-WS-01]`）。<br>・`ws-harvest` 時に Worktree 外の未回収 `.md` を検知して Exit 1 でブロック（`[AC-WS-04]`）。<br>・`verify_cleanliness.py` で `context.md`（<=50行）と7日超放置 Workspace 警告を強制（`[AC-CLN-01]`）。 |
+| **③ Tool & Security** | Pack 2, 3, 4 | 🔴 要対策<br>⬇<br>🟢 **PASS** | ・`core-service` CLI が例外時に生の Python Traceback でクラッシュ。<br>・外部テキストが `<untrusted_content>` なしで返り Prompt Injection に無防備。<br>・OSレベルのサンドボックスがなく機密ファイルが物理読取可能。 | ・CLI共通エラーハンドラで **`recovery_hint` 付き構造化エラーJSON** を返却（`[GTC-ERR-01]`）。<br>・CLI出力側で `notes` / `content` を **`<untrusted_content>` タグ自動ラップ**（`[GTC-SEC-01]`）。<br>・macOS Seatbelt（`worker.sb` + `sandbox_runner.py`）でロール別最小権限（`leader`/`worker`/`reviewer`）と機密 Read/Write・外部通信遮断を物理強制（`[SB-01]`〜`[SB-10]`）。 |
+| **④ 引き算（Delete First）と WHY の高凝集保持** | Pack 3, 5<br>+ 社内原則 | 🟡 要整理<br>⬇<br>🟢 **PASS** | ・`agent-core/pyproject.toml` の相対パス依存による Worktree クラッシュ。<br>・`GEMINI.md` の二重配置ドリフト懸念とゾンビ資産残存。<br>・過剰な引き算による WHY 消失リスク。 | ・`agent-core/pyproject.toml` の外部依存を完全削除し単体自立化（`[EXP-16]`）。<br>・`audit_skills.py` で `GEMINI.md` 完全一致、全 `SKILL.md` <=80行、全 SSOT の `WHY` 高凝集保持を機械検証（`[AC-AUD-01]`, `[AC-AUD-02]`）。<br>・`[EXP-15]`, `[EXP-17]`, `[PREC-08]` を正本へ還流完了。 |
 
 ---
 
@@ -113,14 +113,60 @@ CCA-F Pack 1 の第一原則は **「Start with simple workflows before escalati
 > 2026-11-07 時点で GitHub API (`gh`) が一時停止中のため、以下の Issue 更新・起票内容を本正本に完全な形で記録している（`tools/verify_cleanliness.py` が本マーカー `[PENDING_GITHUB_SYNC]` を検知し、GitHub 反映が完了して本マーカーを削除するまで `make check-all` 実行時に常時リマインドを表示する）。
 > GitHub 復旧時は以下の `gh` コマンドを実行して Issue へ反映し、反映後に本ブロックのマーカーを `[SYNCED_TO_GITHUB]` へ変更せよ：
 > ```bash
-> # 1. 親Epic #14 へ本監査レポートと Phase 3 (ccaf-phase3-rail) 完了の3点ブリーフィングを記録
-> gh issue comment 14 --body "CCA-F アーキテクチャ適合性監査（Step 1〜4）および Phase 3（Sub-Issue B: 構造化CLI・Verdict機械検証・アンチパターンLinterレール）の実装が完了しました。
+> # 1. 親Epic #14 へ本監査レポートと Phase 3 (ccaf-phase3-rail) 完了の3点ブリーフィングを記録＆クローズ
+> gh issue comment 14 --body "CCA-F アーキテクチャ適合性監査（Step 1〜4）、Sub-Issue A (Issue #2: OSサンドボックス)、および Sub-Issue B (Phase 3: 構造化CLI・Verdict機械検証・Linterレール) の全実装・監査が完了しました。
 > - core-service: saturday-briefing 一括取得, <untrusted_content> 自動ラップ, 共通エラーハンドラ (Self-Healing JSON)
 > - agent-core: workspace_manager.py (<review_verdict> 厳密検証, 未回収ドキュメント検知ブロック, ws/docs & progress.md 廃止), audit_skills.py (GEMINI.md 同一性検証, SKILL.md <=80行チェック), verify_cleanliness.py (放置Workspace警告)
-> - 学びの還流: [EXP-17] (警告抑制パッチと固定日付時限爆弾の防止) を docs/experiences/ へ追加済み。"
+> - OSサンドボックス: macOS Seatbelt (sandbox-exec) によるロール別最小権限 (leader/worker/reviewer) と機密Read/Write遮断
+> - 学びの還流: [EXP-17] (警告抑制パッチ禁止), [PREC-08] (Seatbelt採用根拠) を docs/experiences/ へ追加済み。"
+> gh issue close 14 --reason "completed"
 >
-> # 2. Issue #2 (OSレベル完全隔離サンドボックス) の仕様を確定版で更新
-> gh issue edit 2 --title "[Security/Harness] OSレベル完全隔離サンドボックス (sandbox-exec) と最小権限ハーネスの構築" --body "$(sed -n '/### 🛡️ Sub-Issue A/,/### ⚙️ Sub-Issue B/p' docs/ccaf_architecture_audit.md)"
+> # 2. Issue #2 (OSレベル完全隔離サンドボックス) をクローズ
+> gh issue comment 2 --body "Sub-Issue A として macOS Seatbelt によるロール別最小権限サンドボックス (tools/sandbox_runner.py) の実装・検証が完了しました。[PREC-08] を参照してください。"
+> gh issue close 2 --reason "completed"
+>
+> # 3. Phase 3 (構造化CLI・Verdict機械検証・Linterレール) を新規起票＆即時クローズ
+> gh issue create --title "[Architecture/Rail] CCA-F アンチパターン検知 Linter・構造化 CLI・自動検問所（Git Hook & Harness）の実装" --body "$(sed -n '/### ⚙️ Sub-Issue B/,$p' docs/ccaf_architecture_audit.md)"
+>
+> # 4. 技術的負債 Issue 4件の新規起票（Actionモード移行に伴うスコープ保護）
+> # 4-1. [P1 コード負債] 廃止済み SQLite タスク管理層のパージ
+> gh issue create --title "[Refactor/Delete] core-service 内の廃止済み SQLite タスク管理層の完全パージとスリム化" \
+>   --label "technical-debt,refactor" \
+>   --body "### 🎯 WHY
+> [PREC-02] で Google Tasks / Calendar への一本化が完了しているにもかかわらず、core-service 内に旧 SQLite のタスク管理パッケージ（task_management, daily_planning, task_operations 等 約1,000行）が残存し、保守コストと認知負荷を生んでいる。
+>
+> ### 📐 WHAT & DoD
+> - [ ] src/application/task_management, daily_planning, task_operations パッケージの完全削除
+> - [ ] DI コンテナおよび make check-all から旧 SQLite 関連の結合を削除（コード量を約半分にスリム化）"
+>
+> # 4-2. [P1 構造的盲点] Makefile 内包による OS サンドボックス自動強制化
+> gh issue create --title "[Security/Harness] Makefile 内包による OS サンドボックス (Seatbelt) の完全自動強制化" \
+>   --label "technical-debt,security" \
+>   --body "### 🎯 WHY
+> 現在の sandbox_runner.py はプロンプトでの呼び出し指示（性善説）に依存している。エージェントが普通に make check-all や make test を叩くだけで、注意力ゼロで OS サンドボックスが作動する構造にする。
+>
+> ### 📐 WHAT & DoD
+> - [ ] Makefile の check-all / test ターゲット内部で tools/sandbox_runner.py --role worker を自動経由させる
+> - [ ] プロンプト指示なしで、テスト時の外部通信・機密アクセスが常時物理遮断されることを検証"
+>
+> # 4-3. [P2 運用摩擦] 軽微な変更に対するファストトラック規定の整備
+> gh issue create --title "[Process] 軽微な変更に対するファストトラック（単一ワーカー・軽量レビュー）基準の整備" \
+>   --label "process,efficiency" \
+>   --body "### 🎯 WHY
+> 軽微なリファクタリングやドキュメント修正でも毎回 2-Pass × 3エージェントのフルコースを回すとセレモニー税で開発速度が低下するため。
+>
+> ### 📐 WHAT & DoD
+> - [ ] team-leader/SKILL.md のファストトラック基準（リーダー単独・単一ワーカーで即マージしてよい境界）の定量化と安全弁の明文化"
+>
+> # 4-4. [P3 スケーラビリティ] saturday-briefing の件数上限と一括反映バッチ
+> gh issue create --title "[CLI/Workflow] saturday-briefing の件数上限フィルタと決定事項の一括反映バッチコマンド" \
+>   --label "workflow,cli" \
+>   --body "### 🎯 WHY
+> 未処理タスクやメモが大量に溜まった際、単一 JSON のトークン肥大化を防ぎ、また会議後の決定事項（3-3-3仕分け結果）を1コマンドで一括反映（バッチWrite）できるようにするため。
+>
+> ### 📐 WHAT & DoD
+> - [ ] saturday-briefing に --limit 引数の追加
+> - [ ] トリアージ結果 JSON を受け取って Google Tasks のリスト移動を一括実行するバッチ CLI の実装"
 > ```
 
 ---
@@ -175,3 +221,17 @@ CCA-F 監査で特定されたアンチパターン（①定型データ収集�
 3. **ロック③：アンチパターン検知 Linter と Git Pre-Commit 自動検問所**
    - [x] `agent-core/tools/audit_skills.py` / `verify_cleanliness.py` を拡張し、① `GEMINI.md` のシンボリックリンク同一性検証、②各 `SKILL.md` の行数上限（<= 80行）チェック、③7日以上更新のない放置 Workspace の警告を追加する。
    - [x] `.githooks/pre-commit`（および `make install-hooks`）を整備し、コミット時に自動で `make check-all` を走らせて違反があれば 0秒でコミットをブロックする。
+
+---
+
+## 7. 残存リスクと技術的負債の棚卸し (Technical Debt & Risk Matrix)
+
+CCA-F 完了判定に伴い、今後の運用（Actionモード）において顕在化しうるリスク・負債を以下の通り棚卸し・管理下に置く：
+
+| 優先度 | リスク・負債項目 | 顕在化トリガー | 影響度 | 判定・処方箋（Issue管理） |
+| :---: | :--- | :--- | :---: | :--- |
+| 🟡 **P1**<br>(コード負債) | **`core-service` 内の旧 SQLite タスク管理層の残存** | `core-service` リファクタリング時 | 中 | **【Issue 起票】** `[Refactor/Delete]` として計画パージし、コードベースを半減させる。 |
+| 🟡 **P1**<br>(構造的盲点) | **サンドボックスの「任意着用」問題** | ワーカーが `sandbox_runner.py` を付け忘れた時 | 中 | **【Issue 起票】** `Makefile` の `check-all` / `test` 内部で自動経由させ、プロンプト指示依存を根絶する。 |
+| 🟡 **P2**<br>(運用摩擦) | **2-Pass マルチエージェントのセレモニー税** | 軽微な CLI / ドキュメント調整時 | 中 | **【Issue 起票】** ファストトラック（単一ワーカー・軽量レビュー）基準を整備する。 |
+| 🟢 **P3**<br>(スケーラビリティ) | **`saturday-briefing` のトークン肥大化と更新N回呼び出し** | タスク・メモが 30〜50件を超えた時 | 低〜中 | **【Issue 起票】** `--limit` 引数および一括更新（バッチWrite）コマンドを実装する。 |
+| 🟢 **P3**<br>(OS依存) | **macOS `sandbox-exec` の非推奨仕様とローカル専用性** | macOS メジャー更新時 | 低 | **【現時点は許容（`[PREC-08]`）】** ラッパー層（`sandbox_runner.py`）に隔離されているため将来置換可能。 |
