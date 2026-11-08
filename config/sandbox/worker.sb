@@ -1,22 +1,36 @@
 (version 1)
 
 ;; ============================================================================
-;; You_Inc Worker Least-Privilege Seatbelt Profile (Issue #2)
+;; You_Inc Role-Scoped Least-Privilege Seatbelt Profile (Issue #2)
 ;; WHY: プロンプト上の禁止事項（性善説）に頼らず、OSカーネルレベル（macOS sandbox-exec）で
-;;      機密情報の読み取り遮断・Worktree外への書き込み遮断・外部通信遮断を物理強制するため。
+;;      ロール別（leader / worker / reviewer）の書き込み境界・機密読取遮断・外部通信遮断を物理強制するため。
+;;
+;; Parameters (-D):
+;;   - ALLOWED_PRIMARY: ロールに応じた主書き込み許可領域
+;;       * leader   -> workspaces/<epic>/ (tasks/, scratch/, worktrees/, AGENTS.md)
+;;       * worker   -> workspaces/<epic>/worktrees/<repo>/
+;;       * reviewer -> workspaces/<epic>/scratch/ (Worktreeのコード変更も物理遮断)
+;;   - ALLOWED_SCRATCH: workspaces/<epic>/scratch/
+;;   - UV_CACHE_DIR:    ~/.cache/uv
+;;   - ALLOW_NET:       "true" の場合のみ外部通信を一時解禁（デフォルト "false"）
 ;; ============================================================================
 
 ;; 1. ベースライン: プロセス実行・システムライブラリ読取を許可し、危険な操作を後続ルールで遮断
 (allow default)
 
-;; 2. ネットワーク隔離: 外部IPへの通信・データ持ち出しを遮断し、ローカルループバックのみ許可 ([SB-05])
-(deny network-outbound (remote ip))
-(allow network-outbound (remote ip "localhost:*"))
+;; 2. ネットワーク隔離: デフォルトで外部IP通信を遮断し、ローカルループバックのみ許可 ([SB-05])
+;;    ※ --allow-net 指定時 (ALLOW_NET == "true") のみ一時開通を許可 ([SB-10])
+(if (not (string=? (param "ALLOW_NET") "true"))
+  (begin
+    (deny network-outbound (remote ip))
+    (allow network-outbound (remote ip "localhost:*"))
+  )
+)
 
-;; 3. ファイル書き込み遮断: デフォルトで全領域への書き込みを禁止し、指定Worktree/Scratch/Cacheのみ許可 ([SB-01], [SB-08])
+;; 3. ロール別ファイル書き込み遮断: デフォルトで全領域への書き込みを禁止 ([SB-01], [SB-08], [SB-09])
 (deny file-write*)
 (allow file-write*
-  (subpath (param "ALLOWED_WORKTREE"))
+  (subpath (param "ALLOWED_PRIMARY"))
   (subpath (param "ALLOWED_SCRATCH"))
   (subpath "/tmp")
   (subpath "/private/tmp")
@@ -28,8 +42,9 @@
 )
 
 ;; 4. 機密ファイル完全遮断 (Deny All Read/Write):
-;;    ※ allow file-write* より後に配置することで、仮に ALLOWED_WORKTREE 内に機密ファイルが存在しても
-;;      Seatbelt の後勝ち評価により Read/Write の両方を確実に Operation not permitted で拒否する ([SB-07])
+;;    ※ allow file-write* より後に配置することで、いかなるロール（leader/worker/reviewer）であっても、
+;;      また ALLOWED_PRIMARY 内に機密ファイルが存在しても、Seatbelt の後勝ち評価により
+;;      Read/Write の両方を確実に Operation not permitted で拒否する ([SB-07])
 (deny file-read-data file-write*
   (regex
     #"(^|/)(secret\.env|token\.json|credentials\.json|client_secret\.json)$"

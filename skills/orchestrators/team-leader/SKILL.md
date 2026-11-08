@@ -14,8 +14,10 @@ type: Orchestrator
 - **Input**: `workspaces/<epic>/AGENTS.md`（Goal/DoD）、対象 GitHub Issue、`agent-core/docs/rules/thinking_os_and_loop_principles.md`、`agent-core/docs/experiences/agent_antipatterns_and_precedents.md`
 - **Output**:
   1. 確定した `spec.md`（分母シナリオID一覧）
-  2. `make check-all` パス ＆ 独立レビュー `MUST = 0` を達成したコードと GitHub PR (`gh pr create`)
-  3. 更新された `tasks/context.md`（50行以内）、`tasks/progress.md`、および還流済みの学び（ルートA）
+  2. `make check-all` パス ＆ 独立レビュー `MUST = 0` を達成し、対象 Worktree ブランチへローカルコミット完了したコード
+  3. 更新された `tasks/context.md`（50行以内）、`AGENTS.md`（DoD）、および還流済みの学び（ルートA）
+- **🔒 サンドボックス境界 (`sandbox_runner.py --role leader`)**:
+  - リーダーは `workspaces/<epic>/` 内のみで作業し、親の `main` ブランチへの直接書き込みや `config/secret.env` 等の機密読み取りは OS レベルで遮断される。外部通信（本番 CLI 調査や `git push` / `gh pr create`）は本社秘書（`executive-secretary`）の責務とし、ワーカーおよびレビュアーにコマンドを実行させる際は `tools/sandbox_runner.py --role {worker,reviewer}` を適用せよ。
 
 ## 🛠️ 実行手順とループ定義 (HOW & 5 Loop Elements)
 
@@ -46,6 +48,6 @@ type: Orchestrator
   - **同一エラー連続失敗 `== 2回`**、**1バッチ往復上限 `== 3周`**、または **🔴 Tier 3（前例なしの仕様矛盾）発生** のいずれかで即座にループを強制停止せよ。
   - 停止時は `tasks/context.md` に「①停止理由、②原因仮説、③A/B選択肢」を記載して秘書・社長へエスカレーションせよ。
 
-### Phase 3: クローズ・学習還流（ルートA）と PR 回収
+### Phase 3: クローズ・学習還流（ルートA）と秘書への引き継ぎ
 1. 作業中に `tasks/lessons_learned.md` に記録された技術的な学び（ルートA）を、①Linter/CI、②`docs/rules/`、③`docs/experiences/`、④`SKILL.md` のいずれかへ自律的に反映してコミットする。（※成果物としての正本ドキュメントは必ず worktree 内に配置して PR 対象に含めること。使い捨ての workspace に置くことを禁ずる `[EXP-08]`）
-2. 各 Worktree でブランチを Push して `gh pr create` で PR を作成し、`make ws-harvest EPIC=<name>` を実行した上で、秘書（または社長）へ **3点内省ブリーフィング** 用のサマリーを報告する。
+2. 各 Worktree で変更がすべてコミット済み（`git status` クリーン）であることを確認し、本社秘書（`executive-secretary`）へ **3点内省ブリーフィング** 用のサマリーを報告して PR 作成（`gh pr create`）と `make ws-harvest` を引き継ぐ。

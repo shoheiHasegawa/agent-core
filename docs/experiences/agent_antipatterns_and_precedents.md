@@ -179,3 +179,18 @@
        - 「なぜその設計判断を下したか」の再利用可能なルール・前例として Git コミットし、次回以降の 🟢 Tier 1 / 🟡 Tier 2 判断の根拠とする。
     3. **そのタスク固有の意思決定の史実・経緯の恒久アーカイブ ➔ `GitHub PR Description`（および Issue）**
        - PR 本文の「3点内省ブリーフィング」に判断根拠のサマリーを記載してマージすることで、ローカルのファイルを肥大化させずに GitHub 上の SoR として永久保存する。
+
+### [PREC-08] OS ネイティブ Seatbelt (`sandbox-exec`) の採用とロール別最小権限境界（Docker 不採用の根拠）
+- **判断基準（前例）**:
+  - **1. なぜ Docker ではなく macOS `sandbox-exec`（Seatbelt）なのか**:
+    - Git Worktree（`.git` ファイルがホスト側の親 `.git/worktrees/` を絶対パス参照する構造）は、Docker コンテナの Volume Mount とパス整合性が悪く、また小バッチ TDD ループ（数十回の `pytest` 実行）において VM 起動・ファイル同期のオーバーヘッドや Dockerfile 保守コストが「足し算バイアス」となる。
+    - OpenAI Codex CLI、Anthropic Claude Code、Google Chrome と同様、macOS カーネル標準の Mandatory Access Control（`/usr/bin/sandbox-exec` + `config/sandbox/worker.sb`）を採用することで、起動オーバーヘッド 0.01 秒・追加依存ゼロで OS レベルの物理隔離を強制する。
+  - **2. CCA-F 準拠のロール別最小権限（`--role {leader,worker,reviewer}`）と外部通信責務の分離**:
+    - 「チームリーダーだから制限しない（野放しの管理職）」は CCA-F（Pack 2/3 Role-Scoped Least Privilege）違反となるため、Workspace 内で稼働する全ロールにサンドボックスを適用する：
+      - **`executive-secretary`（本社秘書）**: 本社ルート（`agent-core/`）で稼働。本番 CLI による事前データ取得（Context Bundling）や `git push` / `gh pr create` 等の外部通信を唯一担う（Workspace 内作業は行わない）。
+      - **`team-leader` (`--role leader`)**: `workspaces/<epic>/` 内のみ Write 許可。親の `main` ブランチへの直接書き込み（`[EXP-14]`）や機密ファイルの Read/Write、無断の外部通信を OS レベルで遮断する。
+      - **`tdd-red/green-worker` (`--role worker`)**: `worktrees/<repo>/` と `scratch/` のみ Write 許可。`AGENTS.md`（DoD）や `tasks/` の書き換え（Reward Hacking）も遮断する。
+      - **`compliance-reviewer` (`--role reviewer`)**: `scratch/` のみ Write 許可。Worktree 内のコードを勝手に書き換える越権行為を物理遮断する。
+  - **3. 検証用 Secret とネットワーク開通の扱い（`dev-secret.env` 不採用）**:
+    - 開発用と称して `dev-secret.env` のような別ファイルを作ることは、二重管理と誤コミットを招くため禁止する（引き算ファースト）。
+    - 99% のテストは Fake/Stub と `monkeypatch.setenv` でオフライン完結させ、1% の実 API 疎通やパッケージ追加（`uv sync`）が必要な場合のみ、Tier 2/3 判断として `sandbox_runner.py --allow-net` とインメモリ環境変数注入（`os.environ`）を組み合わせて実行する。

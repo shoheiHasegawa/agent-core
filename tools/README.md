@@ -8,7 +8,7 @@
 | ツール名 | 種別 | 目的 (What / Why) |
 | :--- | :--- | :--- |
 | [`workspace_manager.py`](workspace_manager.py) | Harness | Epic Workspace および Git Worktree（`ws-new`, `ws-harvest`, `ws-list`）の管理 |
-| [`sandbox_runner.py`](sandbox_runner.py) | Security Harness | macOS `sandbox-exec`（[`config/sandbox/worker.sb`](../config/sandbox/worker.sb)）によるワーカー最小権限実行ラッパーおよび決定論的自己検証（`--self-test`） |
+| [`sandbox_runner.py`](sandbox_runner.py) | Security Harness | macOS `sandbox-exec`（[`config/sandbox/worker.sb`](../config/sandbox/worker.sb)）によるロール別最小権限（`--role {leader,worker,reviewer}`, `--allow-net`）実行ラッパーおよび決定論的自己検証（`--self-test`） |
 | [`authenticate_google.py`](authenticate_google.py) | Auth | Google Tasks & Calendar API の初回 OAuth 2.0 認可ワンショットスクリプト |
 | [`audit_skills.py`](audit_skills.py) | Audit | `skills/` 配下の全 `SKILL.md` の構文・リンク整合性検証 |
 | [`audit_orphan_scripts.py`](audit_orphan_scripts.py) | Audit | どこからも参照されていない孤立スクリプト・テンプレートの監査検知 |

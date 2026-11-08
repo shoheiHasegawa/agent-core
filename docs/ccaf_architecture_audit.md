@@ -131,22 +131,28 @@ CCA-F Pack 1 の第一原則は **「Start with simple workflows before escalati
 #### 1. 🎯 WHY（目的・解くべき課題）
 現在、「Worktree 外のファイルを編集しない」「`agent-core/config/secret.env` や秘密鍵（`*.pem`, `token.json`）を直接読み取らない」という境界はプロンプト上の指示（`GEMINI.md`）に依存している。プロンプトインジェクションや Agent の誤操作が発生した際、ホスト環境や本流ブランチ（`main`）、機密情報が物理的に破壊・漏洩するリスクをゼロにするため、OS カーネルレベル（macOS `sandbox-exec`）で最小権限（Least Privilege）を強制する。
 
-#### 2. 📐 WHAT（満たすべき境界とマウント仕様）
-| 対象パス / リソース | ワーカー（Subagent）の権限 | 理由・目的 |
-| :--- | :---: | :--- |
-| `workspaces/<epic>/worktrees/<repo>/` | **Read / Write** | 開発・テスト対象の隔離ブランチ領域 |
-| `workspaces/<epic>/scratch/` | **Read / Write** | レポート・一時ファイル出力領域 |
-| `/tmp`, `/private/tmp`, `~/.cache/uv` | **Read / Write** | `pytest` や `uv` の実行時キャッシュ領域 |
-| 親リポジトリ群 (`agent-core/`, `core-service/`, `second-brain/` の `main` 側) | **Read-Only** (Write Deny) | 参照は許可するが、Worktree 外の直接編集・直コミットを物理遮断 |
-| `agent-core/config/secret.env`, `*.pem`, `*.key`, `token.json`, `credentials.json` | **Deny All (Read/Write 遮断)** | 機密情報の直接読み取りを `EPERM (Operation not permitted)` で完全遮断 |
-| ネットワーク通信 (`network*`) | **Default Deny** (ローカルループバックのみ許可) | テスト実行中（`tdd-red` / `tdd-green`）の外部通信・データ持ち出しを遮断 |
+#### 2. 📐 WHAT（満たすべき境界とマウント仕様・アーキテクチャ選定根拠）
+- **アーキテクチャ選定（なぜ Docker ではなく macOS `sandbox-exec` か — `[PREC-08]`）**:
+  - Git Worktree のホスト絶対パス構造との完全互換性、および小バッチ TDD ループにおける起動 0.01 秒・メンテナンスゼロ（引き算ファースト）を達成するため、Codex CLI / Claude Code / Chrome と同じ macOS カーネル標準 Seatbelt（`/usr/bin/sandbox-exec`）を採用する。
+- **ロール別最小権限マトリクス（CCA-F Pack 2/3 Role-Scoped Least Privilege）**:
+
+| 対象パス / リソース | `leader` (`team-leader`) | `worker` (`tdd-red/green`) | `reviewer` (`compliance-reviewer`) | 理由・目的 |
+| :--- | :---: | :---: | :---: | :--- |
+| `workspaces/<epic>/` (`AGENTS.md`, `tasks/`) | **Read / Write** | **Read-Only** (Write Deny) | **Read-Only** (Write Deny) | リーダーのみ進捗・メモリ更新可。ワーカーによる DoD 改ざん（Reward Hacking）を物理遮断 |
+| `workspaces/<epic>/worktrees/<repo>/` | **Read / Write** | **Read / Write** | **Read-Only** (Write Deny) | 開発・テスト対象領域。レビュアーによる越権コード書き換えを物理遮断 |
+| `workspaces/<epic>/scratch/` | **Read / Write** | **Read / Write** | **Read / Write** | レポート・一時ファイル出力領域（全ロール書き込み可） |
+| `/tmp`, `/private/tmp`, `~/.cache/uv` | **Read / Write** | **Read / Write** | **Read / Write** | `pytest` や `uv` の実行時キャッシュ領域 |
+| 親リポジトリ群 (`agent-core/`, `core-service/`, `second-brain/` の `main` 側) | **Read-Only** (Write Deny) | **Read-Only** (Write Deny) | **Read-Only** (Write Deny) | リーダーを含め Workspace 外（親 `main`）の直接編集・直コミット（`[EXP-14]`）を物理遮断 |
+| `config/secret.env`, `*.pem`, `*.key`, `token.json`, `credentials.json`, `client_secret.json` | **Deny All** (Read/Write 遮断) | **Deny All** (Read/Write 遮断) | **Deny All** (Read/Write 遮断) | 機密情報の直接読み取りを `Operation not permitted` で完全遮断（検証時はインメモリ環境変数注入を使用、`dev-secret.env` は作らない） |
+| 外部ネットワーク通信 (`network-outbound`) | **Default Deny** (`--allow-net` 時のみ開通) | **Default Deny** (ローカルループバックのみ) | **Default Deny** (ローカルループバックのみ) | 外部通信・データ持ち出しを遮断（本番 CLI 調査や `gh pr create` は本社秘書が実行） |
 
 #### 3. 🛠️ HOW（実装コンポーネントと完了条件 DoD）
-- [ ] `agent-core/config/sandbox/worker.sb`: 上記の Read/Write/Deny 境界を定義した macOS Seatbelt プロファイルの作成。
-- [ ] `agent-core/tools/sandbox_runner.py`: 指定された Worktree パスを動的パラメータ（`-D ALLOWED_WORKTREE=...`）として注入し、`sandbox-exec` 内でコマンドを実行するラッパーの実装。
-- [ ] 自動検証テスト（Verify Gate）:
+- [x] `agent-core/config/sandbox/worker.sb`: 上記のロール別 Read/Write/Deny 境界および `ALLOW_NET` 制御を定義した macOS Seatbelt プロファイルの作成。
+- [x] `agent-core/tools/sandbox_runner.py`: `--role {leader,worker,reviewer}` および `--allow-net` に対応し、`--self-test` で全 10 シナリオ（`[SB-01]`〜`[SB-10]`）を決定論的に自動検証するラッパーの実装。
+- [x] 自動検証テスト（Verify Gate）:
   - サンドボックス内から `cat agent-core/config/secret.env` を実行して `Operation not permitted`（非ゼロ終了）になること。
-  - サンドボックス内から親の `agent-core/README.md` に書き込もうとして拒否されること。
+  - サンドボックス内から親の `agent-core/README.md` に書き込もうとして（`leader` でも）拒否されること。
+  - ロール別境界（`worker` の `tasks/` 改ざん拒否、`reviewer` の `worktrees/` 改ざん拒否）が強制されること。
   - サンドボックス内から対象 Worktree 内の `make check-all` が正常に Exit 0 で完走すること。
 
 ---
