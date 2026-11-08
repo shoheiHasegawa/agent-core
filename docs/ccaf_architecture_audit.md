@@ -167,6 +167,17 @@ CCA-F Pack 1 の第一原則は **「Start with simple workflows before escalati
 > ### 📐 WHAT & DoD
 > - [ ] saturday-briefing に --limit 引数の追加
 > - [ ] トリアージ結果 JSON を受け取って Google Tasks のリスト移動を一括実行するバッチ CLI の実装"
+>
+> # 4-5. [P1 バグ] ExistingCalendarAdapter.list_events の期間取得バグ改修
+> gh issue create --title "[Bug] core-service: ExistingCalendarAdapter.list_events が期間指定時に start_date 単日しか取得しない" \
+>   --repo shoheiHasegawa/core-service \
+>   --label "bug,calendar" \
+>   --body "### 🎯 WHY
+> 週次作戦会議などで期間指定（start〜end）してカレンダーイベントを取得する際、ExistingCalendarAdapter.list_events が start_date 単日分しか取得しないため、期間内の固定予定がすり抜けてしまう。
+>
+> ### 📐 WHAT & DoD
+> - [ ] core-service/src/di/container.py の ExistingCalendarAdapter.list_events で start_date から end_date までの全期間のイベントを取得・返却するよう修正
+> - [ ] 複数日にまたがるイベント取得の単体テストを追加し make check-all PASS を検証"
 > ```
 
 ---
@@ -230,6 +241,7 @@ CCA-F 完了判定に伴い、今後の運用（Actionモード）において�
 
 | 優先度 | リスク・負債項目 | 顕在化トリガー | 影響度 | 判定・処方箋（Issue管理） |
 | :---: | :--- | :--- | :---: | :--- |
+| 🔴 **P1**<br>(機能バグ) | **`ExistingCalendarAdapter.list_events` の期間取得不備** | 複数日にまたがるカレンダー取得時 | 高 | **【Issue 起票】** `start_date`〜`end_date` の全日取得に改修する。 |
 | 🟡 **P1**<br>(コード負債) | **`core-service` 内の旧 SQLite タスク管理層の残存** | `core-service` リファクタリング時 | 中 | **【Issue 起票】** `[Refactor/Delete]` として計画パージし、コードベースを半減させる。 |
 | 🟡 **P1**<br>(構造的盲点) | **サンドボックスの「任意着用」問題** | ワーカーが `sandbox_runner.py` を付け忘れた時 | 中 | **【Issue 起票】** `Makefile` の `check-all` / `test` 内部で自動経由させ、プロンプト指示依存を根絶する。 |
 | 🟡 **P2**<br>(運用摩擦) | **2-Pass マルチエージェントのセレモニー税** | 軽微な CLI / ドキュメント調整時 | 中 | **【Issue 起票】** ファストトラック（単一ワーカー・軽量レビュー）基準を整備する。 |
