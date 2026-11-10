@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025年度下期 研修計画書（シラバス）</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+    :root {
+      --primary: #0f172a;
+      --primary-accent: #2563eb;
+      --primary-light: #eff6ff;
+      --text-main: #1e293b;
+      --text-muted: #475569;
+      --border: #cbd5e1;
+      --bg-card: #f8fafc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans JP', 'Inter', sans-serif;
+      color: var(--text-main);
+      background-color: #f1f5f9;
+      line-height: 1.5;
+      font-size: 12px;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 36px 44px;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    }
+
+    header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+
+    h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      border-bottom: 1.5px solid var(--border);
+      padding-bottom: 3px;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    p { margin-bottom: 6px; }
+    ul, ol { margin-left: 18px; margin-bottom: 6px; }
+    li { margin-bottom: 3px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 10px 0;
+      font-size: 11.5px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 5px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: var(--bg-card);
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .callout {
+      background: var(--primary-light);
+      border-left: 3.5px solid var(--primary-accent);
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-size: 11.5px;
+    }
+
+    /* 印刷・PDF出力用スタイル（きっちり2ページ完結） */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm 12mm 15mm;
+    }
+
+    @media print {
+      body {
+        background: none !important;
+        padding: 0 !important;
+        font-size: 9.8pt !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .container {
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .page-break {
+        break-before: page !important;
+        page-break-before: always !important;
+      }
+      h2 {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+        margin-top: 12px !important;
+      }
+      table, .callout, tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- ==================== ページ 1 ==================== -->
+  <header>
+    <div class="badge">2025年度下期 研修計画書（シラバス）</div>
+    <h1>WHYから学ぶデータベース構造と設計レビュー実践</h1>
+    <div class="subtitle">Practical Database Architecture & Design Review from WHY （旧名称：Oracle基礎勉強会）</div>
+  </header>
+
+  <section>
+    <h2>1. 基本情報</h2>
+    <table>
+      <tr>
+        <th style="width: 20%;">科目名</th>
+        <td><strong>WHYから学ぶデータベース構造と設計レビュー実践</strong></td>
+      </tr>
+      <tr>
+        <th>担当講師</th>
+        <td>
+          <strong>メイン講師:</strong> 長谷川 祥平（大阪技術部 / データベーススペシャリスト、AWS SAA）<br>
+          <strong>サブ講師・環境支援:</strong> 黒須 翔元（東京技術部）
+        </td>
+      </tr>
+      <tr>
+        <th>開講学期・日程</th>
+        <td>2025年度下期（半年間受講で修了） / 毎月第3火曜日 20:00〜22:00（120分 × 全6回）</td>
+      </tr>
+      <tr>
+        <th>定員・形態</th>
+        <td>30名 / オンライン（Teams） / 宿題・事前課題ゼロ</td>
+      </tr>
+      <tr>
+        <th>受講対象者</th>
+        <td>全社エンジニア（開発・インフラ問わず / 実務1〜3年目および初学者推奨）</td>
+      </tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>2. 講師から受講生へのメッセージ</h2>
+    <div class="callout">
+      <p style="margin-bottom: 4px; font-weight: 600; color: var(--primary-accent);">「世間で囁かれる『ジュニア不要論』を知っていますか？」</p>
+      <p style="margin-bottom: 4px;">これまでの現場は「シニアが設計し、ジュニアが実装する」ことで回っていました。しかし今や、実装やコード生成はAIが一瞬でやってくれます。現場が求めているのは、指示通りにコードを書く作業者ではなく「AIの仕事をレビュー（検収）できる人」です。もしAIの出力をレビューできないなら、現場にとってジュニアの存在意義とは何でしょうか？</p>
+      <p style="margin-bottom: 0;">私自身、皆さんと同じIT歴3〜4年の現場リーダーとして、日々AIを使い倒す中で「単にコードを書くスキルではなく、裏側の構造（WHY）を理解し、AIに適切な問いを立て、その出力を設計レベルで検証する力こそが唯一の生存戦略だ」と確信しました。従来の暗記講座をすべて捨て、『DBの本質から学び、設計レビュー実践までを通して体験できる講座』を用意しました。AIに作業を丸呑みさせられる側ではなく、AIを優秀な部下として自信を持って率いるエンジニアへ、一緒に駆け上がりましょう！</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. 研修の目的</h2>
+    <p>本研修の目的は、AIがコードを生成する時代において、受講生がシステムの全体構造を理解し、<strong>「AIの成果物のリスクを見抜き、現場で設計レビューができる自立したエンジニア」</strong>へと成長することです。</p>
+    <ol>
+      <li><strong>構造の理解（WHY）:</strong> 表面的な構文ではなく、データ整合性と性能を支える内部アーキテクチャを理解する姿勢。</li>
+      <li><strong>問いを立てる力:</strong> AIに対して適切な前提条件やレビュー観点を提示できるプロンプト・要件定義力。</li>
+      <li><strong>出力を検証する力:</strong> AIが生成したテーブル定義やSQLに対し、見落とされたトレードオフや現場リスクを指摘・修正できるレビュー力。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>4. 研修で探求すべき中心の問い（Essential Question）</h2>
+    <div class="callout" style="background: #f8fafc; border-left-color: var(--primary);">
+      <p style="margin: 0; font-weight: 700; color: var(--primary); font-size: 12.5px;">
+        『AIがコードを書く時代、私たちはシステムの何を信じ、何を疑うべきか？』
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>5. 学習目標（Learning Outcomes）</h2>
+    <ul>
+      <li><strong>目標Ⅰ【本質の理解】:</strong> DBが担保すべき本質（ACID特性等）と、それを実現する内部構造（WAL、REDO/UNDO、ロック等）の仕組みを自分の言葉で平易に説明できる。</li>
+      <li><strong>目標Ⅱ【アプリ⇄インフラ両利き】:</strong> クエリやトランザクションの書き方（アプリ視点）が、メモリ・I/O・ロック競合（インフラ視点）に与える影響を論理的に指摘できる。</li>
+      <li><strong>目標Ⅲ【現場トラブルの解決】:</strong> 「画面白画面」「デッドロック」「月末バッチ遅延」などの現場あるあるトラブルの根本原因と解決策を選択できる。</li>
+      <li><strong>目標Ⅳ【AIレビュー実践】:</strong> AIが提示したテーブル設計やSQLに対し、見落とされたトレードオフ（局所最適の罠）を見抜き、設計レビューコメントを具体的に提示できる。</li>
+    </ul>
+  </section>
+
+  <!-- ==================== ページ 2（改ページ） ==================== -->
+  <div class="page-break"></div>
+
+  <section>
+    <h2>6. 研修の大きな特徴（教育工学に基づく設計）</h2>
+    <ol>
+      <li><strong>学習理論に基づく授業設計（ITOR学習モデル）:</strong> インプット（解説）、スループット（思考ミニ問い）、アウトプット（模擬レビュー会議）、リフレクション（気づきの振り返り）の知のサイクルを120分内で完結。</li>
+      <li><strong>ピアラーニング（Think-Pair-Share）:</strong> 個人メモ（Think）➔ グループ議論（Pair/Share）➔ 実機実証により、他者との照合で盲点への気づきを最大化。</li>
+      <li><strong>成人学習論に基づくタイパ最大化:</strong> 業務後の受講生に配慮し、<strong>事前課題・宿題は一切なし</strong>。平日の120分に集中して学習を完結。</li>
+      <li><strong>クラウド実機環境提供:</strong> Oracle 26ai検証環境は講師側がクラウド上に整備し、端末依存のエラーや脱落を防止。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>7. 研修計画（全6回）</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 8%;">回</th>
+          <th style="width: 24%;">タイトル</th>
+          <th style="width: 44%;">概要・現場トラブルシナリオ</th>
+          <th style="width: 14%;">学習方法</th>
+          <th style="width: 10%;">時間外学習</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>第1回</strong></td>
+          <td><strong>【データと整合性】</strong><br>テーブル設計と制約</td>
+          <td><strong>シナリオ:</strong> ECサイトで注文はあるのに配送先が消えて発送不能。<br><strong>内容:</strong> なぜExcelではなくDBなのか？ ACIDの「C」、正規化、制約（PK/FK/NOT NULL）、最小権限。</td>
+          <td>聴講<br>協同（模擬レビュー）<br>討論</td>
+          <td>なし（完結型）</td>
+        </tr>
+        <tr>
+          <td><strong>第2回</strong></td>
+          <td><strong>【アプリとDBの境界線】</strong><br>接続とセッション</td>
+          <td><strong>シナリオ:</strong> 朝9時のアクセス集中でDB生存も画面真っ白に。<br><strong>内容:</strong> リスナーの役割、名前解決、コネクションプール枯渇、セッションとプロセスの違い。</td>
+          <td>聴講<br>体験・実践（実機検証）</td>
+          <td>なし（完結型）</td>
+        </tr>
+        <tr>
+          <td><strong>第3回</strong></td>
+          <td><strong>【速さと安全の両立】</strong><br>メモリと永続化（WAL）</td>
+          <td><strong>シナリオ:</strong> 決済中に電源プラグが抜けた！ データはどうなる？<br><strong>内容:</strong> メモリ（SGA）とディスク、WAL、REDO（耐久性）とUNDO（過去スナップショット）。</td>
+          <td>聴講<br>体験・実践（強制終了実証）</td>
+          <td>なし（完結型）</td>
+        </tr>
+        <tr>
+          <td><strong>第4回</strong></td>
+          <td><strong>【同時実行とロックの力学】</strong><br>トランザクションと衝突</td>
+          <td><strong>シナリオ:</strong> 在庫1個の限定品を2人が同時購入でマイナス在庫に。<br><strong>内容:</strong> トランザクション境界、分離レベル、行ロック・表ロック、デッドロック機構、MVCC。</td>
+          <td>聴講<br>討論<br>体験・実践（衝突実証）</td>
+          <td>なし（完結型）</td>
+        </tr>
+        <tr>
+          <td><strong>第5回</strong></td>
+          <td><strong>【性能監視と耐障害性】</strong><br>SQLチューニングと復旧</td>
+          <td><strong>シナリオ:</strong> 毎月の給与計算バッチがデータ増加でタイムアウト。<br><strong>内容:</strong> B*Tree INDEXの動作原理・トレードオフ、実行計画（Explain Plan）、バックアップリカバリ。</td>
+          <td>聴講<br>体験・実践（100万件実証）</td>
+          <td>なし（完結型）</td>
+        </tr>
+        <tr>
+          <td><strong>第6回</strong></td>
+          <td><strong>【総括と総合演習】</strong><br>シニアの視座へ</td>
+          <td><strong>シナリオ:</strong> 全5回のアーキテクチャ総復習 ＆ AI模擬レビュー総合演習。<br><strong>内容:</strong> 全工程チートシートを用いた体系化、期末総合実力テスト（全20問）とその場解説。</td>
+          <td>聴講<br>発表（テスト）<br>討論</td>
+          <td>なし（完結型）</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>8. 学習評価の方法（最終的な成果目標）</h2>
+    <p>本勉強会における評価基準（ABC制度での成果目標）は以下の通りです。</p>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;">評価項目</th>
+          <th>成果目標・合格基準</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>出席回数</strong></td>
+          <td><strong>全6回出席</strong></td>
+        </tr>
+        <tr>
+          <td><strong>課題・提出物</strong></td>
+          <td><strong>毎月、ボールド公式レポート提出</strong>（※詳細は、人事評価ルール参照）</td>
+        </tr>
+        <tr>
+          <td><strong>ローカル試験</strong></td>
+          <td><strong>最終回に期末実力テストを実施。80%以上正解で合格。</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">※期末テスト合格により、ABC制度における加点対象となります。</p>
+  </section>
+
+  <section>
+    <h2>9. 受講ルール・教材・生成AIポリシー</h2>
+    <ul>
+      <li><strong>教材:</strong> 指定の資格本購入は不要。講義スライドおよび復習用サマリーを毎回配布。</li>
+      <li><strong>実機:</strong> クラウド上のOracle 26ai環境を講師側で提供（受講生PCへのインストール不要）。</li>
+      <li><strong>生成AIポリシー:</strong> <strong>大歓迎・推奨</strong>。講義内のレビュー演習や現場業務でAI（ChatGPT, Claude, Cursor等）を積極的に使い、学んだレビュー観点をAIにぶつける実践を推奨。</li>
+    </ul>
+  </section>
+</div>
+
+</body>
+</html>

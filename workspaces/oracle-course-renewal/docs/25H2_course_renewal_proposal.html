@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>25下期 勉強会リニューアル企画提案書</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #eff6ff;
+      --accent: #2563eb;
+      --text-main: #1f2937;
+      --text-muted: #4b5563;
+      --border: #cbd5e1;
+      --bg-card: #f8fafc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans JP', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-main);
+      background-color: #f3f4f6;
+      line-height: 1.55;
+      font-size: 13px;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 40px 48px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 8px 14px;
+      border-radius: 6px;
+    }
+
+    h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      border-left: 4px solid var(--accent);
+      padding-left: 10px;
+      margin-top: 22px;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    p { margin-bottom: 8px; }
+    ul, ol { margin-left: 18px; margin-bottom: 10px; }
+    li { margin-bottom: 4px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px 0;
+      font-size: 12px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 7px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: var(--bg-card);
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .highlight-box {
+      background: #eff6ff;
+      border-left: 4px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+
+    .highlight-box p {
+      margin: 0;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-done { background: #dcfce7; color: #15803d; }
+    .status-prog { background: #fef3c7; color: #b45309; }
+
+    /* 印刷・PDF出力用スタイル */
+    @page {
+      size: A4 portrait;
+      margin: 14mm 16mm 14mm 16mm;
+    }
+
+    @media print {
+      body {
+        background: none !important;
+        padding: 0 !important;
+        font-size: 10.5pt !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .container {
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .page-break {
+        break-before: page !important;
+        page-break-before: always !important;
+      }
+      h2 {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+        margin-top: 18px !important;
+      }
+      h3 {
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+      }
+      table, .highlight-box, tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- ==================== ページ 1 ==================== -->
+  <header>
+    <div class="badge">25下期 勉強会リニューアル企画提案書</div>
+    <h1>WHYから学ぶデータベース構造と設計レビュー実践</h1>
+    <div class="subtitle">〜旧Oracle基礎勉強会 全面刷新プロジェクト〜</div>
+    <div class="meta-grid">
+      <div><strong>作成日:</strong> 2026年11月10日</div>
+      <div><strong>発案・メイン講師:</strong> 長谷川 祥平（大阪技術部 / DBスペシャリスト、AWS SAA）</div>
+      <div><strong>サブ講師・環境支援:</strong> 黒須 翔元（東京技術部）</div>
+      <div><strong>受講対象:</strong> 全社エンジニア（開発・インフラ問わず / 実務1〜3年目・初学者推奨）</div>
+    </div>
+  </header>
+
+  <section>
+    <h2>1. 企画の結論と目指す姿（GOAL & VALUE）</h2>
+    <div class="highlight-box">
+      <p>🎯 講座のゴール：『AI時代に現場で求められる「設計レビュー」と「AIに問いを立てる力」を備えた、自立したエンジニアの育成』</p>
+    </div>
+    <p>単にコードやSQLを書くだけの作業者を脱し、システムの全体構造を理解した上で、「AIの成果物のリスクを見抜き、設計レベルで目利き・レビューできるエンジニア」へと引き上げます。</p>
+
+    <h3>受講生の目指す姿（Transformation）</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;">項目</th>
+          <th style="width: 37%;">これまでの姿（Before）</th>
+          <th style="width: 38%;">本講座が目指す姿（After）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>知識の捉え方</strong></td>
+          <td>構文やパラメータを暗記しようとする</td>
+          <td><strong>なぜその設計にするのか（WHY）という判断軸を持つ</strong></td>
+        </tr>
+        <tr>
+          <td><strong>AIとの向き合い方</strong></td>
+          <td>AIの出力コードを動くからと鵜呑みにする</td>
+          <td><strong>AIに適切な「問い（レビュー観点）」をぶつけ、出力を検証できる</strong></td>
+        </tr>
+        <tr>
+          <td><strong>現場での立ち位置</strong></td>
+          <td>指示通りに実装する作業者</td>
+          <td><strong>AIを率いて成果物を設計レベルで検収できる自立した現場リーダー候補</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>会社への貢献</h3>
+    <ul>
+      <li><strong>会社が推進する「AI協業エンジニア」の輩出:</strong> 単にAIを使うだけでなく、AIの出力をレビュー・検収して品質を担保できる上位レイヤーの人材を育成します。</li>
+      <li><strong>AI時代を生き抜く若手エンジニアの育成と単価向上:</strong> 「AIに代替される作業者」で終わらせず、現場で高く評価され、高単価で選ばれ続けるエンジニアへと早期育成します。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>2. なぜ今、見直すのか？（2つの問題意識：WHY）</h2>
+    
+    <h3>【軸A：社内勉強会のあり方への疑問】〜辞書知識の伝達から「気づきの場」へ〜</h3>
+    <p>
+      従来の勉強会は「資格本の用語やパラメータをなぞる講義」が中心でした。しかし辞書的な知識の伝達なら、AIや公式ドキュメントで事足ります。人が集まる勉強会の真の価値は、<strong>「学びと実践を通じて、受講者自身の中に『気づき（なるほど！）』が生まれること」</strong>にあるはずです。
+    </p>
+    <ul>
+      <li><strong>資格対策としての構造的限界:</strong> 月1回のペースで半年間暗記を続けても、試験直前には前半の内容を忘れており、受講生は「結局最後に自分で最初から黒本をやり直す」未来を辿っていました（※私自身、過去の受講時に初回の2回目までに自学で合格し、残りが消化試合になってしまった経験があります）。</li>
+      <li><strong>半年間（長期・低頻度）だからこそ生み出せる真の価値:</strong> 暗記は短期集中で自習すべきものです。半年間というスパンだからこそ意味があるのは、<strong>「月1回、新しい設計の視座（レンズ）と気づきを持ち帰り、翌月の現場でそれを意識しながら業務やAIと向き合い、半年かけてじっくりエンジニアとしての思考の骨格（レビュー眼）を形成すること」</strong>です。</li>
+    </ul>
+
+    <h3>【軸B：なぜ今、設計レビューなのか？】〜「ジュニア不要論」を乗り越える生存戦略〜</h3>
+    <p>
+      世間で囁かれる「ジュニア不要論」の本質は、AIがコードを一瞬で生成できるようになったことで、<strong>「指示されたコードを書くだけの作業者の存在意義が失われつつあること」</strong>にあります。
+    </p>
+    <p>AI時代に求められる変化として、以下の3つの力が決定的に重要になっています：</p>
+    <ol>
+      <li>単にコードを書くスキルではなく、<strong>「全体の設計や構造（WHY）」を理解する力</strong></li>
+      <li>AIに対して適切なプロンプトや前提条件を投げかける<strong>「問いを立てる力」</strong></li>
+      <li>AIが生成した成果物のリスクやトレードオフを見抜く<strong>「AIの出力を検証（レビュー）する力」</strong></li>
+    </ol>
+    <p>問いを立てられず、AIの出力をレビューできないエンジニアは淘汰されます。だからこそ、現場に出る前に「レビューする練習」を積む場が絶対に必要です。</p>
+  </section>
+
+  <!-- ==================== ページ 2（改ページ） ==================== -->
+  <div class="page-break"></div>
+
+  <section>
+    <h2>3. 講座コンセプト：なぜ題材が「データベース」なのか？（CONCEPT）</h2>
+    <div class="highlight-box">
+      <p>💡 AI時代必須の「設計レビュー力」を、DBという最も解像度の高い題材で実践訓練する</p>
+    </div>
+    <p>「設計レビューの練習をしよう」と抽象論を語っても、受講生は何をどう見ればいいか掴めません。レビューの訓練には、具体的で手触り感のある題材が不可欠です。</p>
+    <ul>
+      <li><strong>すべてのシステムに共通する「心臓部」:</strong> Web、バッチ、クラウド、インフラ問わず、DBに触れないシステムは存在せず、学んだ知見がどの現場でも100%活きます。</li>
+      <li><strong>「アプリ」と「インフラ」の交差点:</strong> 「クエリやトランザクションの書き方（アプリの都合）」が、「メモリ、ディスクI/O、ロック競合（インフラの現実）」に直結します。両方の視座を持たないとレビューができない、最高の訓練素材です。</li>
+      <li><strong>AIが最も「局所最適化（見落とし）」を起こす領域:</strong> AIは構文的に動くSQLを秒で作りますが、「同時実行時のデッドロック」や「100万件での性能崩壊」「データ不整合」といった現実の物理制約を平気で見落とします。AIの欠陥を突くレビュー練習として最も差が出ます。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. 勉強会新名称と開講概要</h2>
+    <table>
+      <tr>
+        <th style="width: 25%;">新名称案（第1希望）</th>
+        <td><strong>WHYから学ぶデータベース構造と設計レビュー実践</strong><br><span style="color: var(--text-muted); font-size: 11px;">（旧名称：Oracle基礎勉強会 ※社内管理上の旧名併記にも対応）</span></td>
+      </tr>
+      <tr>
+        <th>開講形式</th>
+        <td>毎月第3火曜日 20:00〜22:00（120分 × 6ヶ月間 / 定員30名 / オンライン）</td>
+      </tr>
+      <tr>
+        <th>授業スタイル</th>
+        <td>
+          ・<strong>【前半】</strong>：設計思想・観点のインプット（なぜその設計にするのか）<br>
+          ・<strong>【後半】</strong>：チームでの模擬レビュー会議（AIが出力した設計書の粗探し演習）や実機検証実験<br>
+          ・<strong>宿題・事前課題ゼロ</strong>：業務後の受講生に配慮し、講義時間内の120分で「理解 ➔ 実践」を完結。
+        </td>
+      </tr>
+      <tr>
+        <th>詳細カリキュラム</th>
+        <td>別添資料「<strong>2025年度下期 研修計画書（シラバス）</strong>」に全6回の詳細・学習目標・評価基準を完全網羅。</td>
+      </tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. 登壇実績と下期開講ロードマップ（ROADMAP & STATUS）</h2>
+    <h3>講師の登壇実績（現行期でのプレ検証）</h3>
+    <p>
+      2026年9月より現行期のメイン講師を引き継ぎ、現場目線やレビュー重視のアプローチを試験導入。受講生からも「実務に直結してわかりやすい」「AIを使う上で盲点だった」と高い評価を獲得しており、新コンセプトの有効性を現場で検証済みです。
+    </p>
+
+    <h3>25下期（新期）開講に向けた進行ステータス</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>内容</th>
+          <th style="width: 25%;">ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>企画提案書 ＆ シラバス</strong></td>
+          <td>講座コンセプト、問題意識、全6回シラバス、学習目標、授業設計</td>
+          <td><span class="status-badge status-done">策定完了</span></td>
+        </tr>
+        <tr>
+          <td><strong>社内申請資材</strong></td>
+          <td>講師紹介パラメータ、申し込みのご案内、勉強会紹介カード（全3シート）</td>
+          <td><span class="status-badge status-done">入力済み</span></td>
+        </tr>
+        <tr>
+          <td><strong>新コンテンツ制作</strong></td>
+          <td>全6回の新スライド・模擬レビュー演習課題・検証コード</td>
+          <td><span class="status-badge status-prog">下期開講に向けて順次制作中</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+</body>
+</html>
