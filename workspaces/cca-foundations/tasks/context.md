@@ -6,15 +6,17 @@
 ---
 
 ## 🎯 現在の焦点 (Current Focus)
-- **Issue `#7`（Setup ＆ ELT前処理）**: 完了・クローズ済み。
-- **Issue `#9`（NotebookLM環境構築）**: 社長がNotebookLMへのPack登録とA/Bテスト音声生成予約を完了。耳学習はスキマ時間に日常実施。
-- **次の焦点**: **Issue `#8`（🔴 MUST概念のソクラテス壁打ち ＆ `second-brain` 結晶化）** の開始！
+- **Issue `#8`（🔴 MUST概念のソクラテス壁打ち ＆ `second-brain` 結晶化）**: 進行中
+- **Domain 1（Agent Architecture）**: 🔴 MUST 3項目すべて完了（Permanent Notes 3本登録済）🎉
+- **次の焦点**: **Domain 2: Tool Design & MCP Integration (ツール設計 & MCP連携)** の開始
 
-## 📌 決定事項 (Decisions)
-- **コンテキスト純度リセット**: コンテキスト肥大化を防ぐため、壁打ち着手前にセッションを切り替える。
-- **壁打ち第1弾**: Domain 1（Agent Architecture & Orchestration）の 🔴 MUST 3項目から開始。
+## 📌 決定事項・ステータス (Decisions & Status)
+- **コンテキスト純度管理**: セッション肥大化（Lost in the Middle）回避のため、Domain 1 完了時点でセッションをリセット。
+- **Domain 1 で結晶化した3大原則**:
+  1. Workflow vs Agent（オープンループ vs クローズドループフィードバック）
+  2. Subagent Isolation（S/N比最大化、情報隠蔽、独立二重検証による見逃し率激減）
+  3. Loop Termination（停止判断の自己矛盾、決定論的サーキットブレーカー、Early Stopping）
 
 ## 🚀 次のアクション (Next Actions for New Session)
-1. 新セッション開始後、現場ワークスペース（`agent-core/workspaces/cca-foundations/`）のコンテキストを読み込む。
-2. 社長へ **Domain 1 の第1問（Workflow vs Agent のトレードオフ境界線）** を問いかけ、ソクラテス壁打ちを開始する。
-3. 社長の回答から独自のメガネ（アナロジー・実務洞察）を抽出し、`second-brain/40_Permanent_Notes/` にアトミックノートとして登録する。
+1. 新セッション開始後、現場コンテキスト（`agent-core/workspaces/cca-foundations/`）を読み込む。
+2. 社長へ **Domain 2 の第1問（MCP 3大プリミティブ：Resources vs Prompts vs Tools の責務分離）** を提示し、壁打ちを即座に再開する。

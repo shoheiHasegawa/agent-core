@@ -10,12 +10,15 @@
 ## Domain 1: Agent Architecture & Orchestration (エージェント設計・連携)
 
 ### 🔴 MUST
-1. **Workflow vs Agent (決定論的パイプライン vs 自律ループ)**
+1. **[x] Workflow vs Agent (決定論的パイプライン vs 自律ループ)**
    - *ソクラテスの問い*: 「なぜAnthropicは、可能な限りAgentではなく決定論的なWorkflow（Router / Chaining / Parallel）を使うことを推奨するのか？ そのトレードオフの境界線はどこにあるか？」
-2. **Subagent & Context Isolation (情報隠蔽とコンテキスト純度)**
+   - *結晶化ノート*: [`エージェントの自律ループは環境フィードバックによる動的補正であり、手順が既知の処理は決定論的ワークフロー（DAG）に純化されなければならない.md`](file:///Users/shoheihasegawa/you_inc/second-brain/40_Permanent_Notes/エージェントの自律ループは環境フィードバックによる動的補正であり、手順が既知の処理は決定論的ワークフロー（DAG）に純化されなければならない.md)
+2. **[x] Subagent & Context Isolation (情報隠蔽とコンテキスト純度)**
    - *ソクラテスの問い*: 「単一のエージェントに全ツールを持たせるのではなく、Subagentに委譲すべきなのはどのような状況か？ コンテキストの汚染と精度の関係は？」
-3. **Agentic Loop Termination (停止条件と無限ループ防止)**
+   - *結晶化ノート*: [`サブエージェントによる情報隠蔽は推論のS_N比を最大化し、成果の検証は自己申告ではなく決定論的ゲートと第三者評価に委ねられなければならない.md`](file:///Users/shoheihasegawa/you_inc/second-brain/40_Permanent_Notes/サブエージェントによる情報隠蔽は推論のS_N比を最大化し、成果の検証は自己申告ではなく決定論的ゲートと第三者評価に委ねられなければならない.md)
+3. **[x] Agentic Loop Termination (停止条件と無限ループ防止)**
    - *ソクラテスの問い*: 「エージェントが自己判断で無限ループや堂々巡りに陥るのを防ぐために、アーキテクトが絶対に組み込むべき安全装置は何か？」
+   - *結晶化ノート*: [`エージェント自身に自律ループの停止判断を委ねる設計は自己矛盾であり、遮断は決定論的サーキットブレーカーと進捗減速検知（Early Stopping）によって強制されなければならない.md`](file:///Users/shoheihasegawa/you_inc/second-brain/40_Permanent_Notes/エージェント自身に自律ループの停止判断を委ねる設計は自己矛盾であり、遮断は決定論的サーキットブレーカーと進捗減速検知（Early Stopping）によって強制されなければならない.md)
 
 ### 🟡 SHOULD
 4. **Human-in-the-Loop (人間介入・承認ゲート)**

@@ -10,6 +10,9 @@
   - [x] カバレッジ監査レポート（`docs/coverage_report.md`）で全25項目（100%）の網羅検証完了
 - [ ] **#8: [Phase 1: Pass 1] 🔴 MUST概念のソクラテス壁打ち ＆ second-brain 結晶化**
   - [ ] Domain 1: Agent Architecture（🔴 MUST 3項目）の壁打ち
+    - [x] 1. Workflow vs Agent（決定論的パイプライン vs 自律ループ）➔ Permanent Note 登録完了 🎉
+    - [x] 2. Subagent & Context Isolation（情報隠蔽とコンテキスト純度）➔ Permanent Note 登録完了 🎉
+    - [x] 3. Agentic Loop Termination（停止条件と無限ループ防止）➔ Permanent Note 登録完了 🎉 (Domain 1 🔴 MUST 貫通！)
   - [ ] Domain 2: Tool & MCP（🔴 MUST 3項目）の壁打ち
   - [ ] Domain 3: Claude Code（🔴 MUST 3項目）の壁打ち
   - [ ] Domain 4: Prompt & Structured Output（🔴 MUST 3項目）の壁打ち

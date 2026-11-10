@@ -26,4 +26,14 @@ type: Orchestrator
 
 ### 3. 承認と公式CLIによる登録
 1. ドラフト（既存ノート更新時はその差分）を社長に提示し、承認を得る。
-2. 承認後、`core-service` の Zettelkasten 登録・検証 CLI を実行して保存し、リンク切れやフォーマット違反がないことを確認して完了する。
+2. 承認後、`core-service` の公式CLIを実行して保存する（※直接のファイル作成・編集は厳禁）：
+   ```bash
+   cd core-service && PYTHONPATH=src uv run python -m entrypoints.cli.main zk-register \
+     --type permanent \
+     --title "<タイトル>" \
+     --content "<Claimの内容>" \
+     --context "<Contextの内容>" \
+     --tags "<tag1,tag2>" \
+     --links "<link1,link2>"
+   ```
+3. 登録後、リンク切れやフォーマット違反がないことを確認して完了する。
