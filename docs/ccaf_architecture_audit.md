@@ -106,12 +106,12 @@ CCA-F Pack 1 の第一原則は **「Start with simple workflows before escalati
 
 ---
 
-## 6. 後続タスク（Sub-Issues）の確定仕様と GitHub 復旧時同期キュー `[PENDING_GITHUB_SYNC]`
+## 6. 後続タスク（Sub-Issues）の確定仕様と GitHub 同期完了記録 `[SYNCED_TO_GITHUB]`
 
-> [!IMPORTANT]
-> **🔄 `[PENDING_GITHUB_SYNC]` (GitHub API 復旧後の反映手順)**:
-> 2026-11-07 時点で GitHub API (`gh`) が一時停止中のため、以下の Issue 更新・起票内容を本正本に完全な形で記録している（`tools/verify_cleanliness.py` が本マーカー `[PENDING_GITHUB_SYNC]` を検知し、GitHub 反映が完了して本マーカーを削除するまで `make check-all` 実行時に常時リマインドを表示する）。
-> GitHub 復旧時は以下の `gh` コマンドを実行して Issue へ反映し、反映後に本ブロックのマーカーを `[SYNCED_TO_GITHUB]` へ変更せよ：
+> [!NOTE]
+> **✅ `[SYNCED_TO_GITHUB]` (GitHub 同期完了済み)**:
+> 2026-11-12 GitHub サポートによる制限解除に伴い、以下の全 Issue 更新・起票（#14クローズ、#2クローズ、#15起票＆クローズ、技術的負債 #16〜#19 及び core-service#2 の起票）が完了しました。
+> 記録として以下の実行内容を保存する：
 > ```bash
 > # 1. 親Epic #14 へ本監査レポートと Phase 3 (ccaf-phase3-rail) 完了の3点ブリーフィングを記録＆クローズ
 > gh issue comment 14 --body "CCA-F アーキテクチャ適合性監査（Step 1〜4）、Sub-Issue A (Issue #2: OSサンドボックス)、および Sub-Issue B (Phase 3: 構造化CLI・Verdict機械検証・Linterレール) の全実装・監査が完了しました。
