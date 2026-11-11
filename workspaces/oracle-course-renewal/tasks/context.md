@@ -21,10 +21,7 @@
     - `session_05/raw_extracted.md`（画像抽出済み）および `docs/quiz_archive_24h2.md` をベースに、Step 1（講義設計・120分タイムライン）＆ Step 2（SOLID問題設計全20問）へ着手。
 
 ## 参照すべき正本（SSOT Pointers）
-- 企画提案書正本: `docs/25H2_course_renewal_proposal.md`（HTML: `docs/25H2_course_renewal_proposal.html`）
-- 研修計画書（シラバス）正本: `docs/25H2_course_syllabus.md`（HTML: `docs/25H2_course_syllabus.html`）
-- 開催準備ドラフト正本（3シート入力用）: `docs/25H2_course_application_draft.md`
-- リニューアル戦略・壁打ち記録: `docs/25H2_course_renewal_strategy.md`
+- ※来期リニューアル企画（2027/01開講）は新ワークスペースへ移管完了: `../db-architecture-2027/`
 - 設計思想・アーキテクチャ正本: `docs/00_Design_Decisions.md`
 - 前任者資産監査レポート: `docs/predecessor_audit_report.md`
 - 社内一次資料生データ: `docs/raw_source_archives/`
