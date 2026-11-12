@@ -8,15 +8,16 @@
 ## 🎯 現在の焦点 (Current Focus)
 - **Issue `#8`（🔴 MUST概念のソクラテス壁打ち ＆ `second-brain` 結晶化）**: 進行中
 - **Domain 1（Agent Architecture）**: 🔴 MUST 3項目すべて完了（Permanent Notes 3本登録済）🎉
-- **次の焦点**: **Domain 2: Tool Design & MCP Integration (ツール設計 & MCP連携)** の開始
+- **Domain 2（Tool Design & MCP Integration）**: 🔴 MUST 3項目すべて完了（Permanent Notes 4本登録済）🎉
+- **Domain 3（Claude Code Configuration & Workflows）**:
+  - [x] 🔴 MUST 1: CLAUDE.md Hierarchy & Rule Injection ➔ Permanent Notes 2本登録完了 🎉
+  - [ ] **次の焦点**: 🔴 MUST 2: Permission Model & Sandbox Boundaries (実行許可とサンドボックス)
 
 ## 📌 決定事項・ステータス (Decisions & Status)
-- **コンテキスト純度管理**: セッション肥大化（Lost in the Middle）回避のため、Domain 1 完了時点でセッションをリセット。
-- **Domain 1 で結晶化した3大原則**:
-  1. Workflow vs Agent（オープンループ vs クローズドループフィードバック）
-  2. Subagent Isolation（S/N比最大化、情報隠蔽、独立二重検証による見逃し率激減）
-  3. Loop Termination（停止判断の自己矛盾、決定論的サーキットブレーカー、Early Stopping）
+- **Domain 3 🔴 MUST 1 で結晶化した原則（ノート2本）**:
+  1. ルールの階層解決（局所のHOW優先カスケード vs 大域の不可侵安全境界 WHEN/WHERE）
+  2. プロンプトの認知ジレンマ（抽象の漏れ vs 具体の希釈 ➔ 上位薄いルーティング ＋ 動的専門サブエージェント ＋ 決定論的テストへの三権分立）
+- **第二脳の累計ノート数**: CCA-F関連 9本登録完了（目標10〜15本まであと1〜6本！）
 
-## 🚀 次のアクション (Next Actions for New Session)
-1. 新セッション開始後、現場コンテキスト（`agent-core/workspaces/cca-foundations/`）を読み込む。
-2. 社長へ **Domain 2 の第1問（MCP 3大プリミティブ：Resources vs Prompts vs Tools の責務分離）** を提示し、壁打ちを即座に再開する。
+## 🚀 次のアクション (Next Actions)
+- 社長へ **Domain 3 🔴 MUST 2: Permission Model & Sandbox Boundaries（実行許可フラグ・サンドボックス境界・HITL承認）** のソクラテスの問いを提示する。
