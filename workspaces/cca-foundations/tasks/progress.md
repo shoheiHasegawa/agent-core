@@ -19,11 +19,11 @@
     - [x] 3. Scoped Permissions & Security Boundaries (最小権限とセキュリティ) ➔ Permanent Note 登録完了 🎉
   - [ ] Domain 3: Claude Code（🔴 MUST 3項目）の壁打ち
     - [x] 1. CLAUDE.md Hierarchy & Rule Injection ➔ Permanent Notes 2本登録完了 🎉
-    - [ ] 2. Permission Model & Sandbox Boundaries (実行許可とサンドボックス)
+    - [x] 2. Permission Model & Sandbox Boundaries (実行許可とサンドボックス) ➔ Permanent Note 登録完了 🎉
     - [ ] 3. Headless / CI/CD Automation
   - [ ] Domain 4: Prompt & Structured Output（🔴 MUST 3項目）の壁打ち
   - [ ] Domain 5: Context & Reliability（🔴 MUST 3項目）の壁打ち
-  - [ ] `second-brain/40_Permanent_Notes/` にアトミックノート蓄積（現在9本 / 目標10〜15本以上）
+  - [ ] `second-brain/40_Permanent_Notes/` にアトミックノート蓄積（現在10本 / 目標10〜15本以上達成中 🎉）
 - [ ] **#9: [Phase 1: Ear] NotebookLM環境構築（音声解説・マインドマップ・フラッシュカード）による耳学習反復**
   - [ ] 5つのCleaned PacksのNotebookLM投入
   - [ ] 日本語ポッドキャスト（音声解説）生成 ＆ 3周聴了
