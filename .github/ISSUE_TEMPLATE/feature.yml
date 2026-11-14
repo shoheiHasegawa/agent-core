@@ -6,38 +6,40 @@ body:
   - type: markdown
     attributes:
       value: |
-        You_Inc 公式 Issue テンプレートです。「WHY ➔ WHAT [DoD] ➔ HOW」の思考OSに沿って記入してください。
+        You_Inc 公式 Issue テンプレートです。「WHY & Value ➔ WHAT [DoD] ➔ Non-Scope」に沿って記入してください。起票時に未確定の細部は捏造せず `TBD` と明記してください。
   - type: textarea
     id: why
     attributes:
-      label: 🎯 WHY (背景と目的)
-      description: なぜ今これをやるのか？どのようなエントロピーや不便を解消するか？
-      placeholder: 背景・動機・放置した場合のコスト
+      label: 🎯 WHY & Value (背景・目的と実現する価値)
+      description: なぜ今これをやるのか（放置コスト）？完了すると誰の何がどう良くなるか（実現する価値）？
+      placeholder: |
+        - 解消したい課題・リスク:
+        - 完了後に得られる価値（Before ➔ After）:
     validations:
       required: true
   - type: textarea
     id: what_dod
     attributes:
-      label: 📋 WHAT / DoD (スコープと定量的完了条件)
-      description: 客観的・定量的に検証可能な合格判定基準
+      label: 📋 WHAT / DoD (完了イメージと定量的完了条件)
+      description: 目指すゴール状態と検証可能な合格判定基準（先行Issue待ちで未確定の項目は `TBD（#<num>完了後に確定）` と明記）
       placeholder: |
         - [ ] 条件1 (例: make check-all 通過)
-        - [ ] 条件2 (例: CLIコマンドの挙動検証)
+        - [ ] 条件2 (未確定時は `TBD: Phase 0 で確定`)
     validations:
       required: true
   - type: textarea
     id: non_scope
     attributes:
-      label: 🚫 Non-Scope (今回は絶対にやらないこと)
-      description: 過品質や迷走を防ぐための境界線
+      label: 🚫 Non-Scope (今回はやらないこと・境界)
+      description: 過品質や迷走を防ぐ境界線（起票時に見えていれば記入。未決なら着手時に確定）
       placeholder: 今回はスコープ外とする項目
     validations:
-      required: true
+      required: false
   - type: textarea
     id: how_constraints
     attributes:
-      label: 🛠️ HOW & CONSTRAINTS (想定アプローチと制約)
-      description: 対象リポジトリ、準拠すべき設計原則、禁止事項
-      placeholder: 対象リポジトリや設計アプローチ
+      label: 🛠️ CONSTRAINTS (対象リポジトリと絶対制約 ※詳細HOWは書かない)
+      description: 対象リポジトリ、準拠すべき設計原則・禁止事項（実装手順の固定は避ける）
+      placeholder: 対象リポジトリや絶対制約
     validations:
       required: false
