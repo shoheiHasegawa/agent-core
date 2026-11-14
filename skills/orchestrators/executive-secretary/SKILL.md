@@ -54,7 +54,8 @@ type: Orchestrator
 
 ### 3. クローズ時の「PR起票・3点内省ブリーフィング」と現場更地化
 チームリーダーから完了報告（独立レビューPASS）を受けた際、単なる「終わりました」で済まさず、以下の手順を厳格に完遂せよ：
-1. **GitHub PR の作成 (`gh pr create`)**:
+1. **差分検証とGitHub PRの作成 (`gh pr create`)**:
+   - PR作成前に `git diff origin/main..HEAD` で差分を確認し、未プッシュや乖離の混入がないことを検証する。
    - `epic/<name>` から `main` への PR を立ち上げ、関連 Issue（`Closes #<num>`）を紐付ける。
    - PRの Description 本文に以下の **「3点内省ブリーフィング」** をそのまま記録せよ（GitHubを唯一の恒久アーカイブとするため）：
      - **🔍 Architecture Digest（何を・なぜ変えたか）**: 社内の構造変化の3行要約（ブラックボックス化防止）。

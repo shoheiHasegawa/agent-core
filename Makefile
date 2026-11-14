@@ -3,6 +3,8 @@
 EPIC ?=
 REPOS ?= core-service
 ISSUE ?=
+OFFLINE ?=
+RESET ?=
 CORE_SERVICE_DIR ?= $(firstword $(wildcard ../core-service ../../../../core-service /Users/shoheihasegawa/you_inc/core-service))
 ENV_FILE ?= $(firstword $(wildcard config/conf.env ../../config/conf.env ../../../../agent-core/config/conf.env /Users/shoheihasegawa/you_inc/agent-core/config/conf.env))
 ARGS ?=
@@ -47,8 +49,8 @@ park-clear:
 # Workspace & Worktree Harness (方式A)
 # ---------------------------------------------------------
 ws-new:
-	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-new EPIC=<name> [REPOS=core-service,agent-core] [ISSUE=123]"; exit 1; fi
-	@uv run python tools/workspace_manager.py new --epic "$(EPIC)" --repos "$(REPOS)" $(if $(ISSUE),--issue "$(ISSUE)",)
+	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-new EPIC=<name> [REPOS=core-service,agent-core] [ISSUE=123] [OFFLINE=1] [RESET=1]"; exit 1; fi
+	@uv run python tools/workspace_manager.py new --epic "$(EPIC)" --repos "$(REPOS)" $(if $(ISSUE),--issue "$(ISSUE)",) $(if $(filter-out 0 false FALSE,$(OFFLINE)),--offline,) $(if $(filter-out 0 false FALSE,$(RESET)),--reset,)
 
 ws-harvest:
 	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-harvest EPIC=<name>"; exit 1; fi
