@@ -47,7 +47,9 @@ type: Orchestrator
 - タスク更新: `make tasks-update ARGS="--task-id '<id>' [--title '<title>'] [--target-list '<list>']"`
 
 #### C. 会社（Agentチーム）の課題と現場起動
-1. **会社の課題**: `gh issue create` で目的（WHY）と完了条件（DoD）を明記して起票する。
+1. **会社の課題 (`gh issue create`)**:
+   - **必須3ラベル**（`type:*` または `documentation` / `prio:*` / `size:S|M|L`）と **`WHY & Value`＋`DoD`**（未確定事項は捏造せず `TBD` と明記、`Non-Scope` は判明分のみ）を記入して起票する。
+   - `[PREC-02]` に従い個人の単発行動（予約・受験等）は独立 Issue にせず Epic の DoD と Google Tasks へ分離する。
 2. **現場の立ち上げ**: `make ws-new EPIC=<epic_name> REPOS=<target_repos> ISSUE=<num>` を実行して隔離 Worktree を生成し、`team-leader` へ作業を委譲する（※`REPOS` には `core-service`, `agent-core` に加え、トピック単位の蒸留・大掃除では `second-brain` も指定可能 — `[PREC-06]`）。
 
 ### 3. クローズ時の「PR起票・3点内省ブリーフィング」と現場更地化
