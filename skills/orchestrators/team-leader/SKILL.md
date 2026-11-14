@@ -29,7 +29,7 @@ type: Orchestrator
 ### Phase 1: 🌀 Pass 1 — 貫通ループ (Make it Work)
 - **リーダーのFocusと委譲のバランス（コンテキスト保護 × コスト最適化）**:
   - **機能実装・ドメインロジック変更（SDD×TDD対象）**: リーダー自身がテストと実装の両方を直接書くと確証バイアス（`[EXP-01]`）が働きコンテキストも汚染されるため、必ず `tdd-red-worker`（`Model="flash"`）と `tdd-green-worker`（`Model="flash"`）に小バッチ（1〜2シナリオずつ）で委譲せよ。
-  - **作業中の引っ掛かり退避（ヤクの毛刈り防止）**: 作業中に見つけた軽微な違和感・技術課題は、作業を止めずに `make park-add ARGS="--topic '<topic>' [--details '<details>']"` で Parking Lot へ退避せよ（タスク内学びは `tasks/lessons_learned.md` ➔ ルートA、個人思考・気づきは `second-brain/00_Inbox/` ➔ ルートB）。
+  - **作業中の引っ掛かり退避（ヤクの毛刈り防止）**: 作業中に見つけた軽微な違和感・技術課題は、作業を止めずに `make park-add ARGS="--topic '<topic>' [--details '<details>']"` で Parking Lot へ退避せよ（タスク内学びは `tasks/lessons_learned.md` ➔ ルートA、個人思考・気づきは `second-brain/inbox/` ➔ ルートB）。
   - **単純なファイル削除・設定変更**: ロジックを含まない軽微な整理作業は、サブエージェント起動のオーバーヘッド（コスト）を避けるため単一ワーカーまたはリーダー自身で手早く処理してよい。
   - **【絶対必須：独立レビュアーの別起動】**: 実装方法に関わらず、完了判定前には**必ず別サブエージェントとして `compliance-reviewer`（`Model="pro"`）を起動**し、第三者監査を受けよ（自己レビューで完了とすることは固く禁ずる）。
 - **手順**:

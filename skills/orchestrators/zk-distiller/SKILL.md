@@ -12,28 +12,26 @@ type: Orchestrator
 
 ## 📥 入力と出力の契約 (I/O Contract)
 - **Input**: 社長の気づき・着想メモ・プロジェクト振り返りのトピック、および `agent-core/docs/rules/zettelkasten_and_dialog_principles.md`
-- **Output**: 社長承認済みの Zettelkasten ノート（`20_Sense_Making` または `40_Permanent_Notes`）の登録とリンク整合性検証パス
+- **Output**: 社長承認済みの Zettelkasten ノート（`sense_making` または `permanent_notes`）の登録・更新とリンク整合性検証パス
 
 ## 🛠️ 実行手順 (HOW)
 
 ### 1. 既存知識の探索とソクラテス式壁打ち (Socratic Dialogue)
-1. `second-brain/40_Permanent_Notes/` や `20_Sense_Making/` を検索し、関連する過去のノートや思考の文脈を特定する。
+1. `second-brain/permanent_notes/` や `sense_making/` を検索し、関連する過去のノートや思考の文脈を特定する。
 2. いきなりAIが答えを書いてまとめるのではなく、**「なぜそう感じたのか？」「一見〇〇に見えるが、本質は△△だとしたらどうなるか？」「他の領域にも言える普遍的な構造は何か？」** という問いを1〜2問投げかけ、社長自身の言葉を引き出す。
 
 ### 2. 熱量（Whyのエントロピー）を保つドラフト作成 ([EXP-06] 準拠)
 1. `agent-core/docs/rules/zettelkasten_and_dialog_principles.md` のフォーマット・双方向リンク規則に従い、ノートのドラフトを作成する。
 2. **絶対制約**: AI特有の教科書的で無難な要約に丸めてはならない。社長が語った生々しい表現、トレードオフの葛藤、具体例をそのまま核として残すこと。
 
-### 3. 承認と公式CLIによる登録
+### 3. 承認と公式CLIによる登録・更新
 1. ドラフト（既存ノート更新時はその差分）を社長に提示し、承認を得る。
 2. 承認後、`core-service` の公式CLIを実行して保存する（※直接のファイル作成・編集は厳禁）：
    ```bash
-   cd core-service && PYTHONPATH=src uv run python -m entrypoints.cli.main zk-register \
-     --type permanent \
-     --title "<タイトル>" \
-     --content "<Claimの内容>" \
-     --context "<Contextの内容>" \
-     --tags "<tag1,tag2>" \
-     --links "<link1,link2>"
+   # 新規登録時
+   make zk-register ARGS="--type permanent --title '<タイトル>' --content '<Claimの内容>' --context '<Contextの内容>' --tags '<tag1,tag2>' --links '<link1,link2>'"
+
+   # 既存ノートへの追記・更新時
+   make zk-update ARGS="--path 'permanent_notes/<タイトル>.md' --content '<追記内容>' --append"
    ```
-3. 登録後、リンク切れやフォーマット違反がないことを確認して完了する。
+3. 登録後、リンク切れやフォーマット違反がないことを確認（`make zk-audit`）して完了する。

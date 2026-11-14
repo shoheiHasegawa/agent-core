@@ -398,6 +398,38 @@ class TestCiCompatibility(unittest.TestCase):
         self.assertTrue(len(gemini_text.strip()) > 0, "agent-core/GEMINI.md must not be empty")
         self.assertIn("Global Constitution: GEMINI.md", gemini_text)
 
+    def test_sc_11_worktree_sibling_repo_link_resolution(self):
+        """[SC-11]: worktrees/ 配下に兄弟リポジトリの Worktree が存在する環境では、他リポ横断リンクの検証に兄弟 Worktree 側の最新構造が優先使用されること。"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mono = Path(tmpdir) / "monorepo"
+            mono.mkdir(parents=True, exist_ok=True)
+            (mono / "GEMINI.md").write_text("# Root", encoding="utf-8")
+
+            # 本流の second-brain には旧ディレクトリ 10_Areas しかない状態
+            (mono / "second-brain" / "10_Areas").mkdir(parents=True, exist_ok=True)
+
+            wt_dir = mono / "agent-core" / "workspaces" / "epic" / "worktrees"
+            ac_wt = wt_dir / "agent-core"
+            sb_wt = wt_dir / "second-brain"
+            (ac_wt / "docs").mkdir(parents=True, exist_ok=True)
+            # Epic Worktree 側の second-brain は新ディレクトリ areas/ に移行済み
+            (sb_wt / "areas").mkdir(parents=True, exist_ok=True)
+
+            (ac_wt / "docs" / "arch.md").write_text(
+                "- [Areas](../../second-brain/areas/)\n"
+                "- [Root](../../GEMINI.md)\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(check_markdown_links.check_markdown_links(ac_wt), [])
+
+            # 旧パスを参照し続けている場合は壊れたリンクとして検知すること
+            (ac_wt / "docs" / "stale.md").write_text(
+                "- [Old](../../second-brain/10_Areas/)\n",
+                encoding="utf-8",
+            )
+            errors = check_markdown_links.check_markdown_links(ac_wt)
+            self.assertTrue(any("10_Areas" in e for e in errors), f"Expected stale link error, got {errors}")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,9 +27,9 @@
 ## 2. 🛡️ GOVERNANCE：知識庫純度を守る絶対制約 (Hard Constraints)
 
 1. **Agent単独での Permanent 化の禁止 (Zettelkasten Philosophy)**:
-   - Agentがタスク完了時等に知見を `20_Sense_Making/` へ自動投函することは許可するが、`40_Permanent_Notes/` への移管・新規登録をAgent単独で完結させることは【絶対に禁止】とする。必ず社長とのソクラテス対話を経て、社長自身の言葉として蒸留した後にのみ登録が許される。
+   - Agentがタスク完了時等に知見を `sense_making/` へ自動投函することは許可するが、`permanent_notes/` への移管・新規登録をAgent単独で完結させることは【絶対に禁止】とする。必ず社長とのソクラテス対話を経て、社長自身の言葉として蒸留した後にのみ登録が許される。
 2. **直接ファイル書き込みの禁止 (Architectural Governance)**:
-   - Agentが `write_file` やシェルコマンド等で `second-brain` 配下のファイルを直接作成・編集することは【絶対に禁止】とする。テンプレート崩れやタグバリデーションすり抜けを防ぐため、必ず `core-service` の公式CLI（`zk-register`）を唯一の窓口として実行しなければならない。
+   - Agentが `write_file` やシェルコマンド等で `second-brain` 配下の日常ノートを直接作成・編集することは【絶対に禁止】とする。テンプレート崩れやタグバリデーションすり抜けを防ぐため、必ず `core-service` の公式CLI（`make zk-register`, `zk-update`, `zk-delete`）を唯一の窓口として実行しなければならない。保護領域（`areas/`, `resources/`, `templates/`）の変更は Worktree＋PR が必須である。
 3. **未整形データの投函禁止**:
    - 人間の乱雑な手書きメモや未パースのログ等を直接投函してはならない。必ずMarkdownとして整形・洗練された状態でのみ投入する。
 

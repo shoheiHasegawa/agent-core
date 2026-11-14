@@ -76,7 +76,18 @@ def check_markdown_links(repo_root: Path) -> list[str]:
                 # モノレポ環境における外部リポジトリ横断リンク
                 canonical_md = monorepo_root / "agent-core" / rel_md
                 mono_target = (canonical_md.parent / clean_link).resolve()
-                if not mono_target.is_relative_to(monorepo_root) or not mono_target.exists():
+                if not mono_target.is_relative_to(monorepo_root):
+                    errors.append(f"Broken link in {rel_md}: {link}")
+                    continue
+
+                mono_rel = mono_target.relative_to(monorepo_root)
+                effective_target = mono_target
+                if repo_root.parent.name == "worktrees" and mono_rel.parts:
+                    sibling_wt = repo_root.parent / mono_rel.parts[0]
+                    if sibling_wt.is_dir():
+                        effective_target = repo_root.parent / mono_rel
+
+                if not effective_target.exists():
                     errors.append(f"Broken link in {rel_md}: {link}")
             # 単体 checkout 環境では外部リポジトリへのリンク検証をスキップ
 

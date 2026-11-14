@@ -190,16 +190,18 @@
     3. 社長承認で PR をマージする。
     4. マージ後に `make ws-clean` でワークスペースディレクトリを完全削除し、ローカルを常に「作業中の現場のみ」に保つ。
 
-### [PREC-06] `second-brain` の二刀流運用（日常 Direct Push vs トピック Worktree/PR）
+### [PREC-06] `second-brain` の二刀流運用（日常 Direct CLI vs トピック/保護領域 Worktree/PR）
 - **判断基準（前例）**:
   - `second-brain` に対する「全面的な直接Push禁止」は、思考の摩擦（認知コスト）を増大させ、Obsidianとの同期断絶やロングブランチでのコンフリクトを招くため採用しない（引き算ファースト）。
-  - 代わりに、**作業の性質に応じた二刀流運用** を徹底する：
-    1. **日常モード（Direct Push）**:
-       - 対象: 日常の殴り書き（Inbox）、単発ノートの追記・タイポ修正、単発の Permanent Note 登録。
-       - 運用: 思考の摩擦ゼロと即時性を最優先とし、`main` へ直接コミット＆プッシュ（Conventional Commits 必須）。
-    2. **トピック / Epicモード（Worktree & PR）**:
-       - 対象: 体系的学習（`cca-foundations` 等の集中蒸留）、大掃除・バックログ消化（Inbox棚卸し）、構造改革（全ノートフォーマット変更等）。
-       - 運用: GitHub Issue を起票し、`make ws-new EPIC=<name> REPOS=second-brain ISSUE=<num>` で隔離 Worktree を作成。作業完了時に PR（3点ブリーフィング付き）を作成し、即時マージ ＆ `make ws-clean` で更地化して史実を恒久アーカイブする。
+  - 代わりに、7ディレクトリ構成（日常ノート3領域＋アセット＋保護3領域）のもとで、**作業の性質と対象領域に応じた二刀流運用** を物理 Git Hook（`.githooks/pre-commit`）とともに徹底する：
+    1. **日常モード（Direct CLI on main）**:
+       - 対象領域: 日常ノート3領域（`inbox/`, `sense_making/`, `permanent_notes/`）。
+       - 許可操作: `core-service` 公式CLI（`make zk-register`, `zk-update`, `zk-delete`）を通じた単発の登録・追記・安全削除。
+       - 安全装置: 物理 Git Hook（`.githooks/pre-commit`）がステージされたノートの単体バリデーション（ID存在、階層タグ形式、禁止パターン）を強制実行し、不正ノートの混入を0秒ブロック。
+    2. **トピック / 保護領域モード（Worktree & PR 必須）**:
+       - 対象領域: 保護領域（`areas/`, `resources/`, `templates/`）、ルート直下保護ファイル（`AGENTS.md`, `README.md`, `.githooks/`）、および複数ファイル一括削除・構造刷新。
+       - 運用: `main` ブランチ上での直接コミットは物理 Git Hook により完全にブロックされる。GitHub Issue を起票し、`make ws-new EPIC=<name> REPOS=second-brain ISSUE=<num>` で隔離 Worktree を作成。作業完了時に PR（3点ブリーフィング付き）を作成し、即時マージ ＆ `make ws-clean` で更地化して史実を恒久アーカイブする。
+       - 人間バイパス: 緊急時のみ `SB_ALLOW_MAIN_BYPASS=1 git commit` で明示的にバイパス可能。
 
 ### [PREC-07] 情報のライフサイクルに応じた3層記録境界（`scratch/` vs `docs/experiences/` vs `GitHub PR`）
 - **判断基準（前例）**:
@@ -234,7 +236,7 @@
   - **育成ループ全体の3層境界**:
     1. **タスク内の技術的学び ➔ `tasks/lessons_learned.md`（ルートA）**: PR完了時に各リポジトリのルール・Linter・前例（`[EXP-XX]` / `[PREC-XX]`）へ即時還流。
     2. **スコープ外の引っ掛かり・課題 ➔ `Parking Lot`（`make park-add`）**: 現在のタスク（作業フロー）を止めずに（ヤクの毛刈り防止）、かつ未検証の細切れ GitHub Issue を濫造せずにローカル単一ファイルへ退避し、土曜定例（`make brief-saturday`）または翌朝で秘書が一括トリアージ（破棄 / 統合 / 正式 Issue 化）。
-    3. **社長個人の思考・着想・気づき ➔ `second-brain/00_Inbox/`（ルートB）**: 社長個人の自己成長に直結する思考メモは Obsidian（Mobile Vault）を正本とし、Parking Lot には絶対に混同させない。
+    3. **社長個人の思考・着想・気づき ➔ `second-brain/inbox/`（ルートB）**: 社長個人の自己成長に直結する思考メモは Obsidian（Mobile Vault）を正本とし、Parking Lot には絶対に混同させない。
   - **Seatbelt 最小権限**:
     - `worker.sb` で `(literal (param "PARKING_LOT_FILE"))` および `(literal (param "PARKING_LOT_BACKUP_FILE"))` を用い、`worker` / `leader` のみピンポイント許可し、`reviewer` は Read-Only 監査を強制して書き込みを遮断せよ（`[SB-11]`）。
 
