@@ -200,8 +200,8 @@ class TestMakefileSeatbelt(unittest.TestCase):
 
         original_env_val = os.environ.get("YOU_INC_SANDBOX_ACTIVE")
         try:
-            # サンドボックス内部にいない場合（ホスト環境）のみ実プロセス起動による注入・隔離検証
-            if not getattr(sandbox_runner, "is_inside_sandbox", lambda: False)():
+            # サンドボックス内部にいない場合かつ macOS Seatbelt が利用可能な場合のみ実プロセス起動による注入・隔離検証
+            if Path("/usr/bin/sandbox-exec").exists() and not getattr(sandbox_runner, "is_inside_sandbox", lambda: False)():
                 custom_var = "TEST_CUSTOM_SB_05_VAL"
                 test_command = [
                     sys.executable,
@@ -274,8 +274,8 @@ class TestMakefileSeatbelt(unittest.TestCase):
         )
         self.assertNotEqual(res_make_fail.returncode, 0)
 
-        # sandbox_runner.py CLI における非ゼロ終了コード伝播
-        if not getattr(sandbox_runner, "is_inside_sandbox", lambda: False)():
+        # sandbox_runner.py CLI における非ゼロ終了コード伝播（macOS Seatbelt 利用可能時）
+        if Path("/usr/bin/sandbox-exec").exists() and not getattr(sandbox_runner, "is_inside_sandbox", lambda: False)():
             res_sb_fail = subprocess.run(
                 [
                     sys.executable,

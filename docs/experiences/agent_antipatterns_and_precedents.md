@@ -134,7 +134,15 @@
   - 大量起票・一括更新タスク時は、バースト実行を避け、1件ごとにレスポンス確認とウェイト（`sleep 3〜5`）を入れて安全に実行せよ。
   - 将来的には、外部書き込み CLI 呼び出し時に自動でレートリミットを強制するハーネス/ラッパーを導入し、注意力ゼロでアカウント凍結を防ぐ構造（Fail-safe）へ昇格させる。
 
-### [EXP-19] サンドボックス内からの入れ子 `sandbox-exec` 実行による多重起動クラッシュ
+### [EXP-19] 単体 checkout CI と Worktree 階層におけるモノレポ外部参照・絶対パス除外の罠
+- **失敗の現象**:
+  1. GitHub Actions（`actions/checkout`）では `agent-core` 単体のみがチェックアウトされるため、親ディレクトリ（`../GEMINI.md`）や兄弟リポジトリ（`../../core-service/...`）を参照する Linter が無条件エラーになった。
+  2. 一方で `check_markdown_links.py` が除外判定に絶対パス `f.parts` を使っていたため、Worktree 配下（`.../workspaces/<epic>/worktrees/agent-core/`）で実行した際に全 Markdown ファイルが除外され、ローカルの `make check-all` でリンク切れが素通りしていた。
+- **対策（教訓）**:
+  - モノレポ親の存在を前提とする Linter は、ディレクトリ構造からモノレポ環境か単体 checkout 環境かを決定論的に判別（`find_monorepo_root`）し、ローカルモノレポでは厳格検証・単体 checkout ではリポジトリ内部検証を保ちつつ外部横断参照のみ安全にスキップせよ。
+  - パス除外判定には絶対パス `f.parts` ではなく必ず `f.relative_to(repo_root).parts` を使用し、Worktree 階層下でもリポジトリ内の検査がスキップされないようにせよ。
+
+### [EXP-20] サンドボックス内からの入れ子 `sandbox-exec` 実行による多重起動クラッシュ
 - **失敗の現象**:
   - `make check-all` や `validate-tests` 自体を `sandbox_runner.py`（Seatbelt）下で動かす設計にした際、テストコード内でナイーブに `subprocess.run(["make", "validate-tests"])` を実行すると、macOS カーネル標準の `sandbox-exec` が多重起動（入れ子実行）を禁止しているため、`sandbox_runner.py` が `sandbox_apply: Operation not permitted` で強制クラッシュし、テストスイート全体が全滅する。
 - **対策（教訓）**:
@@ -220,3 +228,21 @@
   - **4. Makefile 内包による完全自動強制化と再入ガード（`YOU_INC_SANDBOX_ACTIVE=1`）**:
     - プロンプトでの呼び出し指示（性善説）に依存せず、`agent-core` および `core-service` のホスト環境から `make check-all`、`make validate-tests`、`make test` を実行した際、自動的に `sandbox_runner.py --role worker --worktree "$(CURDIR)" --` を経由させる。
     - サンドボックス内部での実行時は環境変数 `YOU_INC_SANDBOX_ACTIVE=1` による再入ガード（`ifeq`）により直接ターゲットを実行し、多重 `sandbox-exec` 起因のエラーを決定論的に防止する。また `core-service` 側ではテストフィクスチャの `dummy_token.json` 改名により Seatbelt 機密遮断との衝突を解消した。
+
+### [PREC-09] ヤクの毛刈り防止のための Parking Lot 退避と全体育成ループ（3層境界）の分離
+- **判断基準（前例）**:
+  - **育成ループ全体の3層境界**:
+    1. **タスク内の技術的学び ➔ `tasks/lessons_learned.md`（ルートA）**: PR完了時に各リポジトリのルール・Linter・前例（`[EXP-XX]` / `[PREC-XX]`）へ即時還流。
+    2. **スコープ外の引っ掛かり・課題 ➔ `Parking Lot`（`make park-add`）**: 現在のタスク（作業フロー）を止めずに（ヤクの毛刈り防止）、かつ未検証の細切れ GitHub Issue を濫造せずにローカル単一ファイルへ退避し、土曜定例（`make brief-saturday`）または翌朝で秘書が一括トリアージ（破棄 / 統合 / 正式 Issue 化）。
+    3. **社長個人の思考・着想・気づき ➔ `second-brain/00_Inbox/`（ルートB）**: 社長個人の自己成長に直結する思考メモは Obsidian（Mobile Vault）を正本とし、Parking Lot には絶対に混同させない。
+  - **Seatbelt 最小権限**:
+    - `worker.sb` で `(literal (param "PARKING_LOT_FILE"))` および `(literal (param "PARKING_LOT_BACKUP_FILE"))` を用い、`worker` / `leader` のみピンポイント許可し、`reviewer` は Read-Only 監査を強制して書き込みを遮断せよ（`[SB-11]`）。
+
+### [PREC-10] Worktree 生成時の upstream 起点強制と乖離ブランチのフェイルセーフガード
+- **判断基準（前例）**:
+  - 並列セッション稼働時にローカル `main` の未プッシュコミットや古い同名ブランチの残骸が混入することを防ぐため、`tools/workspace_manager.py`（`make ws-new`）は以下のガードを強制する：
+    1. **`origin/main` の優先起点化**: リモート `origin` が存在する場合は `git fetch origin main` を行い、ローカル `main` ではなく `origin/main` を起点として worktree ブランチを作成する（オフライン時は `--offline` またはキャッシュ利用）。
+    2. **残存ブランチの乖離検知と安全ブロック**: 過去セッションの同名 `epic/<name>` が残存している場合、`origin/main` との乖離（ahead/behind）を検知し、同一コミットでない限りデフォルトで `sys.exit(1)` により安全停止する。上書き再利用には明示的な `--reset` フラグ（または `RESET=1`）を要求する。
+    3. **PR起票前の upstream 差分検証**: 秘書（`executive-secretary`）は PR 作成前に必ず `git diff origin/main..HEAD` を確認し、意図しない混入差分がゼロであることを担保する。
+
+>>>>>>> origin/main

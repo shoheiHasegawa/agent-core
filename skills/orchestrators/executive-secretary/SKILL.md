@@ -30,13 +30,15 @@ type: Orchestrator
 #### A. 日曜起点・土曜作戦会議 (System Saturday Planning)
 毎週土曜日に社長と次週の作戦会議を実施し、日曜日からのロケットスタートを準備する：
 1. **予定・タスク・Inboxの一括収集 (Context Bundler)**:
-   - `make brief-saturday ARGS="--start-date <YYYY-MM-DD> --end-date <YYYY-MM-DD>"` で次週の固定予定、未整理タスク、スマホメモ（Vault）を一括取得する。
+   - `make brief-saturday ARGS="--start-date <YYYY-MM-DD> --end-date <YYYY-MM-DD>"` で次週の固定予定、未整理タスク、スマホメモ（Vault）、および現場の引っ掛かり（`parking_lot_items`）を一括取得する。
 2. **3-3-3 Method に基づくトリアージ**:
    - ⭐️ **`[Must]`（最大3件）**: その日の最重要タスク。計画日（`planned_date`）を設定して昇格（`make tasks-update ARGS="--task-id <id> --planned-date <YYYY-MM-DD> --target-list Must"`）。※カレンダー終日枠に表示されるのは Must のみ。
    - 📌 **`[Should]`（最大3件）**: 余力があれば着手するタスク。カレンダー視認性を守るため期日は付けずに配置。
    - 🔧 **`[Maintenance]`**: 定常ルーティンや30分未満の小用。
 3. **締め切り前倒し（Hard Deadline vs Planned Date）**:
    - メモ内の絶対締切（`[deadline: YYYY-MM-DD]`）に対して、当日にパンクしないよう計画日を前倒し逆算配置する。
+4. **全体育成ループ（3層境界）と Parking Lot トリアージ**:
+   - スコープ外の引っ掛かり（日常は `make park-list`）を破棄/統合/正式Issue化へトリアージし、`make park-clear` で消化する（※タスク内学びはルートAでリポジトリへ、個人思考・気づきは `second-brain`（ルートB）へ集約）。
 
 #### B. 日常のタスク操作 (Daily Operations)
 - タスク一覧: `make tasks-list ARGS="--planned-date <YYYY-MM-DD>"` または `make tasks-list ARGS="--list Must"`
@@ -45,12 +47,15 @@ type: Orchestrator
 - タスク更新: `make tasks-update ARGS="--task-id '<id>' [--title '<title>'] [--target-list '<list>']"`
 
 #### C. 会社（Agentチーム）の課題と現場起動
-1. **会社の課題**: `gh issue create` で目的（WHY）と完了条件（DoD）を明記して起票する。
+1. **会社の課題 (`gh issue create`)**:
+   - **必須3ラベル**（`type:*` または `documentation` / `prio:*` / `size:S|M|L`）と **`WHY & Value`＋`DoD`**（未確定事項は捏造せず `TBD` と明記、`Non-Scope` は判明分のみ）を記入して起票する。
+   - `[PREC-02]` に従い個人の単発行動（予約・受験等）は独立 Issue にせず Epic の DoD と Google Tasks へ分離する。
 2. **現場の立ち上げ**: `make ws-new EPIC=<epic_name> REPOS=<target_repos> ISSUE=<num>` を実行して隔離 Worktree を生成し、`team-leader` へ作業を委譲する（※`REPOS` には `core-service`, `agent-core` に加え、トピック単位の蒸留・大掃除では `second-brain` も指定可能 — `[PREC-06]`）。
 
 ### 3. クローズ時の「PR起票・3点内省ブリーフィング」と現場更地化
 チームリーダーから完了報告（独立レビューPASS）を受けた際、単なる「終わりました」で済まさず、以下の手順を厳格に完遂せよ：
-1. **GitHub PR の作成 (`gh pr create`)**:
+1. **差分検証とGitHub PRの作成 (`gh pr create`)**:
+   - PR作成前に `git diff origin/main..HEAD` で差分を確認し、未プッシュや乖離の混入がないことを検証する。
    - `epic/<name>` から `main` への PR を立ち上げ、関連 Issue（`Closes #<num>`）を紐付ける。
    - PRの Description 本文に以下の **「3点内省ブリーフィング」** をそのまま記録せよ（GitHubを唯一の恒久アーカイブとするため）：
      - **🔍 Architecture Digest（何を・なぜ変えたか）**: 社内の構造変化の3行要約（ブラックボックス化防止）。

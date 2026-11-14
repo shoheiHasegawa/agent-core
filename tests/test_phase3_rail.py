@@ -175,6 +175,41 @@ Some findings.
             stale_warnings = [w for w in warnings if isinstance(w, dict) and w.get("type") == "stale_workspace"]
             self.assertTrue(len(stale_warnings) >= 1)
 
+    def test_ac_pl_01_parking_lot_seatbelt_and_makefile_integration(self):
+        """[AC-PL-01]: sandbox_runner が PARKING_LOT_FILE を注入し、Makefile に park-add/list/clear が定義されていること。"""
+        import sandbox_runner
+
+        agent_core_dir = Path(__file__).resolve().parent.parent
+        makefile = (agent_core_dir / "Makefile").read_text(encoding="utf-8")
+        self.assertIn("park-add:", makefile)
+        self.assertIn("park-list:", makefile)
+        self.assertIn("park-clear:", makefile)
+
+        conf_env = (agent_core_dir / "config" / "conf.env").read_text(encoding="utf-8")
+        self.assertIn("PARKING_LOT_PATH=", conf_env)
+
+        # Seatbelt command injection verification
+        target_path = Path("/tmp/custom_parking_lot.jsonl")
+        cmd = sandbox_runner.build_sandbox_command(
+            command=["echo", "test"],
+            worktree_dir=agent_core_dir,
+            role="worker",
+            parking_lot_file=target_path,
+        )
+        self.assertIn("-D", cmd)
+        self.assertIn("ROLE=worker", cmd)
+        self.assertIn(f"PARKING_LOT_FILE={target_path.resolve()}", cmd)
+
+        # Reviewer role verification
+        cmd_rev = sandbox_runner.build_sandbox_command(
+            command=["echo", "test"],
+            worktree_dir=agent_core_dir,
+            role="reviewer",
+            parking_lot_file=target_path,
+        )
+        self.assertIn("ROLE=reviewer", cmd_rev)
+        self.assertIn(f"PARKING_LOT_BACKUP_FILE={target_path.with_name('parking_lot_backup.jsonl').resolve()}", cmd)
+
 
 if __name__ == "__main__":
     unittest.main()
