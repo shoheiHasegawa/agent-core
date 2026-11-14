@@ -30,13 +30,15 @@ type: Orchestrator
 #### A. 日曜起点・土曜作戦会議 (System Saturday Planning)
 毎週土曜日に社長と次週の作戦会議を実施し、日曜日からのロケットスタートを準備する：
 1. **予定・タスク・Inboxの一括収集 (Context Bundler)**:
-   - `make brief-saturday ARGS="--start-date <YYYY-MM-DD> --end-date <YYYY-MM-DD>"` で次週の固定予定、未整理タスク、スマホメモ（Vault）を一括取得する。
+   - `make brief-saturday ARGS="--start-date <YYYY-MM-DD> --end-date <YYYY-MM-DD>"` で次週の固定予定、未整理タスク、スマホメモ（Vault）、および現場の引っ掛かり（`parking_lot_items`）を一括取得する。
 2. **3-3-3 Method に基づくトリアージ**:
    - ⭐️ **`[Must]`（最大3件）**: その日の最重要タスク。計画日（`planned_date`）を設定して昇格（`make tasks-update ARGS="--task-id <id> --planned-date <YYYY-MM-DD> --target-list Must"`）。※カレンダー終日枠に表示されるのは Must のみ。
    - 📌 **`[Should]`（最大3件）**: 余力があれば着手するタスク。カレンダー視認性を守るため期日は付けずに配置。
    - 🔧 **`[Maintenance]`**: 定常ルーティンや30分未満の小用。
 3. **締め切り前倒し（Hard Deadline vs Planned Date）**:
    - メモ内の絶対締切（`[deadline: YYYY-MM-DD]`）に対して、当日にパンクしないよう計画日を前倒し逆算配置する。
+4. **全体育成ループ（3層境界）と Parking Lot トリアージ**:
+   - スコープ外の引っ掛かり（日常は `make park-list`）を破棄/統合/正式Issue化へトリアージし、`make park-clear` で消化する（※タスク内学びはルートAでリポジトリへ、個人思考・気づきは `second-brain`（ルートB）へ集約）。
 
 #### B. 日常のタスク操作 (Daily Operations)
 - タスク一覧: `make tasks-list ARGS="--planned-date <YYYY-MM-DD>"` または `make tasks-list ARGS="--list Must"`

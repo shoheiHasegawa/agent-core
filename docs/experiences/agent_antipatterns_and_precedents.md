@@ -210,3 +210,12 @@
   - **3. 検証用 Secret とネットワーク開通の扱い（`dev-secret.env` 不採用）**:
     - 開発用と称して `dev-secret.env` のような別ファイルを作ることは、二重管理と誤コミットを招くため禁止する（引き算ファースト）。
     - 99% のテストは Fake/Stub と `monkeypatch.setenv` でオフライン完結させ、1% の実 API 疎通やパッケージ追加（`uv sync`）が必要な場合のみ、Tier 2/3 判断として `sandbox_runner.py --allow-net` とインメモリ環境変数注入（`os.environ`）を組み合わせて実行する。
+
+### [PREC-09] ヤクの毛刈り防止のための Parking Lot 退避と全体育成ループ（3層境界）の分離
+- **判断基準（前例）**:
+  - **育成ループ全体の3層境界**:
+    1. **タスク内の技術的学び ➔ `tasks/lessons_learned.md`（ルートA）**: PR完了時に各リポジトリのルール・Linter・前例（`[EXP-XX]` / `[PREC-XX]`）へ即時還流。
+    2. **スコープ外の引っ掛かり・課題 ➔ `Parking Lot`（`make park-add`）**: 現在のタスク（作業フロー）を止めずに（ヤクの毛刈り防止）、かつ未検証の細切れ GitHub Issue を濫造せずにローカル単一ファイルへ退避し、土曜定例（`make brief-saturday`）または翌朝で秘書が一括トリアージ（破棄 / 統合 / 正式 Issue 化）。
+    3. **社長個人の思考・着想・気づき ➔ `second-brain/00_Inbox/`（ルートB）**: 社長個人の自己成長に直結する思考メモは Obsidian（Mobile Vault）を正本とし、Parking Lot には絶対に混同させない。
+  - **Seatbelt 最小権限**:
+    - `worker.sb` で `(literal (param "PARKING_LOT_FILE"))` および `(literal (param "PARKING_LOT_BACKUP_FILE"))` を用い、`worker` / `leader` のみピンポイント許可し、`reviewer` は Read-Only 監査を強制して書き込みを遮断せよ（`[SB-11]`）。

@@ -1,10 +1,10 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday park-add park-list park-clear install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
 
 EPIC ?=
 REPOS ?= core-service
 ISSUE ?=
-CORE_SERVICE_DIR ?= ../core-service
-ENV_FILE ?= config/conf.env
+CORE_SERVICE_DIR ?= $(firstword $(wildcard ../core-service ../../../../core-service /Users/shoheihasegawa/you_inc/core-service))
+ENV_FILE ?= $(firstword $(wildcard config/conf.env ../../config/conf.env ../../../../agent-core/config/conf.env /Users/shoheihasegawa/you_inc/agent-core/config/conf.env))
 ARGS ?=
 
 # ---------------------------------------------------------
@@ -33,6 +33,15 @@ calendar-events:
 
 brief-saturday:
 	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main saturday-briefing $(ARGS)
+
+park-add:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-add $(ARGS)
+
+park-list:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-list $(ARGS)
+
+park-clear:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-clear $(ARGS)
 
 # ---------------------------------------------------------
 # Workspace & Worktree Harness (方式A)

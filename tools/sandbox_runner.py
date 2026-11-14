@@ -33,6 +33,30 @@ RoleType = Literal["leader", "worker", "reviewer"]
 VALID_ROLES: tuple[RoleType, ...] = ("leader", "worker", "reviewer")
 
 
+def resolve_parking_lot_path(explicit_path: Path | None = None) -> Path:
+    """環境変数または conf.env から PARKING_LOT_PATH を解決する。"""
+    if explicit_path:
+        return explicit_path.expanduser().resolve()
+    if "PARKING_LOT_PATH" in os.environ:
+        return Path(os.environ["PARKING_LOT_PATH"]).expanduser().resolve()
+    candidates = [
+        AGENT_CORE_DIR / "config" / "conf.env",
+        AGENT_CORE_DIR.parent.parent.parent / "config" / "conf.env",
+        Path("/Users/shoheihasegawa/you_inc/agent-core/config/conf.env"),
+    ]
+    for c in candidates:
+        if c.exists():
+            try:
+                for line in c.read_text(encoding="utf-8").splitlines():
+                    if line.startswith("PARKING_LOT_PATH="):
+                        val = line.split("=", 1)[1].strip().strip('"').strip("'")
+                        if val:
+                            return Path(val).expanduser().resolve()
+            except Exception:
+                pass
+    return (AGENT_CORE_DIR / "data" / "parking_lot.jsonl").resolve()
+
+
 def infer_workspace_and_scratch(worktree_path: Path) -> tuple[Path, Path]:
     """
     `workspaces/<epic>/worktrees/<repo>` の構造から `(workspace_dir, scratch_dir)` を自動推論する。
@@ -85,6 +109,7 @@ def build_sandbox_command(
     role: RoleType = "worker",
     allow_net: bool = False,
     profile_path: Path = DEFAULT_PROFILE,
+    parking_lot_file: Path | None = None,
 ) -> list[str]:
     """
     Seatbelt プロファイル (`worker.sb`) に動的パラメータ (`-D`) を注入した `sandbox-exec` コマンド列を構築する。
@@ -102,6 +127,8 @@ def build_sandbox_command(
         role=role,
     )
     uv_cache = Path(os.environ.get("UV_CACHE_DIR", Path.home() / ".cache" / "uv")).expanduser().resolve()
+    target_parking_lot = resolve_parking_lot_path(parking_lot_file)
+    target_parking_lot_backup = target_parking_lot.with_name("parking_lot_backup.jsonl")
 
     return [
         "/usr/bin/sandbox-exec",
@@ -115,9 +142,28 @@ def build_sandbox_command(
         f"UV_CACHE_DIR={uv_cache}",
         "-D",
         f"ALLOW_NET={'true' if allow_net else 'false'}",
+        "-D",
+        f"ROLE={role}",
+        "-D",
+        f"PARKING_LOT_FILE={target_parking_lot}",
+        "-D",
+        f"PARKING_LOT_BACKUP_FILE={target_parking_lot_backup}",
         "--",
         *command,
     ]
+
+
+def ensure_parking_lot_files(parking_lot_path: Path) -> None:
+    """Seatbelt の literal 指定が安全に機能するよう、親ディレクトリと空ファイルを事前に確保する。"""
+    try:
+        parking_lot_path.parent.mkdir(parents=True, exist_ok=True)
+        if not parking_lot_path.exists():
+            parking_lot_path.touch(exist_ok=True)
+        backup_path = parking_lot_path.with_name("parking_lot_backup.jsonl")
+        if not backup_path.exists():
+            backup_path.touch(exist_ok=True)
+    except Exception:
+        pass
 
 
 def run_in_sandbox(
@@ -127,10 +173,13 @@ def run_in_sandbox(
     role: RoleType = "worker",
     allow_net: bool = False,
     profile_path: Path = DEFAULT_PROFILE,
+    parking_lot_file: Path | None = None,
     cwd: Path | None = None,
     capture_output: bool = False,
 ) -> subprocess.CompletedProcess[str]:
     """指定されたコマンドをロール別最小権限の `sandbox-exec` 内で実行する。"""
+    resolved_pl = resolve_parking_lot_path(parking_lot_file)
+    ensure_parking_lot_files(resolved_pl)
     sb_cmd = build_sandbox_command(
         command=command,
         worktree_dir=worktree_dir,
@@ -138,6 +187,7 @@ def run_in_sandbox(
         role=role,
         allow_net=allow_net,
         profile_path=profile_path,
+        parking_lot_file=parking_lot_file,
     )
     return subprocess.run(
         sb_cmd,
@@ -448,6 +498,59 @@ def run_self_test(profile_path: Path = DEFAULT_PROFILE, output_json: bool = Fals
             "ValueError raised as expected on invalid worktree/command",
         )
 
+        # ⑪ [SB-11] Parking Lot 単一ファイルへの書き込み許可と他ファイル遮断の維持（ロール別最小権限）
+        test_parking_lot = outside_dir / "data" / "parking_lot.jsonl"
+        test_other_file = outside_dir / "data" / "other.txt"
+        test_parking_lot.parent.mkdir(parents=True, exist_ok=True)
+        test_parking_lot.write_text('{"initial": 1}\n', encoding="utf-8")
+        test_other_file.write_text("protected\n", encoding="utf-8")
+
+        # 1. worker による parking_lot.jsonl への追記（許可）
+        res_pl_write = run_in_sandbox(
+            command=["/bin/sh", "-c", f"echo '{{\"parked\": 2}}' >> '{test_parking_lot}'"],
+            worktree_dir=worktree_dir,
+            scratch_dir=scratch_dir,
+            role="worker",
+            profile_path=profile_path,
+            parking_lot_file=test_parking_lot,
+            capture_output=True,
+        )
+        # 2. worker による同ディレクトリ他ファイルへの追記（遮断）
+        res_other_write = run_in_sandbox(
+            command=["/bin/sh", "-c", f"echo 'hack' >> '{test_other_file}'"],
+            worktree_dir=worktree_dir,
+            scratch_dir=scratch_dir,
+            role="worker",
+            profile_path=profile_path,
+            parking_lot_file=test_parking_lot,
+            capture_output=True,
+        )
+        # 3. reviewer による parking_lot.jsonl への追記（遮断: 監査役はRead-Only）
+        res_reviewer_pl_write = run_in_sandbox(
+            command=["/bin/sh", "-c", f"echo 'reviewer_hack' >> '{test_parking_lot}'"],
+            worktree_dir=worktree_dir,
+            scratch_dir=scratch_dir,
+            role="reviewer",
+            profile_path=profile_path,
+            parking_lot_file=test_parking_lot,
+            capture_output=True,
+        )
+
+        pl_write_ok = res_pl_write.returncode == 0
+        other_blocked = res_other_write.returncode != 0 and (
+            "Operation not permitted" in res_other_write.stderr or "Permission denied" in res_other_write.stderr
+        )
+        reviewer_blocked = res_reviewer_pl_write.returncode != 0 and (
+            "Operation not permitted" in res_reviewer_pl_write.stderr or "Permission denied" in res_reviewer_pl_write.stderr
+        )
+        sb11_ok = pl_write_ok and other_blocked and reviewer_blocked
+        record(
+            "[SB-11]",
+            "Allow write to single parking_lot.jsonl for worker while denying other files and blocking reviewer",
+            sb11_ok,
+            f"worker_pl: {'OK' if pl_write_ok else 'FAIL'}, worker_other: {'BLOCKED' if other_blocked else 'UNBLOCKED'}, reviewer_pl: {'BLOCKED' if reviewer_blocked else 'UNBLOCKED'}",
+        )
+
     # ⑨ [SB-03] Leave No Trace（一時ディレクトリ完全消去の冪等性確認）
     leave_no_trace_ok = not tmp_root.exists()
     record(
@@ -536,9 +639,15 @@ def main() -> None:
         help="Path to the Seatbelt .sb profile (default: config/sandbox/worker.sb).",
     )
     parser.add_argument(
+        "--parking-lot-file",
+        type=Path,
+        default=None,
+        help="Path to allowed single parking lot file (default: data/parking_lot.jsonl).",
+    )
+    parser.add_argument(
         "--self-test",
         action="store_true",
-        help="Run deterministic self-verification suite ([SB-01] to [SB-10]).",
+        help="Run deterministic self-verification suite ([SB-01] to [SB-11]).",
     )
     parser.add_argument(
         "--json",
@@ -571,6 +680,7 @@ def main() -> None:
             role=args.role,
             allow_net=args.allow_net,
             profile_path=args.profile,
+            parking_lot_file=args.parking_lot_file,
         )
     except (FileNotFoundError, ValueError) as exc:
         print(f"❌ Sandbox Runner Error: {exc}", file=sys.stderr)

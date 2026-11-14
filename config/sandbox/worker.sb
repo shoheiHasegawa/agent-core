@@ -13,6 +13,8 @@
 ;;   - ALLOWED_SCRATCH: workspaces/<epic>/scratch/
 ;;   - UV_CACHE_DIR:    ~/.cache/uv
 ;;   - ALLOW_NET:       "true" の場合のみ外部通信を一時解禁（デフォルト "false"）
+;;   - ROLE:            "leader" / "worker" / "reviewer"
+;;   - PARKING_LOT_FILE: 単一 Parking Lot ファイルへのピンポイント書き込み許可パス ([SB-11])
 ;; ============================================================================
 
 ;; 1. ベースライン: プロセス実行・システムライブラリ読取を許可し、危険な操作を後続ルールで遮断
@@ -39,6 +41,16 @@
   (literal "/dev/zero")
   (literal "/dev/tty")
   (literal "/dev/dtracehelper")
+)
+
+;; leader / worker のみ Parking Lot 単一ファイルおよび直前バックアップへの書き込みを許可（reviewer は遮断）([SB-11])
+(if (not (string=? (param "ROLE") "reviewer"))
+  (begin
+    (allow file-write*
+      (literal (param "PARKING_LOT_FILE"))
+      (literal (param "PARKING_LOT_BACKUP_FILE"))
+    )
+  )
 )
 
 ;; 4. 機密ファイル完全遮断 (Deny All Read/Write):
