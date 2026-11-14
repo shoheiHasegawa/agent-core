@@ -1,4 +1,4 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit zk-register zk-update zk-delete vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
 
 EPIC ?=
 REPOS ?= core-service
@@ -12,6 +12,15 @@ ARGS ?=
 # ---------------------------------------------------------
 zk-audit:
 	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main zk-audit
+
+zk-register:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main zk-register $(ARGS)
+
+zk-update:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main zk-update $(ARGS)
+
+zk-delete:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main zk-delete $(ARGS)
 
 vault-peek:
 	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main vault-peek
@@ -61,6 +70,11 @@ install-hooks:
 	cp tools/pre_handoff_verify.sh "$$HOOKS_DIR/pre-commit" && \
 	chmod +x "$$HOOKS_DIR/pre-commit" && \
 	echo "✅ Git pre-commit hook installed to $$HOOKS_DIR/pre-commit"
+	@if [ -d "../second-brain" ]; then \
+		git -C ../second-brain config core.hooksPath .githooks && \
+		chmod +x ../second-brain/.githooks/* 2>/dev/null || true; \
+		echo "✅ second-brain core.hooksPath set to .githooks"; \
+	fi
 
 # ---------------------------------------------------------
 # Secrets Management (sops)

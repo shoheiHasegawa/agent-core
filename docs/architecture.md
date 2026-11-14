@@ -67,7 +67,7 @@ You_Inc は、クリーンアーキテクチャの同心円構造に基づき、
 ```mermaid
 flowchart LR
     CS["⚙️ core-service<br/>(最外周: 手足・インフラ)"] -->|"単方向依存"| AC["🏢 agent-core<br/>(中流: 会社OS・ユースケース)"]
-    AC -->|"単方向依存"| SB["🌟 second-brain/10_Areas<br/>(最内周: 社長の人生憲法・生き方)"]
+    AC -->|"単方向依存"| SB["🌟 second-brain/areas<br/>(最内周: 社長の人生憲法・生き方)"]
 
     style SB fill:#f9f,stroke:#333,stroke-width:3px
     style AC fill:#bbf,stroke:#333,stroke-width:2px
@@ -77,16 +77,16 @@ flowchart LR
 > [!IMPORTANT]
 > **単方向依存ルール（The Dependency Rule）**:
 > 依存の矢印は **外側から内側へのみ** 許される。
-> - `agent-core` は社長の `10_Areas` を読み解き、それを実現するための戦略・プロトコルを組む。
-> - 一方、`10_Areas`（社長個人の生き方）は外側の `agent-core` やツール（Google Tasks, CLI, Workspace）を **一切知らない（依存度ゼロ）**。
+> - `agent-core` は社長の `areas` を読み解き、それを実現するための戦略・プロトコルを組む。
+> - 一方、`areas`（社長個人の生き方）は外側の `agent-core` やツール（Google Tasks, CLI, Workspace）を **一切知らない（依存度ゼロ）**。
 > - 内側が外側の HOW を語った瞬間、依存汚染（Dependency Pollution）が発生し、システム変更のたびに生活OSが破壊される。
 
 | 領域 / リポジトリ | 階層 | 役割（WHAT） | 正本データ（Single Source of Truth） |
 | :--- | :--- | :--- | :--- |
-| **🌟 社長の生き方 (`second-brain/10_Areas`)** | 最内周（ドメイン） | **社長個人の人生の基準（Policy / Standard）**<br>※ツールの話・手順・HOWは一切書かない | [`01_Identity/`](../../second-brain/10_Areas/01_Identity/), [`04_Life_Systems/`](../../second-brain/10_Areas/04_Life_Systems/) |
+| **🌟 社長の生き方 (`second-brain/areas`)** | 最内周（ドメイン） | **社長個人の人生の基準（Policy / Standard）**<br>※ツールの話・手順・HOWは一切書かない | [`01_Identity/`](../../second-brain/areas/01_Identity/), [`04_Life_Systems/`](../../second-brain/areas/04_Life_Systems/) |
 | **🏢 本社・司令塔 (`agent-core`)** | 中流（ユースケース） | **社長の基準を達成する会社経営OS・戦略**<br>・秘書プロトコル（作戦会議・トリアージ）<br>・憲法・思考原則・経験ストック・Worktree | [`GEMINI.md`](../GEMINI.md), [`AGENTS.md`](../AGENTS.md), `docs/`, `skills/`, `config/` |
 | **⚙️ 機能工場 (`core-service`)** | 最外周（インフラ） | **ステートレスな機能基盤・機械的実行（手足）**<br>・Google Tasks & Calendar 双方向連携<br>・公式CLIツール、DIコンテナ | `src/domain/`, `src/application/` (`spec.md`), `src/entrypoints/cli/` |
-| **🧠 知識資産庫 (`second-brain`)** | 思考基盤 | **社長自身の頭で咀嚼された普遍的知見（Zettelkasten）** | `00_Inbox/`, `20_Sense_Making/`, `40_Permanent_Notes/` |
+| **🧠 知識資産庫 (`second-brain`)** | 思考基盤 | **社長自身の頭で咀嚼された普遍的知見（Docs for AI & Zettelkasten）** | `inbox/`, `sense_making/`, `permanent_notes/` |
 | **📱 スマホ窓口 (`Gemini` & Widget)** | 出張所 | 外出先でのスケジュール確認と着想・ToDoの雑な放り込み | Google Calendar, Google Tasks, Mobile Vault |
 
 ### 2.4 CCA-F 準拠の5大アーキテクチャ設計規約 (Do / Don't Matrix)
