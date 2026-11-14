@@ -142,6 +142,13 @@
   - モノレポ親の存在を前提とする Linter は、ディレクトリ構造からモノレポ環境か単体 checkout 環境かを決定論的に判別（`find_monorepo_root`）し、ローカルモノレポでは厳格検証・単体 checkout ではリポジトリ内部検証を保ちつつ外部横断参照のみ安全にスキップせよ。
   - パス除外判定には絶対パス `f.parts` ではなく必ず `f.relative_to(repo_root).parts` を使用し、Worktree 階層下でもリポジトリ内の検査がスキップされないようにせよ。
 
+### [EXP-20] サンドボックス内からの入れ子 `sandbox-exec` 実行による多重起動クラッシュ
+- **失敗の現象**:
+  - `make check-all` や `validate-tests` 自体を `sandbox_runner.py`（Seatbelt）下で動かす設計にした際、テストコード内でナイーブに `subprocess.run(["make", "validate-tests"])` を実行すると、macOS カーネル標準の `sandbox-exec` が多重起動（入れ子実行）を禁止しているため、`sandbox_runner.py` が `sandbox_apply: Operation not permitted` で強制クラッシュし、テストスイート全体が全滅する。
+- **対策（教訓）**:
+  - サンドボックス配下で動作するテストコードから Makefile の分岐やコマンド組み立てを検証する際は、サブプロセスで実実行するのではなく、**GNU Make の dry-run モード（`make -n <target>`）の出力をアサートする決定論的検証方式**を採用せよ。
+  - また、GNU Make のレシピ内でサブ make を呼ぶ際は、再帰 make 展開による dry-run 時の誤爆実行を防ぐため、`MAKE_CMD := $(MAKE)` 変数を経由して `$(MAKE_CMD) $@` を実行せよ。
+
 ---
 
 ## Part 2: 社長の意思決定・アーキテクチャ判断の前例集 (Executive Precedents)
@@ -218,6 +225,9 @@
   - **3. 検証用 Secret とネットワーク開通の扱い（`dev-secret.env` 不採用）**:
     - 開発用と称して `dev-secret.env` のような別ファイルを作ることは、二重管理と誤コミットを招くため禁止する（引き算ファースト）。
     - 99% のテストは Fake/Stub と `monkeypatch.setenv` でオフライン完結させ、1% の実 API 疎通やパッケージ追加（`uv sync`）が必要な場合のみ、Tier 2/3 判断として `sandbox_runner.py --allow-net` とインメモリ環境変数注入（`os.environ`）を組み合わせて実行する。
+  - **4. Makefile 内包による完全自動強制化と再入ガード（`YOU_INC_SANDBOX_ACTIVE=1`）**:
+    - プロンプトでの呼び出し指示（性善説）に依存せず、`agent-core` および `core-service` のホスト環境から `make check-all`、`make validate-tests`、`make test` を実行した際、自動的に `sandbox_runner.py --role worker --worktree "$(CURDIR)" --` を経由させる。
+    - サンドボックス内部での実行時は環境変数 `YOU_INC_SANDBOX_ACTIVE=1` による再入ガード（`ifeq`）により直接ターゲットを実行し、多重 `sandbox-exec` 起因のエラーを決定論的に防止する。また `core-service` 側ではテストフィクスチャの `dummy_token.json` 改名により Seatbelt 機密遮断との衝突を解消した。
 
 ### [PREC-09] ヤクの毛刈り防止のための Parking Lot 退避と全体育成ループ（3層境界）の分離
 - **判断基準（前例）**:
@@ -235,3 +245,4 @@
     2. **残存ブランチの乖離検知と安全ブロック**: 過去セッションの同名 `epic/<name>` が残存している場合、`origin/main` との乖離（ahead/behind）を検知し、同一コミットでない限りデフォルトで `sys.exit(1)` により安全停止する。上書き再利用には明示的な `--reset` フラグ（または `RESET=1`）を要求する。
     3. **PR起票前の upstream 差分検証**: 秘書（`executive-secretary`）は PR 作成前に必ず `git diff origin/main..HEAD` を確認し、意図しない混入差分がゼロであることを担保する。
 
+>>>>>>> origin/main

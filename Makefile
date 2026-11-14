@@ -1,4 +1,4 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday park-add park-list park-clear install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
+.PHONY: test secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday park-add park-list park-clear install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
 
 EPIC ?=
 REPOS ?= core-service
@@ -85,8 +85,12 @@ secrets-decrypt:
 	@sops --decrypt --in-place .env || echo "Failed to decrypt. Check if you have the correct PGP/AGE keys."
 
 # ---------------------------------------------------------
-# Quality Gate & Architecture Validation
+# Quality Gate & Architecture Validation (Seatbelt Protected)
 # ---------------------------------------------------------
+test: validate-tests
+
+ifeq ($(YOU_INC_SANDBOX_ACTIVE),1)
+
 validate-skills:
 	@echo "Auditing skills..."
 	@uv run python tools/audit_skills.py
@@ -109,3 +113,12 @@ validate-tests:
 
 check-all: validate-skills validate-orphans validate-cleanliness validate-links validate-tests
 	@echo "✅ All agent-core Quality Gates passed!"
+
+else
+
+MAKE_CMD := $(MAKE)
+
+check-all validate-skills validate-orphans validate-cleanliness validate-links validate-tests:
+	@uv run python tools/sandbox_runner.py --role worker --worktree "$(CURDIR)" -- $(MAKE_CMD) $@
+
+endif

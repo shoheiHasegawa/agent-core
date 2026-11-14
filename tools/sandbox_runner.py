@@ -31,6 +31,12 @@ AGENT_CORE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_PROFILE = AGENT_CORE_DIR / "config" / "sandbox" / "worker.sb"
 RoleType = Literal["leader", "worker", "reviewer"]
 VALID_ROLES: tuple[RoleType, ...] = ("leader", "worker", "reviewer")
+SANDBOX_ENV_VAR = "YOU_INC_SANDBOX_ACTIVE"
+
+
+def is_inside_sandbox() -> bool:
+    """Seatbelt サンドボックス内部で動作中かを判定する。"""
+    return os.environ.get(SANDBOX_ENV_VAR) == "1"
 
 
 def resolve_parking_lot_path(explicit_path: Path | None = None) -> Path:
@@ -176,6 +182,7 @@ def run_in_sandbox(
     parking_lot_file: Path | None = None,
     cwd: Path | None = None,
     capture_output: bool = False,
+    env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """指定されたコマンドをロール別最小権限の `sandbox-exec` 内で実行する。"""
     resolved_pl = resolve_parking_lot_path(parking_lot_file)
@@ -189,12 +196,15 @@ def run_in_sandbox(
         profile_path=profile_path,
         parking_lot_file=parking_lot_file,
     )
+    run_env = (env if env is not None else os.environ).copy()
+    run_env[SANDBOX_ENV_VAR] = "1"
     return subprocess.run(
         sb_cmd,
         cwd=str((cwd or worktree_dir).resolve()),
         text=True,
         capture_output=capture_output,
         check=False,
+        env=run_env,
     )
 
 

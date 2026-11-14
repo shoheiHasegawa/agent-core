@@ -13,11 +13,17 @@
     - [x] 1. Workflow vs Agent（決定論的パイプライン vs 自律ループ）➔ Permanent Note 登録完了 🎉
     - [x] 2. Subagent & Context Isolation（情報隠蔽とコンテキスト純度）➔ Permanent Note 登録完了 🎉
     - [x] 3. Agentic Loop Termination（停止条件と無限ループ防止）➔ Permanent Note 登録完了 🎉 (Domain 1 🔴 MUST 貫通！)
-  - [ ] Domain 2: Tool & MCP（🔴 MUST 3項目）の壁打ち
+  - [x] Domain 2: Tool & MCP（🔴 MUST 3項目）の壁打ち
+    - [x] 1. MCP 3大プリミティブの責務分離 (Resources vs Prompts vs Tools) ➔ Permanent Note 登録完了 🎉
+    - [x] 2. Tool Definition Best Practices (ツール定義の品質) ➔ Permanent Note 登録完了 🎉 (Domain 2 🔴 MUST 貫通！)
+    - [x] 3. Scoped Permissions & Security Boundaries (最小権限とセキュリティ) ➔ Permanent Note 登録完了 🎉
   - [ ] Domain 3: Claude Code（🔴 MUST 3項目）の壁打ち
+    - [x] 1. CLAUDE.md Hierarchy & Rule Injection ➔ Permanent Notes 2本登録完了 🎉
+    - [x] 2. Permission Model & Sandbox Boundaries (実行許可とサンドボックス) ➔ Permanent Note 登録完了 🎉
+    - [ ] 3. Headless / CI/CD Automation
   - [ ] Domain 4: Prompt & Structured Output（🔴 MUST 3項目）の壁打ち
   - [ ] Domain 5: Context & Reliability（🔴 MUST 3項目）の壁打ち
-  - [ ] `second-brain/40_Permanent_Notes/` にアトミックノート蓄積（目標10〜15本以上）
+  - [ ] `second-brain/40_Permanent_Notes/` にアトミックノート蓄積（現在10本 / 目標10〜15本以上達成中 🎉）
 - [ ] **#9: [Phase 1: Ear] NotebookLM環境構築（音声解説・マインドマップ・フラッシュカード）による耳学習反復**
   - [ ] 5つのCleaned PacksのNotebookLM投入
   - [ ] 日本語ポッドキャスト（音声解説）生成 ＆ 3周聴了
