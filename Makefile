@@ -1,10 +1,12 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit zk-register zk-update zk-delete vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
+.PHONY: test secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit zk-register zk-update zk-delete vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday park-add park-list park-clear install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
 
 EPIC ?=
 REPOS ?= core-service
 ISSUE ?=
-CORE_SERVICE_DIR ?= ../core-service
-ENV_FILE ?= config/conf.env
+OFFLINE ?=
+RESET ?=
+CORE_SERVICE_DIR ?= $(firstword $(wildcard ../core-service ../../../../core-service /Users/shoheihasegawa/you_inc/core-service))
+ENV_FILE ?= $(firstword $(wildcard config/conf.env ../../config/conf.env ../../../../agent-core/config/conf.env /Users/shoheihasegawa/you_inc/agent-core/config/conf.env))
 ARGS ?=
 
 # ---------------------------------------------------------
@@ -43,12 +45,21 @@ calendar-events:
 brief-saturday:
 	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main saturday-briefing $(ARGS)
 
+park-add:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-add $(ARGS)
+
+park-list:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-list $(ARGS)
+
+park-clear:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-clear $(ARGS)
+
 # ---------------------------------------------------------
 # Workspace & Worktree Harness (方式A)
 # ---------------------------------------------------------
 ws-new:
-	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-new EPIC=<name> [REPOS=core-service,agent-core] [ISSUE=123]"; exit 1; fi
-	@uv run python tools/workspace_manager.py new --epic "$(EPIC)" --repos "$(REPOS)" $(if $(ISSUE),--issue "$(ISSUE)",)
+	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-new EPIC=<name> [REPOS=core-service,agent-core] [ISSUE=123] [OFFLINE=1] [RESET=1]"; exit 1; fi
+	@uv run python tools/workspace_manager.py new --epic "$(EPIC)" --repos "$(REPOS)" $(if $(ISSUE),--issue "$(ISSUE)",) $(if $(filter-out 0 false FALSE,$(OFFLINE)),--offline,) $(if $(filter-out 0 false FALSE,$(RESET)),--reset,)
 
 ws-harvest:
 	@if [ -z "$(EPIC)" ]; then echo "Usage: make ws-harvest EPIC=<name>"; exit 1; fi
@@ -88,8 +99,12 @@ secrets-decrypt:
 	@sops --decrypt --in-place .env || echo "Failed to decrypt. Check if you have the correct PGP/AGE keys."
 
 # ---------------------------------------------------------
-# Quality Gate & Architecture Validation
+# Quality Gate & Architecture Validation (Seatbelt Protected)
 # ---------------------------------------------------------
+test: validate-tests
+
+ifeq ($(YOU_INC_SANDBOX_ACTIVE),1)
+
 validate-skills:
 	@echo "Auditing skills..."
 	@uv run python tools/audit_skills.py
@@ -112,3 +127,12 @@ validate-tests:
 
 check-all: validate-skills validate-orphans validate-cleanliness validate-links validate-tests
 	@echo "✅ All agent-core Quality Gates passed!"
+
+else
+
+MAKE_CMD := $(MAKE)
+
+check-all validate-skills validate-orphans validate-cleanliness validate-links validate-tests:
+	@uv run python tools/sandbox_runner.py --role worker --worktree "$(CURDIR)" -- $(MAKE_CMD) $@
+
+endif

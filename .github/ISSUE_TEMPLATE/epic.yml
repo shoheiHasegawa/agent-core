@@ -6,20 +6,20 @@ body:
   - type: markdown
     attributes:
       value: |
-        You_Inc の親課題（Epic）用テンプレートです。
+        You_Inc の親課題（Epic）用テンプレートです。人間個人の単発行動（`[PREC-02]`）は独立 Issue にせず Epic の DoD ＆ Google Tasks へ配置してください。
   - type: textarea
     id: why
     attributes:
-      label: 🎯 WHY (背景と事業/システムインパクト)
-      description: なぜこのEpicを立ち上げるのか？何を達成したいか？
-      placeholder: 背景と達成したい世界観
+      label: 🎯 WHY & Value (背景と事業/システム価値)
+      description: なぜこのEpicを立ち上げるのか？完了すると何がどう変わるか？
+      placeholder: 背景と達成したい価値（Before ➔ After）
     validations:
       required: true
   - type: textarea
     id: what_dod
     attributes:
-      label: 📋 WHAT / DoD (親Epic完了条件)
-      description: Epic全体の包括的な完了条件
+      label: 📋 WHAT / DoD (親Epic完了条件・クローズ条件)
+      description: Epic全体の包括的な完了条件（人間マイルストーンはチェックリストに含め、実行は Google Tasks へ分離）
       placeholder: |
         - [ ] 子タスク/サブIssueの完了
         - [ ] アーキテクチャ正本への昇格
@@ -28,11 +28,11 @@ body:
   - type: textarea
     id: non_scope
     attributes:
-      label: 🚫 Non-Scope (今回は絶対にやらないこと)
-      description: Epic肥大化を防ぐ境界線
+      label: 🚫 Non-Scope (今回はやらないこと・境界)
+      description: Epic肥大化を防ぐ境界線（未決なら着手時に確定）
       placeholder: 今回のEpicに含めない事項
     validations:
-      required: true
+      required: false
   - type: textarea
     id: subtasks
     attributes:

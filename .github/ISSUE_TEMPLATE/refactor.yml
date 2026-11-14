@@ -6,20 +6,20 @@ body:
   - type: markdown
     attributes:
       value: |
-        You_Inc の引き算（Delete ➔ Simplify ➔ Add）用 Issue テンプレートです。
+        You_Inc の引き算（Delete ➔ Simplify ➔ Add）用 Issue テンプレートです。起票時に未確定の細部は捏造せず `TBD` と明記してください。
   - type: textarea
     id: why
     attributes:
-      label: 🎯 WHY (背景と負債の正体)
-      description: どのような陳腐化・肥大化・技術的負債を解消するか？
-      placeholder: 現状の負債と、削除・整理によるメリット
+      label: 🎯 WHY & Value (負債の正体と整理による価値)
+      description: どのような陳腐化・肥大化を解消し、どんな保守性・シンプルさを獲得するか？
+      placeholder: 現状の負債と、削除・整理による価値（Before ➔ After）
     validations:
       required: true
   - type: textarea
     id: what_dod
     attributes:
-      label: 📋 WHAT / DoD (定量的完了条件・純減目標)
-      description: 削除対象ファイル、純減行数目標、テスト通過条件
+      label: 📋 WHAT / DoD (完了イメージと定量的完了条件)
+      description: 削除対象、純減目標、テスト通過条件（未確定時は `TBD` と明記）
       placeholder: |
         - [ ] 対象ファイル・ディレクトリの削除
         - [ ] make check-all 通過 (Cov >= 90%)
@@ -28,16 +28,16 @@ body:
   - type: textarea
     id: non_scope
     attributes:
-      label: 🚫 Non-Scope (今回は絶対にやらないこと)
-      description: リファクタリング中の機能追加（足し算）を防止する境界線
+      label: 🚫 Non-Scope (今回はやらないこと・境界)
+      description: リファクタリング中の足し算を防止する境界線（起票時に見えていれば記入）
       placeholder: 今回はスコープ外とする新規機能・仕様変更
     validations:
-      required: true
+      required: false
   - type: textarea
     id: how_constraints
     attributes:
-      label: 🛠️ HOW & CONSTRAINTS (想定アプローチと制約)
-      description: 対象リポジトリ、互換性維持、移行手順
-      placeholder: 削除手順・影響範囲
+      label: 🛠️ CONSTRAINTS (対象リポジトリと互換性制約 ※詳細HOWは書かない)
+      description: 対象リポジトリ、維持すべき互換性境界
+      placeholder: 対象リポジトリ・維持すべき境界
     validations:
       required: false

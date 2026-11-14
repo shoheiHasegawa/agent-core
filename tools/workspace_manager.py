@@ -164,7 +164,78 @@ def find_unharvested_docs(ws_dir: Path) -> list[Path]:
     return sorted(unharvested)
 
 
-def mount_worktree(ws_dir: Path, epic: str, repo_name: str) -> None:
+def ref_exists(repo_root: Path, ref: str) -> bool:
+    """ローカルリポジトリ内に指定された ref が存在するか検証する。"""
+    return run_git(repo_root, ["rev-parse", "--verify", ref], check=False).returncode == 0
+
+
+def resolve_target_base(repo_root: Path, offline: bool = False) -> str:
+    """
+    対象リポジトリの起点となる ref（通常 'origin/main'、不在時は 'main'）を解決する。
+    - offline=False の場合、'git fetch origin main' を試行。
+    - fetch 失敗時、'origin/main' がローカルにあれば警告を出して 'origin/main' を返す。
+    - 'origin/main' が存在しない場合は警告を出して 'main' を返す。
+    - どちらも存在しない場合は RuntimeError を送出。
+    """
+    repo_name = repo_root.name
+    remotes = run_git(repo_root, ["remote"], check=False).stdout.split()
+
+    if not offline and "origin" in remotes:
+        fetch_res = run_git(repo_root, ["fetch", "origin", "main"], check=False)
+        if fetch_res.returncode != 0 and ref_exists(repo_root, "origin/main"):
+            stderr_msg = fetch_res.stderr.strip()
+            print(
+                f"⚠️  Failed to fetch 'origin/main' ({stderr_msg}). Falling back to cached 'origin/main'."
+            )
+            return "origin/main"
+
+    if ref_exists(repo_root, "origin/main"):
+        return "origin/main"
+
+    if ref_exists(repo_root, "main"):
+        print(
+            f"⚠️  'origin/main' not found for repository '{repo_name}'. Falling back to local 'main'."
+        )
+        return "main"
+
+    raise RuntimeError(
+        f"Neither 'origin/main' nor 'main' could be resolved for repository '{repo_name}'."
+    )
+
+
+def check_branch_divergence(
+    repo_root: Path, branch_name: str, target_base: str
+) -> tuple[bool, int, int]:
+    """
+    既存ブランチと target_base のコミット差分を計測する。
+    返り値: (is_diverged, ahead_count, behind_count)
+    ahead == 0 and behind == 0 の場合 is_diverged=False。
+    """
+    res = run_git(
+        repo_root,
+        ["rev-list", "--left-right", "--count", f"{branch_name}...{target_base}"],
+        check=False,
+    )
+    if res.returncode != 0:
+        raise RuntimeError(
+            f"Failed to check divergence between '{branch_name}' and '{target_base}': {res.stderr.strip()}"
+        )
+    parts = res.stdout.strip().split()
+    if len(parts) != 2:
+        raise RuntimeError(f"Unexpected output from rev-list: '{res.stdout.strip()}'")
+    ahead = int(parts[0])
+    behind = int(parts[1])
+    is_diverged = ahead != 0 or behind != 0
+    return (is_diverged, ahead, behind)
+
+
+def mount_worktree(
+    ws_dir: Path,
+    epic: str,
+    repo_name: str,
+    offline: bool = False,
+    reset: bool = False,
+) -> None:
     repo_root = YOU_INC_ROOT / repo_name
     if not (repo_root / ".git").exists():
         print(f"⚠️  Skipping '{repo_name}': Git repository not found at {repo_root}")
@@ -173,23 +244,48 @@ def mount_worktree(ws_dir: Path, epic: str, repo_name: str) -> None:
     wt_target = ws_dir / "worktrees" / repo_name
     branch_name = f"epic/{epic}"
 
+    try:
+        rel_wt = wt_target.relative_to(AGENT_CORE_ROOT)
+    except ValueError:
+        rel_wt = wt_target
+
     if wt_target.exists():
-        print(f"ℹ️  Worktree already exists: {wt_target.relative_to(AGENT_CORE_ROOT)}")
+        print(f"ℹ️  Worktree already exists: {rel_wt}")
         return
 
+    try:
+        target_base = resolve_target_base(repo_root, offline=offline)
+    except RuntimeError:
+        print(f"❌ Neither 'origin/main' nor 'main' could be resolved for repository '{repo_name}'.")
+        sys.exit(1)
+
     # Check if branch already exists
-    branch_check = run_git(repo_root, ["rev-parse", "--verify", branch_name], check=False)
-    if branch_check.returncode == 0:
+    if ref_exists(repo_root, branch_name):
+        is_diverged, ahead, behind = check_branch_divergence(repo_root, branch_name, target_base)
+        if is_diverged:
+            if not reset:
+                print(
+                    f"❌ Branch '{branch_name}' already exists and has diverged from {target_base} "
+                    f"(ahead {ahead}, behind {behind}). Use --reset to overwrite or delete it manually."
+                )
+                sys.exit(1)
+            reset_res = run_git(repo_root, ["branch", "-f", branch_name, target_base], check=False)
+            if reset_res.returncode != 0:
+                print(f"❌ Failed to reset branch '{branch_name}' to {target_base}:\n{reset_res.stderr}")
+                sys.exit(1)
+            print(f"ℹ️  Reset branch '{branch_name}' to {target_base} (--reset specified).")
+        else:
+            print(f"ℹ️  Existing branch '{branch_name}' matches {target_base}. Reusing it.")
         cmd = ["worktree", "add", str(wt_target), branch_name]
     else:
-        cmd = ["worktree", "add", "-b", branch_name, str(wt_target), "main"]
+        cmd = ["worktree", "add", "-b", branch_name, str(wt_target), target_base]
 
     res = run_git(repo_root, cmd, check=False)
     if res.returncode != 0:
-        print(f"❌ Failed to mount worktree for {repo_name}:\n{res.stderr}")
+        print(f"❌ Failed to mount worktree for '{repo_name}':\n{res.stderr}")
         sys.exit(1)
 
-    print(f"✅ Mounted worktree: {wt_target.relative_to(AGENT_CORE_ROOT)} (branch: {branch_name})")
+    print(f"✅ Mounted worktree: {rel_wt} (branch: {branch_name})")
 
 
 def cmd_new(args: argparse.Namespace) -> None:
@@ -200,7 +296,13 @@ def cmd_new(args: argparse.Namespace) -> None:
 
     repos = [r.strip() for r in args.repos.split(",") if r.strip()]
     for repo in repos:
-        mount_worktree(ws_dir, epic, repo)
+        mount_worktree(
+            ws_dir,
+            epic,
+            repo,
+            offline=getattr(args, "offline", False),
+            reset=getattr(args, "reset", False),
+        )
 
 
 def cmd_harvest(args: argparse.Namespace) -> None:
@@ -309,6 +411,16 @@ def main() -> None:
     p_new.add_argument("--epic", required=True, help="Epic directory/branch name")
     p_new.add_argument("--repos", default="core-service", help="Comma-separated repo names (e.g. core-service,agent-core)")
     p_new.add_argument("--issue", default=None, help="GitHub Issue number")
+    p_new.add_argument(
+        "--offline",
+        action="store_true",
+        help="Skip remote fetch and use cached local refs",
+    )
+    p_new.add_argument(
+        "--reset",
+        action="store_true",
+        help="Force reset existing diverged epic branch to target base",
+    )
 
     p_harvest = sub.add_parser("harvest", help="Unmount worktrees and clean temporary files for closing")
     p_harvest.add_argument("--epic", required=True, help="Epic name")
