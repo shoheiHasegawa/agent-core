@@ -134,6 +134,14 @@
   - 大量起票・一括更新タスク時は、バースト実行を避け、1件ごとにレスポンス確認とウェイト（`sleep 3〜5`）を入れて安全に実行せよ。
   - 将来的には、外部書き込み CLI 呼び出し時に自動でレートリミットを強制するハーネス/ラッパーを導入し、注意力ゼロでアカウント凍結を防ぐ構造（Fail-safe）へ昇格させる。
 
+### [EXP-19] 単体 checkout CI と Worktree 階層におけるモノレポ外部参照・絶対パス除外の罠
+- **失敗の現象**:
+  1. GitHub Actions（`actions/checkout`）では `agent-core` 単体のみがチェックアウトされるため、親ディレクトリ（`../GEMINI.md`）や兄弟リポジトリ（`../../core-service/...`）を参照する Linter が無条件エラーになった。
+  2. 一方で `check_markdown_links.py` が除外判定に絶対パス `f.parts` を使っていたため、Worktree 配下（`.../workspaces/<epic>/worktrees/agent-core/`）で実行した際に全 Markdown ファイルが除外され、ローカルの `make check-all` でリンク切れが素通りしていた。
+- **対策（教訓）**:
+  - モノレポ親の存在を前提とする Linter は、ディレクトリ構造からモノレポ環境か単体 checkout 環境かを決定論的に判別（`find_monorepo_root`）し、ローカルモノレポでは厳格検証・単体 checkout ではリポジトリ内部検証を保ちつつ外部横断参照のみ安全にスキップせよ。
+  - パス除外判定には絶対パス `f.parts` ではなく必ず `f.relative_to(repo_root).parts` を使用し、Worktree 階層下でもリポジトリ内の検査がスキップされないようにせよ。
+
 ---
 
 ## Part 2: 社長の意思決定・アーキテクチャ判断の前例集 (Executive Precedents)

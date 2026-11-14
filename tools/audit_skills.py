@@ -60,34 +60,65 @@ def audit_skill_file(skill_path: Path) -> list[str]:
     return errors
 
 
+def find_monorepo_root(agent_core_root: Path) -> Path | None:
+    """
+    agent-core の配置からモノレポルート（you_inc）を探索する。
+    Pass 1: 上位ディレクトリで GEMINI.md が存在し、agent-core/ ディレクトリを持つディレクトリを探索。
+    Pass 2: GEMINI.md が欠損している場合でも、兄弟リポ（core-service または second-brain）と agent-core を持つ親ディレクトリを探索。
+            ただし worktrees 自体は誤認しないよう除外する。
+    モノレポ構造が見つからない場合（単体 checkout 等）は None を返す。
+    """
+    resolved = agent_core_root.resolve()
+
+    # Pass 1: 正常モノレポ検出（GEMINI.md と agent-core/ が存在）
+    for p in resolved.parents:
+        if (p / "GEMINI.md").exists() and (p / "agent-core").is_dir():
+            return p
+
+    # Pass 2: ルート GEMINI.md 欠損モノレポ検出（兄弟リポと agent-core/ が存在）
+    for p in resolved.parents:
+        if p.name != "worktrees" and (p / "agent-core").is_dir():
+            if (p / "core-service").is_dir() or (p / "second-brain").is_dir():
+                return p
+
+    return None
+
+
 def verify_gemini_identity(agent_core_root: Path, root_gemini_path: Path | None = None) -> list[str]:
     """
     リポジトリ最上位ルートの GEMINI.md と agent-core/GEMINI.md が完全一致することを検証する。
+    単体 checkout 環境（root_gemini_path=None かつ find_monorepo_root が None）では比較をスキップする。
     """
     errors = []
-    if root_gemini_path is None:
-        for p in agent_core_root.parents:
-            if (p / "GEMINI.md").exists() and (p / "agent-core").is_dir():
-                root_gemini_path = p / "GEMINI.md"
-                break
-        if root_gemini_path is None:
-            root_gemini_path = agent_core_root.parent / "GEMINI.md"
-
     agent_gemini = agent_core_root / "GEMINI.md"
 
-    if not root_gemini_path.exists():
-        errors.append(f"Root GEMINI.md not found at {root_gemini_path}")
+    # agent-core/GEMINI.md 自体の存在・非空チェック
+    agent_content = None
     if not agent_gemini.exists():
         errors.append(f"agent-core/GEMINI.md not found at {agent_gemini}")
-
-    if not errors:
-        root_content = root_gemini_path.read_text(encoding="utf-8")
+    else:
         agent_content = agent_gemini.read_text(encoding="utf-8")
-        if root_content != agent_content:
-            errors.append(
-                f"GEMINI.md mismatch between root ({root_gemini_path}) and agent-core ({agent_gemini})! "
-                "Global Constitution must be completely identical across both locations."
-            )
+        if not agent_content.strip():
+            errors.append(f"agent-core/GEMINI.md is empty at {agent_gemini}")
+
+    # root GEMINI.md のパス解決
+    target_root_gemini = root_gemini_path
+    if target_root_gemini is None:
+        monorepo_root = find_monorepo_root(agent_core_root)
+        if monorepo_root is not None:
+            target_root_gemini = monorepo_root / "GEMINI.md"
+
+    # root GEMINI.md が特定された場合の存在・一致チェック
+    if target_root_gemini is not None:
+        if not target_root_gemini.exists():
+            errors.append(f"Root GEMINI.md not found at {target_root_gemini}")
+        elif agent_content and agent_content.strip():
+            root_content = target_root_gemini.read_text(encoding="utf-8")
+            if root_content != agent_content:
+                errors.append(
+                    f"GEMINI.md mismatch between root ({target_root_gemini}) and agent-core ({agent_gemini})! "
+                    "Global Constitution must be completely identical across both locations."
+                )
 
     return errors
 
