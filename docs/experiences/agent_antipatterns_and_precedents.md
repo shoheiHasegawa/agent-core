@@ -134,6 +134,13 @@
   - 大量起票・一括更新タスク時は、バースト実行を避け、1件ごとにレスポンス確認とウェイト（`sleep 3〜5`）を入れて安全に実行せよ。
   - 将来的には、外部書き込み CLI 呼び出し時に自動でレートリミットを強制するハーネス/ラッパーを導入し、注意力ゼロでアカウント凍結を防ぐ構造（Fail-safe）へ昇格させる。
 
+### [EXP-19] サンドボックス内からの入れ子 `sandbox-exec` 実行による多重起動クラッシュ
+- **失敗の現象**:
+  - `make check-all` や `validate-tests` 自体を `sandbox_runner.py`（Seatbelt）下で動かす設計にした際、テストコード内でナイーブに `subprocess.run(["make", "validate-tests"])` を実行すると、macOS カーネル標準の `sandbox-exec` が多重起動（入れ子実行）を禁止しているため、`sandbox_runner.py` が `sandbox_apply: Operation not permitted` で強制クラッシュし、テストスイート全体が全滅する。
+- **対策（教訓）**:
+  - サンドボックス配下で動作するテストコードから Makefile の分岐やコマンド組み立てを検証する際は、サブプロセスで実実行するのではなく、**GNU Make の dry-run モード（`make -n <target>`）の出力をアサートする決定論的検証方式**を採用せよ。
+  - また、GNU Make のレシピ内でサブ make を呼ぶ際は、再帰 make 展開による dry-run 時の誤爆実行を防ぐため、`MAKE_CMD := $(MAKE)` 変数を経由して `$(MAKE_CMD) $@` を実行せよ。
+
 ---
 
 ## Part 2: 社長の意思決定・アーキテクチャ判断の前例集 (Executive Precedents)
@@ -210,3 +217,6 @@
   - **3. 検証用 Secret とネットワーク開通の扱い（`dev-secret.env` 不採用）**:
     - 開発用と称して `dev-secret.env` のような別ファイルを作ることは、二重管理と誤コミットを招くため禁止する（引き算ファースト）。
     - 99% のテストは Fake/Stub と `monkeypatch.setenv` でオフライン完結させ、1% の実 API 疎通やパッケージ追加（`uv sync`）が必要な場合のみ、Tier 2/3 判断として `sandbox_runner.py --allow-net` とインメモリ環境変数注入（`os.environ`）を組み合わせて実行する。
+  - **4. Makefile 内包による完全自動強制化と再入ガード（`YOU_INC_SANDBOX_ACTIVE=1`）**:
+    - プロンプトでの呼び出し指示（性善説）に依存せず、ホスト環境から `make check-all`、`make validate-tests`、`make test` を実行した際、自動的に `sandbox_runner.py --role worker --worktree "$(CURDIR)" --` を経由させる。
+    - サンドボックス内部での実行時は環境変数 `YOU_INC_SANDBOX_ACTIVE=1` による再入ガード（`ifeq`）により直接ターゲットを実行し、多重 `sandbox-exec` 起因のエラーを決定論的に防止する。
