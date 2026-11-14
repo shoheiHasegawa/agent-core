@@ -37,8 +37,8 @@ type: Orchestrator
    - 🔧 **`[Maintenance]`**: 定常ルーティンや30分未満の小用。
 3. **締め切り前倒し（Hard Deadline vs Planned Date）**:
    - メモ内の絶対締切（`[deadline: YYYY-MM-DD]`）に対して、当日にパンクしないよう計画日を前倒し逆算配置する。
-4. **Parking Lot トリアージと消化**:
-   - 回収した引っ掛かり（日常は `make park-list`）を破棄/統合/正式Issue化へトリアージし、`make park-clear` で消化する（※個人思考は `second-brain/00_Inbox/` へ直接登録し混同させない）。
+4. **全体育成ループ（3層境界）と Parking Lot トリアージ**:
+   - スコープ外の引っ掛かり（日常は `make park-list`）を破棄/統合/正式Issue化へトリアージし、`make park-clear` で消化する（※タスク内学びはルートAでリポジトリへ、個人思考・気づきは `second-brain`（ルートB）へ集約）。
 
 #### B. 日常のタスク操作 (Daily Operations)
 - タスク一覧: `make tasks-list ARGS="--planned-date <YYYY-MM-DD>"` または `make tasks-list ARGS="--list Must"`

@@ -3,8 +3,8 @@
 EPIC ?=
 REPOS ?= core-service
 ISSUE ?=
-CORE_SERVICE_DIR ?= ../core-service
-ENV_FILE ?= config/conf.env
+CORE_SERVICE_DIR ?= $(firstword $(wildcard ../core-service ../../../../core-service /Users/shoheihasegawa/you_inc/core-service))
+ENV_FILE ?= $(firstword $(wildcard config/conf.env ../../config/conf.env ../../../../agent-core/config/conf.env /Users/shoheihasegawa/you_inc/agent-core/config/conf.env))
 ARGS ?=
 
 # ---------------------------------------------------------

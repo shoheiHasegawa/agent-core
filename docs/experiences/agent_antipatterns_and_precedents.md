@@ -211,8 +211,11 @@
     - 開発用と称して `dev-secret.env` のような別ファイルを作ることは、二重管理と誤コミットを招くため禁止する（引き算ファースト）。
     - 99% のテストは Fake/Stub と `monkeypatch.setenv` でオフライン完結させ、1% の実 API 疎通やパッケージ追加（`uv sync`）が必要な場合のみ、Tier 2/3 判断として `sandbox_runner.py --allow-net` とインメモリ環境変数注入（`os.environ`）を組み合わせて実行する。
 
-### [PREC-09] ヤクの毛刈り防止のための Parking Lot 退避と個人思考（Second Brain）の境界分離
+### [PREC-09] ヤクの毛刈り防止のための Parking Lot 退避と全体育成ループ（3層境界）の分離
 - **判断基準（前例）**:
-  - 作業中の「軽微な引っ掛かり・システム上の技術課題」は、作業フローを中断させずに（ヤクの毛刈り防止）、かつ未検証の細切れ GitHub Issue を濫造せずに、ローカル単一ファイル（`data/parking_lot.jsonl`）へ退避（`make park-add`）し、土曜定例（`make brief-saturday`）または翌朝で秘書が一括回収・トリアージ（破棄 / 統合 / 正式 Issue 化）する。
-  - 一方で、社長個人の着想・疑問・哲学などの「個人思考」は、`second-brain/00_Inbox/`（または Obsidian Mobile Vault）を正本とし、Parking Lot には混ぜない。
-  - Seatbelt 穴開け時は、`worker.sb` で `(literal (param "PARKING_LOT_FILE"))` を用いて単一ファイルのみをピンポイントで許可し、同一ディレクトリ内の他ファイルや機密ファイルのアクセス遮断を OS カーネルレベルで維持せよ（`[SB-11]`）。
+  - **育成ループ全体の3層境界**:
+    1. **タスク内の技術的学び ➔ `tasks/lessons_learned.md`（ルートA）**: PR完了時に各リポジトリのルール・Linter・前例（`[EXP-XX]` / `[PREC-XX]`）へ即時還流。
+    2. **スコープ外の引っ掛かり・課題 ➔ `Parking Lot`（`make park-add`）**: 現在のタスク（作業フロー）を止めずに（ヤクの毛刈り防止）、かつ未検証の細切れ GitHub Issue を濫造せずにローカル単一ファイルへ退避し、土曜定例（`make brief-saturday`）または翌朝で秘書が一括トリアージ（破棄 / 統合 / 正式 Issue 化）。
+    3. **社長個人の思考・着想・気づき ➔ `second-brain/00_Inbox/`（ルートB）**: 社長個人の自己成長に直結する思考メモは Obsidian（Mobile Vault）を正本とし、Parking Lot には絶対に混同させない。
+  - **Seatbelt 最小権限**:
+    - `worker.sb` で `(literal (param "PARKING_LOT_FILE"))` および `(literal (param "PARKING_LOT_BACKUP_FILE"))` を用い、`worker` / `leader` のみピンポイント許可し、`reviewer` は Read-Only 監査を強制して書き込みを遮断せよ（`[SB-11]`）。

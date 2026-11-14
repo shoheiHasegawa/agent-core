@@ -197,7 +197,18 @@ Some findings.
             parking_lot_file=target_path,
         )
         self.assertIn("-D", cmd)
+        self.assertIn("ROLE=worker", cmd)
         self.assertIn(f"PARKING_LOT_FILE={target_path.resolve()}", cmd)
+
+        # Reviewer role verification
+        cmd_rev = sandbox_runner.build_sandbox_command(
+            command=["echo", "test"],
+            worktree_dir=agent_core_dir,
+            role="reviewer",
+            parking_lot_file=target_path,
+        )
+        self.assertIn("ROLE=reviewer", cmd_rev)
+        self.assertIn(f"PARKING_LOT_BACKUP_FILE={target_path.with_name('parking_lot_backup.jsonl').resolve()}", cmd)
 
 
 if __name__ == "__main__":
