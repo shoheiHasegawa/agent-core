@@ -1,4 +1,4 @@
-.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
+.PHONY: secrets-encrypt secrets-decrypt ws-new ws-harvest ws-clean ws-list zk-audit vault-peek tasks-list tasks-add tasks-complete tasks-update calendar-events brief-saturday park-add park-list park-clear install-hooks validate-skills validate-orphans validate-cleanliness validate-links validate-tests check-all
 
 EPIC ?=
 REPOS ?= core-service
@@ -33,6 +33,15 @@ calendar-events:
 
 brief-saturday:
 	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main saturday-briefing $(ARGS)
+
+park-add:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-add $(ARGS)
+
+park-list:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-list $(ARGS)
+
+park-clear:
+	@PYTHONPATH="$(CORE_SERVICE_DIR)/src" uv run --project "$(CORE_SERVICE_DIR)" $(if $(wildcard $(ENV_FILE)),--env-file "$(ENV_FILE)",) python -m entrypoints.cli.main park-clear $(ARGS)
 
 # ---------------------------------------------------------
 # Workspace & Worktree Harness (方式A)

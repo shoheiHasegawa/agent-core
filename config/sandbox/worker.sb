@@ -13,6 +13,7 @@
 ;;   - ALLOWED_SCRATCH: workspaces/<epic>/scratch/
 ;;   - UV_CACHE_DIR:    ~/.cache/uv
 ;;   - ALLOW_NET:       "true" の場合のみ外部通信を一時解禁（デフォルト "false"）
+;;   - PARKING_LOT_FILE: 単一 Parking Lot ファイルへのピンポイント書き込み許可パス ([SB-11])
 ;; ============================================================================
 
 ;; 1. ベースライン: プロセス実行・システムライブラリ読取を許可し、危険な操作を後続ルールで遮断
@@ -32,6 +33,7 @@
 (allow file-write*
   (subpath (param "ALLOWED_PRIMARY"))
   (subpath (param "ALLOWED_SCRATCH"))
+  (literal (param "PARKING_LOT_FILE"))
   (subpath "/tmp")
   (subpath "/private/tmp")
   (subpath (param "UV_CACHE_DIR"))

@@ -29,6 +29,7 @@ from typing import Any, Literal
 
 AGENT_CORE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_PROFILE = AGENT_CORE_DIR / "config" / "sandbox" / "worker.sb"
+DEFAULT_PARKING_LOT_FILE = AGENT_CORE_DIR / "data" / "parking_lot.jsonl"
 RoleType = Literal["leader", "worker", "reviewer"]
 VALID_ROLES: tuple[RoleType, ...] = ("leader", "worker", "reviewer")
 
@@ -85,6 +86,7 @@ def build_sandbox_command(
     role: RoleType = "worker",
     allow_net: bool = False,
     profile_path: Path = DEFAULT_PROFILE,
+    parking_lot_file: Path | None = None,
 ) -> list[str]:
     """
     Seatbelt プロファイル (`worker.sb`) に動的パラメータ (`-D`) を注入した `sandbox-exec` コマンド列を構築する。
@@ -102,6 +104,7 @@ def build_sandbox_command(
         role=role,
     )
     uv_cache = Path(os.environ.get("UV_CACHE_DIR", Path.home() / ".cache" / "uv")).expanduser().resolve()
+    target_parking_lot = (parking_lot_file or DEFAULT_PARKING_LOT_FILE).resolve()
 
     return [
         "/usr/bin/sandbox-exec",
@@ -115,6 +118,8 @@ def build_sandbox_command(
         f"UV_CACHE_DIR={uv_cache}",
         "-D",
         f"ALLOW_NET={'true' if allow_net else 'false'}",
+        "-D",
+        f"PARKING_LOT_FILE={target_parking_lot}",
         "--",
         *command,
     ]
@@ -127,6 +132,7 @@ def run_in_sandbox(
     role: RoleType = "worker",
     allow_net: bool = False,
     profile_path: Path = DEFAULT_PROFILE,
+    parking_lot_file: Path | None = None,
     cwd: Path | None = None,
     capture_output: bool = False,
 ) -> subprocess.CompletedProcess[str]:
@@ -138,6 +144,7 @@ def run_in_sandbox(
         role=role,
         allow_net=allow_net,
         profile_path=profile_path,
+        parking_lot_file=parking_lot_file,
     )
     return subprocess.run(
         sb_cmd,
@@ -448,6 +455,43 @@ def run_self_test(profile_path: Path = DEFAULT_PROFILE, output_json: bool = Fals
             "ValueError raised as expected on invalid worktree/command",
         )
 
+        # ⑪ [SB-11] Parking Lot 単一ファイルへの書き込み許可と他ファイル遮断の維持
+        test_parking_lot = outside_dir / "data" / "parking_lot.jsonl"
+        test_other_file = outside_dir / "data" / "other.txt"
+        test_parking_lot.parent.mkdir(parents=True, exist_ok=True)
+        test_parking_lot.write_text('{"initial": 1}\n', encoding="utf-8")
+        test_other_file.write_text("protected\n", encoding="utf-8")
+
+        res_pl_write = run_in_sandbox(
+            command=["/bin/sh", "-c", f"echo '{{\"parked\": 2}}' >> '{test_parking_lot}'"],
+            worktree_dir=worktree_dir,
+            scratch_dir=scratch_dir,
+            role="worker",
+            profile_path=profile_path,
+            parking_lot_file=test_parking_lot,
+            capture_output=True,
+        )
+        res_other_write = run_in_sandbox(
+            command=["/bin/sh", "-c", f"echo 'hack' >> '{test_other_file}'"],
+            worktree_dir=worktree_dir,
+            scratch_dir=scratch_dir,
+            role="worker",
+            profile_path=profile_path,
+            parking_lot_file=test_parking_lot,
+            capture_output=True,
+        )
+        pl_write_ok = res_pl_write.returncode == 0
+        other_blocked = res_other_write.returncode != 0 and (
+            "Operation not permitted" in res_other_write.stderr or "Permission denied" in res_other_write.stderr
+        )
+        sb11_ok = pl_write_ok and other_blocked
+        record(
+            "[SB-11]",
+            "Allow write to single parking_lot.jsonl while denying other files outside worktree",
+            sb11_ok,
+            f"parking_lot write: {'OK' if pl_write_ok else 'FAIL'}, other file write: {'BLOCKED' if other_blocked else 'UNBLOCKED'}",
+        )
+
     # ⑨ [SB-03] Leave No Trace（一時ディレクトリ完全消去の冪等性確認）
     leave_no_trace_ok = not tmp_root.exists()
     record(
@@ -536,9 +580,15 @@ def main() -> None:
         help="Path to the Seatbelt .sb profile (default: config/sandbox/worker.sb).",
     )
     parser.add_argument(
+        "--parking-lot-file",
+        type=Path,
+        default=None,
+        help="Path to allowed single parking lot file (default: data/parking_lot.jsonl).",
+    )
+    parser.add_argument(
         "--self-test",
         action="store_true",
-        help="Run deterministic self-verification suite ([SB-01] to [SB-10]).",
+        help="Run deterministic self-verification suite ([SB-01] to [SB-11]).",
     )
     parser.add_argument(
         "--json",
@@ -571,6 +621,7 @@ def main() -> None:
             role=args.role,
             allow_net=args.allow_net,
             profile_path=args.profile,
+            parking_lot_file=args.parking_lot_file,
         )
     except (FileNotFoundError, ValueError) as exc:
         print(f"❌ Sandbox Runner Error: {exc}", file=sys.stderr)

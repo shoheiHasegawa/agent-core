@@ -210,3 +210,9 @@
   - **3. 検証用 Secret とネットワーク開通の扱い（`dev-secret.env` 不採用）**:
     - 開発用と称して `dev-secret.env` のような別ファイルを作ることは、二重管理と誤コミットを招くため禁止する（引き算ファースト）。
     - 99% のテストは Fake/Stub と `monkeypatch.setenv` でオフライン完結させ、1% の実 API 疎通やパッケージ追加（`uv sync`）が必要な場合のみ、Tier 2/3 判断として `sandbox_runner.py --allow-net` とインメモリ環境変数注入（`os.environ`）を組み合わせて実行する。
+
+### [PREC-09] ヤクの毛刈り防止のための Parking Lot 退避と個人思考（Second Brain）の境界分離
+- **判断基準（前例）**:
+  - 作業中の「軽微な引っ掛かり・システム上の技術課題」は、作業フローを中断させずに（ヤクの毛刈り防止）、かつ未検証の細切れ GitHub Issue を濫造せずに、ローカル単一ファイル（`data/parking_lot.jsonl`）へ退避（`make park-add`）し、土曜定例（`make brief-saturday`）または翌朝で秘書が一括回収・トリアージ（破棄 / 統合 / 正式 Issue 化）する。
+  - 一方で、社長個人の着想・疑問・哲学などの「個人思考」は、`second-brain/00_Inbox/`（または Obsidian Mobile Vault）を正本とし、Parking Lot には混ぜない。
+  - Seatbelt 穴開け時は、`worker.sb` で `(literal (param "PARKING_LOT_FILE"))` を用いて単一ファイルのみをピンポイントで許可し、同一ディレクトリ内の他ファイルや機密ファイルのアクセス遮断を OS カーネルレベルで維持せよ（`[SB-11]`）。
