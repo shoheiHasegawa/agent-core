@@ -218,5 +218,5 @@
     - 開発用と称して `dev-secret.env` のような別ファイルを作ることは、二重管理と誤コミットを招くため禁止する（引き算ファースト）。
     - 99% のテストは Fake/Stub と `monkeypatch.setenv` でオフライン完結させ、1% の実 API 疎通やパッケージ追加（`uv sync`）が必要な場合のみ、Tier 2/3 判断として `sandbox_runner.py --allow-net` とインメモリ環境変数注入（`os.environ`）を組み合わせて実行する。
   - **4. Makefile 内包による完全自動強制化と再入ガード（`YOU_INC_SANDBOX_ACTIVE=1`）**:
-    - プロンプトでの呼び出し指示（性善説）に依存せず、ホスト環境から `make check-all`、`make validate-tests`、`make test` を実行した際、自動的に `sandbox_runner.py --role worker --worktree "$(CURDIR)" --` を経由させる。
-    - サンドボックス内部での実行時は環境変数 `YOU_INC_SANDBOX_ACTIVE=1` による再入ガード（`ifeq`）により直接ターゲットを実行し、多重 `sandbox-exec` 起因のエラーを決定論的に防止する。
+    - プロンプトでの呼び出し指示（性善説）に依存せず、`agent-core` および `core-service` のホスト環境から `make check-all`、`make validate-tests`、`make test` を実行した際、自動的に `sandbox_runner.py --role worker --worktree "$(CURDIR)" --` を経由させる。
+    - サンドボックス内部での実行時は環境変数 `YOU_INC_SANDBOX_ACTIVE=1` による再入ガード（`ifeq`）により直接ターゲットを実行し、多重 `sandbox-exec` 起因のエラーを決定論的に防止する。また `core-service` 側ではテストフィクスチャの `dummy_token.json` 改名により Seatbelt 機密遮断との衝突を解消した。
