@@ -219,3 +219,11 @@
     3. **社長個人の思考・着想・気づき ➔ `second-brain/00_Inbox/`（ルートB）**: 社長個人の自己成長に直結する思考メモは Obsidian（Mobile Vault）を正本とし、Parking Lot には絶対に混同させない。
   - **Seatbelt 最小権限**:
     - `worker.sb` で `(literal (param "PARKING_LOT_FILE"))` および `(literal (param "PARKING_LOT_BACKUP_FILE"))` を用い、`worker` / `leader` のみピンポイント許可し、`reviewer` は Read-Only 監査を強制して書き込みを遮断せよ（`[SB-11]`）。
+
+### [PREC-10] Worktree 生成時の upstream 起点強制と乖離ブランチのフェイルセーフガード
+- **判断基準（前例）**:
+  - 並列セッション稼働時にローカル `main` の未プッシュコミットや古い同名ブランチの残骸が混入することを防ぐため、`tools/workspace_manager.py`（`make ws-new`）は以下のガードを強制する：
+    1. **`origin/main` の優先起点化**: リモート `origin` が存在する場合は `git fetch origin main` を行い、ローカル `main` ではなく `origin/main` を起点として worktree ブランチを作成する（オフライン時は `--offline` またはキャッシュ利用）。
+    2. **残存ブランチの乖離検知と安全ブロック**: 過去セッションの同名 `epic/<name>` が残存している場合、`origin/main` との乖離（ahead/behind）を検知し、同一コミットでない限りデフォルトで `sys.exit(1)` により安全停止する。上書き再利用には明示的な `--reset` フラグ（または `RESET=1`）を要求する。
+    3. **PR起票前の upstream 差分検証**: 秘書（`executive-secretary`）は PR 作成前に必ず `git diff origin/main..HEAD` を確認し、意図しない混入差分がゼロであることを担保する。
+
