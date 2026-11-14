@@ -158,7 +158,7 @@ CCA-F Pack 1 の第一原則は **「Start with simple workflows before escalati
 > ### 📐 WHAT & DoD
 > - [ ] team-leader/SKILL.md のファストトラック基準（リーダー単独・単一ワーカーで即マージしてよい境界）の定量化と安全弁の明文化"
 >
-> # 4-4. [P3 スケーラビリティ] saturday-briefing の件数上限と一括反映バッチ
+> # 4-4. [P3 スケーラビリティ] saturday-briefing の件数上限と一括反映バッチ（※#19 として起票後、実運用調査により YAGNI として Won't Do クローズし #29/#30 へ統合）
 > gh issue create --title "[CLI/Workflow] saturday-briefing の件数上限フィルタと決定事項の一括反映バッチコマンド" \
 >   --label "workflow,cli" \
 >   --body "### 🎯 WHY
@@ -245,5 +245,5 @@ CCA-F 完了判定に伴い、今後の運用（Actionモード）において�
 | 🟡 **P1**<br>(コード負債) | **`core-service` 内の旧 SQLite タスク管理層の残存** | `core-service` リファクタリング時 | 中 | **【Issue 起票】** `[Refactor/Delete]` として計画パージし、コードベースを半減させる。 |
 | 🟡 **P1**<br>(構造的盲点) | **サンドボックスの「任意着用」問題** | ワーカーが `sandbox_runner.py` を付け忘れた時 | 中 | **【Issue 起票】** `Makefile` の `check-all` / `test` 内部で自動経由させ、プロンプト指示依存を根絶する。 |
 | 🟡 **P2**<br>(運用摩擦) | **2-Pass マルチエージェントのセレモニー税** | 軽微な CLI / ドキュメント調整時 | 中 | **【Issue 起票】** ファストトラック（単一ワーカー・軽量レビュー）基準を整備する。 |
-| 🟢 **P3**<br>(スケーラビリティ) | **`saturday-briefing` のトークン肥大化と更新N回呼び出し** | タスク・メモが 30〜50件を超えた時 | 低〜中 | **【Issue 起票】** `--limit` 引数および一括更新（バッチWrite）コマンドを実装する。 |
+| 🟢 **P3**<br>(スケーラビリティ) | **`saturday-briefing` のトークン肥大化と更新N回呼び出し** | Mobile Vault への長文・滞留メモ蓄積時（実測 Tasks は一桁台で健全） | 低〜中 | **【Won't Do (`#19` クローズ / YAGNI)】** `--limit` による隠蔽やバッチ更新は過剰投資のため不採用。`#29`（Vault 構造分離・初期棚卸し）と `#30`（捨てる前提トリアージ）で根本解消。 |
 | 🟢 **P3**<br>(OS依存) | **macOS `sandbox-exec` の非推奨仕様とローカル専用性** | macOS メジャー更新時 | 低 | **【現時点は許容（`[PREC-08]`）】** ラッパー層（`sandbox_runner.py`）に隔離されているため将来置換可能。 |
