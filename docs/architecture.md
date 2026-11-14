@@ -1,4 +1,4 @@
-# 🏛️ You_Inc Architecture Blueprint (Timeless SSOT)
+# 🏛️ You_Inc Architecture Blueprint
 
 ## 🎯 本ドキュメントの存在目的 (Document Purpose & When to Read)
 - **WHY（なぜこのドキュメントが存在するか）**:
